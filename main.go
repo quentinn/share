@@ -29,8 +29,8 @@ func main() {
 
 func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
-	http.Handle("/file", logreq(viewFile))
-	http.Handle("/secret", logreq(viewSecret))
+	http.Handle("/file", logreq(viewCreateFile))
+	http.Handle("/secret", logreq(viewCreateSecret))
 	http.HandleFunc("/share/file", uploadFile)
 	http.HandleFunc("/share/secret", uploadSecret)
 
@@ -87,8 +87,8 @@ func viewIndex(w http.ResponseWriter, r *http.Request) {
 
 
 
-func viewFile(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "view.file.html", struct {
+func viewCreateFile(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "view.create.file.html", struct {
 		Name string
 	}{
 		Name: "name to fill",
@@ -97,8 +97,8 @@ func viewFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-func viewSecret(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "view.secret.html", struct {
+func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "view.create.secret.html", struct {
 		Name string
 	}{
 		Name: "name to fill",
