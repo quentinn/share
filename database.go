@@ -51,7 +51,7 @@ func createDatabase() {
 
 		
 			sqlStmt := `
-			CREATE TABLE share (id text not null primary key, password text, expiration datetime);
+			CREATE TABLE share (id text not null primary key, password text, expiration datetime, creation datetime);
 			DELETE FROM share;
 			CREATE TABLE file (id text not null primary key, path text);
 			DELETE FROM file;
@@ -85,10 +85,11 @@ func createShare() {
 
 	id := sql.Named("id", uuid.NewV4())
 	password := sql.Named("password", uuid.NewV4())
-	datetime := sql.Named("datetime", time.Now())
+	expiration := sql.Named("datetime", time.Now())
+	creation := sql.Named("datetime", time.Now())
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, expiration) values(:id, :password, :datetime)", id, password, datetime)
+	_, err = db.Exec("INSERT INTO share(id, password, expiration, creation) values(:id, :password, :datetime, :datetime)", id, password, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
