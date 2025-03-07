@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"io"
+
 )
 
 type App struct {
@@ -14,6 +15,9 @@ type App struct {
 }
 
 func main() {
+
+	createDatabase()
+
 	server := App{
 		Port: env("PORT", "8080"),
 	}
