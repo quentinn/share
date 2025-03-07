@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"os"
 	"io"
-
+	"path/filepath"
+	"errors"
 )
 
 type App struct {
@@ -110,23 +111,36 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Get handler for filename, size and headers
 	file, handler, err := r.FormFile("myFile")
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
+		fmt.Println("Error retrieving the file")
 		fmt.Println(err)
 		return
 	}
 
 	defer file.Close()
-	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	fmt.Printf("File Size: %+v\n", handler.Size)
-	fmt.Printf("MIME Header: %+v\n", handler.Header)
+	fmt.Printf("Uploaded file: %+v\n", handler.Filename)
+	fmt.Printf("File size: %+v\n", handler.Size)
+	fmt.Printf("MIME header: %+v\n", handler.Header)
+
+
+	// Create destination directory
+	dir := "uploads"
+	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+
 
 	// Create file
-	dst, err := os.Create(handler.Filename)
+	// dst, err := os.Create(dir, handler.Filename)
+	dst, err := os.Create(filepath.Join(dir, filepath.Base(handler.Filename))) // dir is directory where you want to save file.	
 	defer dst.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 
 	// Copy the uploaded file to the created file on the filesystem
 	if _, err := io.Copy(dst, file); err != nil {
@@ -134,5 +148,5 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Successfully Uploaded File\n")
+	fmt.Fprintf(w, "Successfully uploaded file\n")
 }
