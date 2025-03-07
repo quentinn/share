@@ -11,21 +11,28 @@ import (
 	"errors"
 )
 
+
+
+
 type App struct {
 	Port string
 }
 
+
+
+
 func main() {
 
 	createDatabase()
-
-	createShare()
 
 	server := App{
 		Port: env("PORT", "8080"),
 	}
 	server.Start()
 }
+
+
+
 
 func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
@@ -41,6 +48,8 @@ func (a *App) Start() {
 }
 
 
+
+
 func env(key, adefault string) string {
 	val, ok := os.LookupEnv(key)
 	if !ok {
@@ -49,6 +58,9 @@ func env(key, adefault string) string {
 	return val
 }
 
+
+
+
 func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("path: %s", r.URL.Path)
@@ -56,6 +68,9 @@ func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 		f(w, r)
 	})
 }
+
+
+
 
 func renderTemplate(w http.ResponseWriter, name string, data interface{}) {
 	// This is inefficient - it reads the templates from the filesystem every
@@ -77,6 +92,7 @@ func renderTemplate(w http.ResponseWriter, name string, data interface{}) {
 
 
 
+
 func viewIndex(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view.index.html", struct {
 		Name string
@@ -84,6 +100,7 @@ func viewIndex(w http.ResponseWriter, r *http.Request) {
 		Name: "name to fill",
 	})
 }
+
 
 
 
@@ -97,6 +114,7 @@ func viewCreateFile(w http.ResponseWriter, r *http.Request) {
 
 
 
+
 func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view.create.secret.html", struct {
 		Name string
@@ -104,6 +122,7 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 		Name: "name to fill",
 	})
 }
+
 
 
 
@@ -138,8 +157,6 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Create file
 	path := filepath.Join(dir, filepath.Base(handler.Filename))
 	dst, err := os.Create(path)
-	// dst, err := os.Create(filepath.Join(dir, filepath.Base(handler.Filename)))
-	// dst, err := os.Create(dir, handler.Filename)
 	defer dst.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -153,11 +170,18 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Successfully uploaded file\n")
 	
-
+	// Create database entries
 	createShare()
 	createFile(path)
+
+
+	// Display the confirmation
+	renderTemplate(w, "view.confirm.file.html", struct {
+		Name string
+	}{
+		Name: "name to fill",
+	})
 }
 
 
@@ -167,9 +191,15 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
+	// Create database entries
 	createShare()
 	createSecret(r.PostFormValue("mySecret"))
 
-	fmt.Fprintf(w, "Successfully uploaded secret\n")
 
+	// Display the confirmation
+	renderTemplate(w, "view.confirm.secret.html", struct {
+		Name string
+	}{
+		Name: "name to fill",
+	})
 }
