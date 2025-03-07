@@ -19,6 +19,8 @@ func main() {
 
 	createDatabase()
 
+	createShare()
+
 	server := App{
 		Port: env("PORT", "8080"),
 	}
@@ -133,8 +135,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 	// Create file
+	path := filepath.Join(dir, filepath.Base(handler.Filename))
+	dst, err := os.Create(path)
+	// dst, err := os.Create(filepath.Join(dir, filepath.Base(handler.Filename)))
 	// dst, err := os.Create(dir, handler.Filename)
-	dst, err := os.Create(filepath.Join(dir, filepath.Base(handler.Filename))) // dir is directory where you want to save file.	
 	defer dst.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -149,4 +153,28 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "Successfully uploaded file\n")
+	
+
+	createShare()
+	createFile(path)
 }
+
+
+
+// func uploadSecret(w http.ResponseWriter, r *http.Request) {
+// 	db, err := sql.Open("sqlite3", "./foo.db")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+
+// 	_, err = db.Exec("INSERT INTO share(id, password, expiration) values(1, 123, :datetime)", sql.Named("datetime", time.Now()))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	_, err = db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
