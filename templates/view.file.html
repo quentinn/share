@@ -1,8 +1,8 @@
 {{ template "layout.header.html" . }}
 <h1>file</h1>
 
-<form enctype="multipart/form-data" action="/upload" method="post">
+<form enctype="multipart/form-data" action="/share/file" method="post">
 	<input type="file" name="myFile" />
-	<input type="submit" value="upload" />
+	<input type="submit" value="share" />
 </form>
 {{ template "layout.footer.html" . }}

@@ -20,6 +20,19 @@ var DELETE_DB_ON_NEXT_START bool = false
 
 
 
+// func openDatabase() {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+
+// 	return db
+// }
+
+
+
+
 func createDatabase() {
 
 	if _, err := os.Stat(dbFile); err == nil {
@@ -28,13 +41,14 @@ func createDatabase() {
 		// Delete database only if the user has decided to.
 		if DELETE_DB_ON_NEXT_START == true {
 			os.Remove(dbFile)
-
-
 			db, err := sql.Open("sqlite3", dbFile)
 			if err != nil {
 				log.Fatal(err)
 			}
 			defer db.Close()
+		
+			// openDatabase()
+
 		
 			sqlStmt := `
 			CREATE TABLE share (id text not null primary key, password text, expiration datetime);
@@ -66,6 +80,8 @@ func createShare() {
 	}
 	defer db.Close()
 
+	// openDatabase()
+
 
 	id := sql.Named("id", uuid.NewV4())
 	password := sql.Named("password", uuid.NewV4())
@@ -88,11 +104,35 @@ func createFile(path string) {
 	}
 	defer db.Close()
 
+	// openDatabase()
+
 
 	id := sql.Named("id", uuid.NewV4())
 
 
 	_, err = db.Exec("INSERT INTO file(id, path) values(:id, :path)", id, path)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+
+
+func createSecret(text string) {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// openDatabase()
+
+
+	id := sql.Named("id", uuid.NewV4())
+
+
+	_, err = db.Exec("INSERT INTO secret(id, text) values(:id, :text)", id, text)
 	if err != nil {
 		log.Fatal(err)
 	}

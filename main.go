@@ -31,7 +31,8 @@ func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
 	http.Handle("/file", logreq(viewFile))
 	http.Handle("/secret", logreq(viewSecret))
-	http.HandleFunc("/upload", uploadFile)
+	http.HandleFunc("/share/file", uploadFile)
+	http.HandleFunc("/share/secret", uploadSecret)
 
 
 	addr := fmt.Sprintf(":%s", a.Port)
@@ -161,20 +162,14 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-// func uploadSecret(w http.ResponseWriter, r *http.Request) {
-// 	db, err := sql.Open("sqlite3", "./foo.db")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
 
-// 	_, err = db.Exec("INSERT INTO share(id, password, expiration) values(1, 123, :datetime)", sql.Named("datetime", time.Now()))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
-// 	_, err = db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+	r.ParseForm()
+
+	createShare()
+	createSecret(r.PostFormValue("mySecret"))
+
+	fmt.Fprintf(w, "Successfully uploaded secret\n")
+
+}
