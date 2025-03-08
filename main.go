@@ -148,10 +148,15 @@ func viewCreateFile(w http.ResponseWriter, r *http.Request) {
 
 
 func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
+
+	// Generate a token that will permit to prevent unwanted record to database due to browse the upload URL without using the form
+	// The trick is that this token is used from an hidden input on the HTML form, and if it's empty it means we're not using the form
+	token := generatePassword()
+
 	renderTemplate(w, "view.create.secret.html", struct {
-		Name string
+		TokenAvoidRefresh string
 	}{
-		Name: "name to fill",
+		TokenAvoidRefresh: token,
 	})
 }
 
@@ -194,9 +199,11 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 	password := readShare(id)
 
 	renderTemplate(w, "view.unlock.share.html", struct {
-		Name string
+		Id string
+		Password string
 	}{
-		Name: password,
+		Id: id,
+		Password: password,
 	})
 }
 
@@ -275,31 +282,36 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 
-	id := uuid.NewString()
-	shared_id := uuid.NewString()
-	uri := r.Header.Get("Referer")
-	url := path.Dir(uri)
+	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
+
+	if tokenAvoidRefresh != "" {
+
+		id := uuid.NewString()
+		shared_id := uuid.NewString()
+		uri := r.Header.Get("Referer")		// Entire path 'http://domain:port/node1/node2/etc.../'
+		url := path.Dir(uri)				// Only the 'http://domain:port' part
 
 
 
-	link := strings.Join([]string{"/share/", shared_id}, "")
+		link := strings.Join([]string{"/share/", shared_id}, "")
 
-	fmt.Println("blablabla %s", link)
-	fmt.Println("blablabla %s", url)
+		fmt.Println("blablabla %s", link)
+		fmt.Println("blablabla %s", url)
+		fmt.Println("blablabla %s", tokenAvoidRefresh)
 
-	// Create database entries
-	createSecret(id, shared_id, r.PostFormValue("mySecret"))
-	
+		// Create database entries
+		createSecret(id, shared_id, r.PostFormValue("mySecret"))
+		
 
 
 
-	// Display the confirmation
-	renderTemplate(w, "view.confirm.secret.html", struct {
-		Link string // To permit the user to click on it 
-		Url string	// To permit the user to copy it
-	}{
-		Link: link,
-		Url: url,
-	})
-
+		// Display the confirmation
+		renderTemplate(w, "view.confirm.secret.html", struct {
+			Link string // To permit the user to click on it 
+			Url string	// To permit the user to copy it
+		}{
+			Link: link,
+			Url: url,
+		})
+	}
 }

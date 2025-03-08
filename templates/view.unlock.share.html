@@ -1,7 +1,10 @@
 {{ template "layout.header.html" . }}
 
-
-{{ .Name }}
+<br>
+id : {{ .Id }}
+<br>
+pwd: {{ .Password }}
+<br>
 
 <form action="/share/unlock" method="post">
     <label for="sharePassword">Password</label>

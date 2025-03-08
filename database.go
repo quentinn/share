@@ -11,8 +11,8 @@ import (
 	// "github.com/google/uuid"
 	// "github.com/sethvargo/go-password/password"
 
-	"crypto/rand"
-    "encoding/base64"
+	// "crypto/rand"
+    // "encoding/base64"
 )
 
 
@@ -140,21 +140,21 @@ func createDatabase() {
 
 
 
-func generatePassword() string {
+// func generatePassword() string {
 
 
-	b := make([]byte, 64)
-	_, err := rand.Read(b)
-	if err != nil {
-	   panic(err)
-	}
+// 	b := make([]byte, 64)
+// 	_, err := rand.Read(b)
+// 	if err != nil {
+// 	   panic(err)
+// 	}
 
-	password := base64.StdEncoding.EncodeToString(b)
+// 	password := base64.StdEncoding.EncodeToString(b)
 	
-	fmt.Println(password)
+// 	fmt.Println(password)
 
-	return password
- }
+// 	return password
+//  }
 
 
 
