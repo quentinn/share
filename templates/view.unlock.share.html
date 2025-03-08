@@ -1,0 +1,16 @@
+{{ template "layout.header.html" . }}
+
+
+{{ .Name }}
+
+<form action="/share/unlock" method="post">
+    <label for="sharePassword">Password</label>
+    <input id="sharePassword" type="password" />
+    
+    <br>
+    <br>
+
+    <input type="submit" value="unlock" />
+</form>
+
+{{ template "layout.footer.html" . }}

@@ -6,4 +6,5 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/sethvargo/go-password v0.3.1 // indirect
 )

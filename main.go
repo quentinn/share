@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 
 	"strings"
+	"path"
 )
 
 
@@ -48,6 +49,8 @@ func main() {
 
 func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
+
+	http.Handle("/share/{id}", logreq(viewUnlockShare))
 
 	http.Handle("/file", logreq(viewCreateFile))
 	http.Handle("/file/shared", logreq(uploadFile))
@@ -185,6 +188,21 @@ func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 
 
 
+func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
+
+	id := r.PathValue("id")
+	password := readShare(id)
+
+	renderTemplate(w, "view.unlock.share.html", struct {
+		Name string
+	}{
+		Name: password,
+	})
+}
+
+
+
+
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Maximum upload of 10 MB files
 	r.ParseMultipartForm(10 << 20)
@@ -258,22 +276,30 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 
 	id := uuid.NewString()
-	url := r.Header.Get("Referer")
-	link := strings.Join([]string{url, "/", id}, "")
+	shared_id := uuid.NewString()
+	uri := r.Header.Get("Referer")
+	url := path.Dir(uri)
 
+
+
+	link := strings.Join([]string{"/share/", shared_id}, "")
+
+	fmt.Println("blablabla %s", link)
+	fmt.Println("blablabla %s", url)
 
 	// Create database entries
-	// createShare()
-	createSecret(id, r.PostFormValue("mySecret"))
+	createSecret(id, shared_id, r.PostFormValue("mySecret"))
 	
 
 
 
 	// Display the confirmation
 	renderTemplate(w, "view.confirm.secret.html", struct {
-		Name string
+		Link string // To permit the user to click on it 
+		Url string	// To permit the user to copy it
 	}{
-		// Name: readShare(createShare()),
-		Name: link,
+		Link: link,
+		Url: url,
 	})
+
 }
