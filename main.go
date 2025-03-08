@@ -48,13 +48,25 @@ func main() {
 
 func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
-	http.Handle("/file", logreq(viewCreateFile))
-	http.Handle("/secret", logreq(viewCreateSecret))
-	http.Handle("/share/file", logreq(uploadFile))
-	http.Handle("/share/secret", logreq(uploadSecret))
-	// http.HandleFunc("/share/file", uploadFile)
-	// http.HandleFunc("/share/secret", uploadSecret)
 
+	http.Handle("/file", logreq(viewCreateFile))
+	http.Handle("/file/shared", logreq(uploadFile))
+	http.Handle("/file/{id}", logreq(viewRevealFile))
+
+	http.Handle("/secret", logreq(viewCreateSecret))
+	http.Handle("/secret/shared", logreq(uploadSecret))
+	// http.Handle("/secret/reveal", logreq(viewRevealSecret))
+	http.Handle("/secret/{id}", logreq(viewRevealSecret))
+	// http.HandleFunc("/secret/{id}", func(w http.ResponseWriter, r *http.Request) {
+	// 	id := r.PathValue("id")
+	// 	renderTemplate(w, "view.reveal.secret.html", struct {
+	// 		Name string
+	// 	}{
+	// 		Name: id,
+	// 	})
+	// })
+
+	
 
 	addr := fmt.Sprintf(":%s", a.Port)
 	log.Printf("Starting app on %s", addr)
@@ -143,6 +155,36 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 
 
+func viewRevealSecret(w http.ResponseWriter, r *http.Request) {
+
+	id := r.PathValue("id")
+	text := readSecret(id)
+
+	renderTemplate(w, "view.reveal.secret.html", struct {
+		Name string
+	}{
+		Name: text,
+	})
+}
+
+
+
+
+func viewRevealFile(w http.ResponseWriter, r *http.Request) {
+
+	id := r.PathValue("id")
+	path := readFile(id)
+
+	renderTemplate(w, "view.reveal.secret.html", struct {
+		Name string
+	}{
+		Name: path,
+	})
+}
+
+
+
+
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Maximum upload of 10 MB files
 	r.ParseMultipartForm(10 << 20)
@@ -188,10 +230,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	
-	// Create database entries
-	// createShare()
-	// id := reflect.ValueOf(uuid.Must(uuid.NewV4()))
 	id := uuid.NewString()
+	url := r.Header.Get("Referer")
+	link := strings.Join([]string{url, "/", id}, "")
+
+
+	// Create database entries
 	createFile(id, path)
 
 
@@ -200,7 +244,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view.confirm.file.html", struct {
 		Name string
 	}{
-		Name: "name to fill",
+		Name: link,
 	})
 }
 
