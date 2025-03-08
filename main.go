@@ -9,6 +9,10 @@ import (
 	"io"
 	"path/filepath"
 	"errors"
+	// "github.com/satori/go.uuid"
+	"github.com/google/uuid"
+
+	"strings"
 )
 
 
@@ -17,6 +21,14 @@ import (
 type App struct {
 	Port string
 }
+
+
+
+
+// type Share struct {
+//     Id string
+//     Password string
+// }
 
 
 
@@ -38,13 +50,17 @@ func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
 	http.Handle("/file", logreq(viewCreateFile))
 	http.Handle("/secret", logreq(viewCreateSecret))
-	http.HandleFunc("/share/file", uploadFile)
-	http.HandleFunc("/share/secret", uploadSecret)
+	http.Handle("/share/file", logreq(uploadFile))
+	http.Handle("/share/secret", logreq(uploadSecret))
+	// http.HandleFunc("/share/file", uploadFile)
+	// http.HandleFunc("/share/secret", uploadSecret)
 
 
 	addr := fmt.Sprintf(":%s", a.Port)
 	log.Printf("Starting app on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
+
+
 }
 
 
@@ -63,7 +79,8 @@ func env(key, adefault string) string {
 
 func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("path: %s", r.URL.Path)
+		// log.Printf("path: %s", r.URL.Path)
+		log.Printf("url: %s", r.Header.Get("Referer"))
 
 		f(w, r)
 	})
@@ -172,8 +189,11 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	
 	// Create database entries
-	createShare()
-	createFile(path)
+	// createShare()
+	// id := reflect.ValueOf(uuid.Must(uuid.NewV4()))
+	id := uuid.NewString()
+	createFile(id, path)
+
 
 
 	// Display the confirmation
@@ -189,17 +209,27 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
+
 	r.ParseForm()
 
+
+	id := uuid.NewString()
+	url := r.Header.Get("Referer")
+	link := strings.Join([]string{url, "/", id}, "")
+
+
 	// Create database entries
-	createShare()
-	createSecret(r.PostFormValue("mySecret"))
+	// createShare()
+	createSecret(id, r.PostFormValue("mySecret"))
+	
+
 
 
 	// Display the confirmation
 	renderTemplate(w, "view.confirm.secret.html", struct {
 		Name string
 	}{
-		Name: "name to fill",
+		// Name: readShare(createShare()),
+		Name: link,
 	})
 }

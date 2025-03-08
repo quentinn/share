@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
+
 )
 
 
@@ -51,7 +52,7 @@ func createDatabase() {
 
 		
 			sqlStmt := `
-			CREATE TABLE share (id text not null primary key, password text, expiration datetime, creation datetime);
+			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration datetime, creation datetime);
 			DELETE FROM share;
 			CREATE TABLE file (id text not null primary key, path text);
 			DELETE FROM file;
@@ -73,7 +74,34 @@ func createDatabase() {
 
 
 
-func createShare() {
+// func readShare(id sql.NamedArg) {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+
+// 	// openDatabase()
+
+
+// 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
+// 	row := db.QueryRow("SELECT password FROM share WHERE :id", id)
+// 	var password string
+// 	switch err := row.Scan(&password); err {
+// 		case sql.ErrNoRows:
+// 			fmt.Println("No rows were returned!")
+// 		case nil:
+// 			fmt.Println(password)
+// 		default:
+// 			panic(err)
+// 	}
+
+// }
+
+
+
+
+func createShare(id string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -83,22 +111,27 @@ func createShare() {
 	// openDatabase()
 
 
-	id := sql.Named("id", uuid.NewV4())
-	password := sql.Named("password", uuid.NewV4())
+	// id := sql.Named("id", uuid.NewString())
+	password := sql.Named("password", uuid.NewString())
+	maxopen := 3
 	expiration := sql.Named("datetime", time.Now())
 	creation := sql.Named("datetime", time.Now())
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, expiration, creation) values(:id, :password, :datetime, :datetime)", id, password, expiration, creation)
+	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :datetime, :datetime)", id, password, maxopen, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+
+	// Return the ID to be able to read it just after the creation
+	// return id
 }
 
 
 
 
-func createFile(path string) {
+func createFile(id string, path string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -108,19 +141,23 @@ func createFile(path string) {
 	// openDatabase()
 
 
-	id := sql.Named("id", uuid.NewV4())
+	// id := sql.Named("id", uuid.NewString())
 
 
 	_, err = db.Exec("INSERT INTO file(id, path) values(:id, :path)", id, path)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+
+	createShare(id)
+	// readShare(createShare())
 }
 
 
 
 
-func createSecret(text string) {
+func createSecret(id string, text string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -130,11 +167,15 @@ func createSecret(text string) {
 	// openDatabase()
 
 
-	id := sql.Named("id", uuid.NewV4())
+	// id := sql.Named("id", uuid.NewString())
 
 
 	_, err = db.Exec("INSERT INTO secret(id, text) values(:id, :text)", id, text)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+
+	createShare(id)
+	// readShare(createShare())
 }
