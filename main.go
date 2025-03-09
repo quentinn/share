@@ -14,6 +14,7 @@ import (
 
 	"strings"
 	"path"
+	"net/url"
 )
 
 
@@ -50,24 +51,16 @@ func main() {
 func (a *App) Start() {
 	http.Handle("/", logreq(viewIndex))
 
-	http.Handle("/share/{id}", logreq(viewUnlockShare))
+	http.Handle("/file", logreq(viewCreateFile))								// Form to create a share
+	http.Handle("/file/shared", logreq(uploadFile))								// Confirmation + display the link of the share to the creator
+	http.Handle("/file/{id}", logreq(viewRevealFile))							// Reveal the share after unlocked with password
+	
+	http.Handle("/secret", logreq(viewCreateSecret))							// Form to create a share
+	http.Handle("/secret/shared", logreq(uploadSecret))							// Confirmation + display the link of the share to the creator
+	http.Handle("/secret/{id}", logreq(viewRevealSecret))						// Reveal the share after unlocked with password
 
-	http.Handle("/file", logreq(viewCreateFile))
-	http.Handle("/file/shared", logreq(uploadFile))
-	http.Handle("/file/{id}", logreq(viewRevealFile))
-
-	http.Handle("/secret", logreq(viewCreateSecret))
-	http.Handle("/secret/shared", logreq(uploadSecret))
-	// http.Handle("/secret/reveal", logreq(viewRevealSecret))
-	http.Handle("/secret/{id}", logreq(viewRevealSecret))
-	// http.HandleFunc("/secret/{id}", func(w http.ResponseWriter, r *http.Request) {
-	// 	id := r.PathValue("id")
-	// 	renderTemplate(w, "view.reveal.secret.html", struct {
-	// 		Name string
-	// 	}{
-	// 		Name: id,
-	// 	})
-	// })
+	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
+	// http.Handle("/share/{id}#{password}", logreq(viewUnlockShare))				// Ask for password to unlock the share
 
 	
 
@@ -94,12 +87,29 @@ func env(key, adefault string) string {
 
 func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		// log.Printf("path: %s", r.URL.Path)
 		log.Printf("url: %s", r.Header.Get("Referer"))
 
 		f(w, r)
 	})
 }
+
+
+
+
+// func logreqJwt(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// 	return http.HandleFunc("/protected", login.ProtectedHandler).Methods("GET")
+
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+// 		// log.Printf("path: %s", r.URL.Path)
+// 		log.Printf("url: %s", r.Header.Get("Referer"))
+
+// 		f(w, r)
+// 	})
+	
+// }
 
 
 
@@ -183,7 +193,7 @@ func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	path := readFile(id)
 
-	renderTemplate(w, "view.reveal.secret.html", struct {
+	renderTemplate(w, "view.reveal.file.html", struct {
 		Name string
 	}{
 		Name: path,
@@ -195,15 +205,41 @@ func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
-	id := r.PathValue("id")
-	password := readShare(id)
+	// url := r.Header.Get("Referer")
 
+	u, err := url.Parse(r.Header.Get("Referer"))
+    if err != nil {
+        panic(err)
+    }
+
+	fmt.Println("blabla", r.Header)
+
+	fragments, _ := url.ParseQuery(u.Fragment)
+	if fragments != nil {
+		// password_url := fragments
+		fmt.Println("Access token:", fragments)
+	} else {
+		fmt.Println("Access token not found")
+	}
+  
+
+
+
+	id := r.PathValue("id")
+
+	
+	password_database := readShare(id)
+
+
+
+
+	
 	renderTemplate(w, "view.unlock.share.html", struct {
 		Id string
 		Password string
 	}{
 		Id: id,
-		Password: password,
+		Password: password_database,
 	})
 }
 
