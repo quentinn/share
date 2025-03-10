@@ -4,62 +4,126 @@
 
 <div id="future">
     <br>
-    id : {{ .Id }}
     <br>
-    pwd: {{ .Password }}
+    {{ .Id }}
+    <br>
+    <br>
+    {{ .Password }}
+    <br>
     <br>
 
-    <form action="/share/unlock" method="post">
+
+    <!-- 
+    <form action="/share/{{ .Id }}" method="post" id="form">
         <label for="sharePassword">Password</label>
         <input id="sharePassword" type="password" />
-<!--         
-        <br>
-        <br>
 
-        <input type="submit" value="unlock" /> -->
+        <input type="submit" value="Search">
+    </form> -->
+
+
+    <form id="form">
+        <label for="sharePassword">Password</label>
+        <input id="sharePassword" type="password" />
+
+        <input type="submit" value="unlock">
+
+
+        <!-- <input type="text" name="name" value="John">
+        <input type="text" name="surname" value="Smith">
+        <input type="submit"> -->
+
+
+        <div id="error"></div>
+
     </form>
 
 
-    <button onclick="press()">unlock</button>
 
-    <div id="error"></div>
+    <!-- <button >unlock</button> -->
+    <!-- <button onclick="unlock()">unlock</button> -->
+
+
+
+
+
+    <script>
+
+        error = document.getElementById('error')                                // Element to display error like wrong passwords
+
+
+        // let formData = new FormData([form]);
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            let response = await fetch('/share/unlock', {
+                method: 'POST',
+                body: new FormData(form)
+            });
+
+            let result = await response.json();
+
+
+            // data = document.createElement('div')
+            // data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error
+            // data.innerHTML = result.message;
+            // error.replaceWith(data);
+
+            // alert(result.message);
+
+            future = document.getElementById('form')                              // Element that will be replaced with the content of the share
+            error = document.getElementById('error')                                // Element to display error like wrong passwords
+            givenPassword = document.getElementById('sharePassword').value          // Password given by the user
+
+
+            // If the given password correspond to the password of the share
+            if (givenPassword === result.message) {
+                data = document.createElement('div')
+                data.innerHTML = 'content of the secret';
+                future.replaceWith(data)
+
+                // Of display error in case of wrong password
+            } else {
+                data = document.createElement('div')
+                data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error
+
+                data.innerHTML = 'wrong password';
+                error.replaceWith(data);
+
+            }
+
+        };
+
+
+        // function unlock() {
+        //     future = document.getElementById('form')                              // Element that will be replaced with the content of the share
+        //     error = document.getElementById('error')                                // Element to display error like wrong passwords
+        //     givenPassword = document.getElementById('sharePassword').value          // Password given by the user
+
+
+        //     // If the given password correspond to the password of the share
+        //     if (givenPassword === result.message) {
+        //         data = document.createElement('div')
+        //         data.innerHTML = 'content of the secret';
+        //         future.replaceWith(data)
+
+        //         // Of display error in case of wrong password
+        //     } else {
+        //         data = document.createElement('div')
+        //         data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error
+
+        //         data.innerHTML = 'wrong password';
+        //         error.replaceWith(data);
+
+        //     }
+        // };
+    </script>
 
 </div>
 
 
 
-<script>	
-    function press(){
 
-
-        future = document.getElementById('future')                              // Element that will be replaced with the content of the share
-        error = document.getElementById('error')                                // Element to display error like wrong passwords
-        givenPassword = document.getElementById('sharePassword').value          // Password given by the user
-
-
-        // If the given password correspond to the password of the share
-        if (givenPassword === '{{ .Password }}') {
-            data = document.createElement('div')
-            data.innerHTML= '{{ .Id }}';
-            future.replaceWith(data)
-
-        // Of display error in case of wrong password
-        } else {
-            data = document.createElement('div')
-            data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error
-
-            data.innerHTML= 'wrong password';
-            error.replaceWith(data);
-
-        }
-
-        
-    };
-
-
-
-    
-
-</script>
 
 {{ template "layout.footer.html" . }}

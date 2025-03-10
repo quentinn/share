@@ -15,6 +15,8 @@ import (
 	"strings"
 	"path"
 	"net/url"
+	"encoding/json"
+
 )
 
 
@@ -49,6 +51,11 @@ func main() {
 
 
 func (a *App) Start() {
+
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+
+
 	http.Handle("/", logreq(viewIndex))
 
 	http.Handle("/file", logreq(viewCreateFile))								// Form to create a share
@@ -61,8 +68,25 @@ func (a *App) Start() {
 
 	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
 	// http.Handle("/share/{id}#{password}", logreq(viewUnlockShare))				// Ask for password to unlock the share
-
+	// http.Handle("/share/unlock", logreq(viewIndex))							// Ask for password to unlock the share
+	http.Handle("/share/unlock", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data := map[string]interface{}{
+			"message":    "1234",
+		}
 	
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			fmt.Printf("could not marshal json: %s\n", err)
+			return
+		}
+	
+		w.Write(jsonData) // write JSON to JS
+		
+
+	}))	
+
+
+
 
 	addr := fmt.Sprintf(":%s", a.Port)
 	log.Printf("Starting app on %s", addr)
