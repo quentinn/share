@@ -12,14 +12,15 @@
     <br>
     <br>
     <br>
-    <br>
-    <br>
 
 
 
     <form id="form">
-        <label for="sharePassword">Password</label>
-        <input id="sharePassword" type="password" />
+        <label for="givenPassword">Password</label>
+        <input id="givenPassword" type="password" />
+
+        <!-- just to submit with the form -->
+        <input id="givenPasswordHash" type="text" disabled />
 
         <input type="submit" value="unlock">
 
@@ -30,26 +31,58 @@
 
 
     <script>
+
+        // Automatically set the checksum of the password in an hidden input to be able to send it through the form
+        document.getElementById("givenPassword").addEventListener("input", function () {
+            document.getElementById("givenPasswordHash").value = sha256(this.value);
+        });
+
+
+
         // This permit to send data to /share/unlock without reloading the HTML.
         // The URL is configured in Go side to return the password
         form.onsubmit = async (e) => {
+
+            let future = document.getElementById('future')                                  // Element that will be replaced with the content of the share
+            let error = document.getElementById('error')                                    // Element to display error like wrong passwords
+            let givenPassword = document.getElementById('givenPassword').value              // Password given by the user
+            let givenPasswordHash = document.getElementById('givenPasswordHash').value      // Hash of the password given by the user to send to Go
+
+
+            var details = {
+                // 'givenPassword': givenPassword,
+                'givenPasswordHash': givenPasswordHash
+            };
+
+            var formBody = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+
+
+
+
             e.preventDefault();
 
             let response = await fetch('/share/unlock', {
                 method: 'POST',
-                body: new FormData(form)
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                // body: new FormData(form)
+                // body: (urlencodeFormData(new FormData(form)))
+                body: formBody
             });
 
             let result = await response.json();
 
 
-            let future = document.getElementById('form')                                // Element that will be replaced with the content of the share
-            let error = document.getElementById('error')                                // Element to display error like wrong passwords
-            let givenPassword = document.getElementById('sharePassword').value          // Password given by the user
+            // let givenPasswordHash = sha256(givenPassword)
+            // console.log(givenPasswordHash)
 
-
-            let givenPasswordHash = sha256(givenPassword);
-            console.log(givenPasswordHash);
 
             // If the given password correspond to the password of the share
             // if (givenPassword === result.sharePassword) {
@@ -58,7 +91,7 @@
                 data.innerHTML = result.sharePassword;
                 future.replaceWith(data)
 
-                // Of display error in case of wrong password
+                // Or display error in case of wrong password
             } else {
                 let data = document.createElement('div')
                 data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error

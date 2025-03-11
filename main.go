@@ -17,6 +17,7 @@ import (
 	// "net/url"
 	"encoding/json"
     "crypto/sha256"
+	// "math"
 
 )
 
@@ -72,38 +73,59 @@ func (a *App) Start() {
 	// http.Handle("/share/unlock", logreq(viewIndex))							// Ask for password to unlock the share
 	http.Handle("/share/unlock", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+		r.ParseForm()
+		// r.ParseMultipartForm(math.MaxInt64)
+
+
+		// fmt.Println(r.Form["givenPassword"])
+        // fmt.Println("givenPasswordHash:", r.Form["givenPasswordHash"])
+	
+		// fmt.Println(r.Form)
+
+
 		url := r.Header.Get("Referer")
 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
 
-		
 
-		givenPassword := readShare(idToUnlock)
+		givenPasswordHash := r.FormValue("givenPasswordHash")
+
+		sharePassword := readShare(idToUnlock)
 		hash := sha256.New()
-		hash.Write([]byte(givenPassword))
-		sharePasswordHash1 := hash.Sum(nil)
-	
-		fmt.Printf("STR", givenPassword)
-		// sharePasswordHash := fmt.Printf("%x", sharePasswordHash1)
-		sharePasswordHash := fmt.Sprintf("%x", []byte(sharePasswordHash1))
+		hash.Write([]byte(sharePassword))
+		// sharePasswordHash1 := hash.Sum(nil)
+		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
 
-	
 
-		data := map[string]interface{}{
-			// "idToUnlock":    idToUnlock,
-			"sharePasswordHash":    sharePasswordHash,
-			// "sharePassword": readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-		}
-	
-		jsonData, err := json.Marshal(data)
-		if err != nil {
-			fmt.Printf("could not marshal json: %s\n", err)
-			return
-		}
-	
-		// fmt.Printf("DATA",  data, "\n\n\n")
 
-		w.Write(jsonData) // write JSON to JS
+		fmt.Println("sharePasswordHash", sharePasswordHash)
+		fmt.Println("givenPasswordHash", givenPasswordHash)
+
+
+		if givenPasswordHash == sharePasswordHash {
+			fmt.Printf("YEAH !!!!!!!!!!!!!!!!!!!!!!!")
+
+			data := map[string]interface{}{
+				// "idToUnlock":    idToUnlock,
+				"sharePasswordHash":	sharePasswordHash,
+				"sharePassword":		readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+			}
 		
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				fmt.Printf("could not marshal json: %s\n", err)
+				return
+			}
+		
+	
+			w.Write(jsonData) // write JSON to JS
+			
+
+		} else {
+			fmt.Printf("password hash mismatch")
+
+		}
+
+
 
 	}))	
 
