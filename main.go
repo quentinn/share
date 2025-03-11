@@ -14,8 +14,9 @@ import (
 
 	"strings"
 	"path"
-	"net/url"
+	// "net/url"
 	"encoding/json"
+    "crypto/sha256"
 
 )
 
@@ -70,8 +71,27 @@ func (a *App) Start() {
 	// http.Handle("/share/{id}#{password}", logreq(viewUnlockShare))				// Ask for password to unlock the share
 	// http.Handle("/share/unlock", logreq(viewIndex))							// Ask for password to unlock the share
 	http.Handle("/share/unlock", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		url := r.Header.Get("Referer")
+		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+		
+
+		givenPassword := readShare(idToUnlock)
+		hash := sha256.New()
+		hash.Write([]byte(givenPassword))
+		sharePasswordHash1 := hash.Sum(nil)
+	
+		fmt.Printf("STR", givenPassword)
+		// sharePasswordHash := fmt.Printf("%x", sharePasswordHash1)
+		sharePasswordHash := fmt.Sprintf("%x", []byte(sharePasswordHash1))
+
+	
+
 		data := map[string]interface{}{
-			"message":    "1234",
+			// "idToUnlock":    idToUnlock,
+			"sharePasswordHash":    sharePasswordHash,
+			// "sharePassword": readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
 		}
 	
 		jsonData, err := json.Marshal(data)
@@ -80,6 +100,8 @@ func (a *App) Start() {
 			return
 		}
 	
+		// fmt.Printf("DATA",  data, "\n\n\n")
+
 		w.Write(jsonData) // write JSON to JS
 		
 
@@ -114,6 +136,27 @@ func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 
 		// log.Printf("path: %s", r.URL.Path)
 		log.Printf("url: %s", r.Header.Get("Referer"))
+
+
+
+		// fields := strings.SplitAfter(r.Header.Get("Referer"), "share/")
+
+		// for i, field := range fields {
+		// 	if fields == 1 {
+		// 		log.Printf("url: %s", field)
+		// 	}
+		//  }
+		 
+		//  log.Printf("url: %s", fields)
+
+		// url := r.Header.Get("Referer")
+
+		// result := strings.TrimRight(url, "share/")
+		// fmt.Println(result)
+		 
+
+
+
 
 		f(w, r)
 	})
@@ -231,20 +274,20 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 	// url := r.Header.Get("Referer")
 
-	u, err := url.Parse(r.Header.Get("Referer"))
-    if err != nil {
-        panic(err)
-    }
+	// u, err := url.Parse(r.Header.Get("Referer"))
+    // if err != nil {
+    //     panic(err)
+    // }
 
-	fmt.Println("blabla", r.Header)
+	// fmt.Println("blabla", r.Header)
 
-	fragments, _ := url.ParseQuery(u.Fragment)
-	if fragments != nil {
-		// password_url := fragments
-		fmt.Println("Access token:", fragments)
-	} else {
-		fmt.Println("Access token not found")
-	}
+	// fragments, _ := url.ParseQuery(u.Fragment)
+	// if fragments != nil {
+	// 	// password_url := fragments
+	// 	fmt.Println("Access token:", fragments)
+	// } else {
+	// 	fmt.Println("Access token not found")
+	// }
   
 
 

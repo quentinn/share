@@ -7,8 +7,11 @@
     <br>
     {{ .Id }}
     <br>
-    <br>
     {{ .Password }}
+    <br>
+    <br>
+    <br>
+    <br>
     <br>
     <br>
 
@@ -44,10 +47,15 @@
             let error = document.getElementById('error')                                // Element to display error like wrong passwords
             let givenPassword = document.getElementById('sharePassword').value          // Password given by the user
 
+
+            let givenPasswordHash = sha256(givenPassword);
+            console.log(givenPasswordHash);
+
             // If the given password correspond to the password of the share
-            if (givenPassword === result.message) {
+            // if (givenPassword === result.sharePassword) {
+            if (givenPasswordHash === result.sharePasswordHash) {
                 let data = document.createElement('div')
-                data.innerHTML = 'content of the secret';
+                data.innerHTML = result.sharePassword;
                 future.replaceWith(data)
 
                 // Of display error in case of wrong password
