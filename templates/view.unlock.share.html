@@ -20,7 +20,7 @@
         <input id="givenPassword" type="password" />
 
         <!-- just to submit with the form -->
-        <input id="givenPasswordHash" type="text" disabled />
+        <input id="givenPasswordHash" type="text" disabled hidden />
 
         <input type="submit" value="unlock">
 
@@ -38,10 +38,12 @@
         });
 
 
-
         // This permit to send data to /share/unlock without reloading the HTML.
         // The URL is configured in Go side to return the password
         form.onsubmit = async (e) => {
+
+            e.preventDefault();
+
 
             let future = document.getElementById('future')                                  // Element that will be replaced with the content of the share
             let error = document.getElementById('error')                                    // Element to display error like wrong passwords
@@ -49,8 +51,8 @@
             let givenPasswordHash = document.getElementById('givenPasswordHash').value      // Hash of the password given by the user to send to Go
 
 
+            // Payload to send to backend
             var details = {
-                // 'givenPassword': givenPassword,
                 'givenPasswordHash': givenPasswordHash
             };
 
@@ -64,43 +66,47 @@
 
 
 
-
-            e.preventDefault();
-
+            // Form to discuss with backend
             let response = await fetch('/share/unlock', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
                 },
                 // body: new FormData(form)
-                // body: (urlencodeFormData(new FormData(form)))
                 body: formBody
             });
 
-            let result = await response.json();
+            try {
+                let result = await response.json();
 
 
-            // let givenPasswordHash = sha256(givenPassword)
-            // console.log(givenPasswordHash)
+                // If the given password correspond to the password of the share
+                if (givenPasswordHash === result.sharePasswordHash) {
+                    let data = document.createElement('div')
+                    data.innerHTML = result.sharePassword;
+                    future.replaceWith(data)
 
+                } else {
+                    display_error()
+                }
+            } catch (e) {
+                console.log(e);
 
-            // If the given password correspond to the password of the share
-            // if (givenPassword === result.sharePassword) {
-            if (givenPasswordHash === result.sharePasswordHash) {
-                let data = document.createElement('div')
-                data.innerHTML = result.sharePassword;
-                future.replaceWith(data)
-
-                // Or display error in case of wrong password
-            } else {
-                let data = document.createElement('div')
-                data.setAttribute("id", "error");                                   // Set the ID to always replace the same element with the error
-
-                data.innerHTML = 'wrong password';
-                error.replaceWith(data);
-
+                display_error()
             }
         };
+
+
+
+        function display_error() {
+            let data = document.createElement('div')
+            data.setAttribute("id", "error");               // Set the ID to always replace the same element with the error
+
+            data.innerHTML = 'wrong password';
+            error.replaceWith(data);
+        }
+
+
     </script>
 
 </div>
