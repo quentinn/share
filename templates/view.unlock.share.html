@@ -20,7 +20,7 @@
         <input id="givenPassword" type="password" />
 
         <!-- just to submit with the form -->
-        <input id="givenPasswordHash" type="text" disabled hidden />
+        <input id="givenPasswordHash" type="text" disabled />
 
         <input type="submit" value="unlock">
 
@@ -32,10 +32,55 @@
 
     <script>
 
-        // Automatically set the checksum of the password in an hidden input to be able to send it through the form
+        // let givenPassword                                                               // Password given by the user
+        // let givenPasswordHash                                                           // Hash of the password given by the user to send to Go
+
+
+        // // Read the #fragment that contains the password if exists, or use the values filled in the form by the user
+        // if (window.location.hash) {
+
+        //     if (location.href.indexOf("#") != -1) {
+        //         givenPassword = location.href.substr(location.href.indexOf("#"))
+        //         givenPassword = decodeURIComponent(givenPassword.substring(1));         // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
+
+        //         // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
+        //         document.getElementById("givenPassword").value = givenPassword;
+        //         document.getElementById("givenPasswordHash").value = sha256(givenPassword);
+
+        //         console.log(givenPassword)
+        //     }
+
+        // } else {
+        //     givenPassword = document.getElementById('givenPassword').value
+        //     givenPasswordHash = document.getElementById('givenPasswordHash').value
+        // }
+
+
+
+        // // Read the #fragment again to know if the form must be automatically submitted
+        // if (window.location.hash) {
+        //     // window.onload = function () {
+        //     //     // document.forms['form'].submit();
+        //     //     document.getElementById(form).submit();
+
+
+        //     // }
+
+        //     document.addEventListener("DOMContentLoaded", function (event) {
+        //         document.getElementById(form).submit();
+        //     });
+        // }
+
+
+        // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
         document.getElementById("givenPassword").addEventListener("input", function () {
             document.getElementById("givenPasswordHash").value = sha256(this.value);
         });
+
+
+
+
+
 
 
         // This permit to send data to /share/unlock without reloading the HTML.
@@ -44,12 +89,13 @@
 
             e.preventDefault();
 
-
             let future = document.getElementById('future')                                  // Element that will be replaced with the content of the share
             let error = document.getElementById('error')                                    // Element to display error like wrong passwords
-            let givenPassword = document.getElementById('givenPassword').value              // Password given by the user
-            let givenPasswordHash = document.getElementById('givenPasswordHash').value      // Hash of the password given by the user to send to Go
+            let givenPassword                                                               // Password given by the user
+            let givenPasswordHash                                                           // Hash of the password given by the user to send to Go
 
+            givenPassword = document.getElementById('givenPassword').value
+            givenPasswordHash = document.getElementById('givenPasswordHash').value
 
             // Payload to send to backend
             var details = {
@@ -87,7 +133,7 @@
                     future.replaceWith(data)
                 }
             } catch (e) {
-                console.log(e);
+                // console.log(e);
 
                 if (!givenPassword) {
                     display_error('Please fill the password')
@@ -96,7 +142,6 @@
                 }
             }
         };
-
 
 
         // Function to write something on the div "error"
