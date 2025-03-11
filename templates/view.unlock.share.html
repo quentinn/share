@@ -85,24 +85,26 @@
                     let data = document.createElement('div')
                     data.innerHTML = result.sharePassword;
                     future.replaceWith(data)
-
-                } else {
-                    display_error()
                 }
             } catch (e) {
                 console.log(e);
 
-                display_error()
+                if (!givenPassword) {
+                    display_error('Please fill the password')
+                } else {
+                    display_error('Wrong password')
+                }
             }
         };
 
 
 
-        function display_error() {
+        // Function to write something on the div "error"
+        function display_error(message) {
             let data = document.createElement('div')
             data.setAttribute("id", "error");               // Set the ID to always replace the same element with the error
 
-            data.innerHTML = 'wrong password';
+            data.innerHTML = message;
             error.replaceWith(data);
         }
 
