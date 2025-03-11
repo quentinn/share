@@ -442,9 +442,9 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
-		fmt.Println("blablabla %s", link)
-		fmt.Println("blablabla %s", url)
-		fmt.Println("blablabla %s", tokenAvoidRefresh)
+		// fmt.Println("blablabla %s", link)
+		// fmt.Println("blablabla %s", url)
+		// fmt.Println("blablabla %s", tokenAvoidRefresh)
 
 		// Create database entries
 		createSecret(id, shared_id, r.PostFormValue("mySecret"))
@@ -454,11 +454,13 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 		// Display the confirmation
 		renderTemplate(w, "view.confirm.secret.html", struct {
-			Link string // To permit the user to click on it 
-			Url string	// To permit the user to copy it
+			Link string				// To permit the user to click on it 
+			Url string				// To permit the user to copy it
+			Password string			// To permit the user to copy it
 		}{
 			Link: link,
 			Url: url,
+			Password: readShare(shared_id),
 		})
 	}
 }
