@@ -234,6 +234,33 @@ func readShare(id string) string {
 }
 
 
+
+
+func getSharePassword(id string) string {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
+	row := db.QueryRow("SELECT password FROM share WHERE id = :id", id)
+	var password string
+	switch err := row.Scan(&password); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", password)
+		default:
+			panic(err)
+	}
+	
+	return password
+}
+
+
+
 // SELECT id, text FROM secret
 // where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
 // UNION
