@@ -69,65 +69,58 @@ func (a *App) Start() {
 	http.Handle("/secret/{id}", logreq(viewRevealSecret))						// Reveal the share after unlocked with password
 
 	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
-	// http.Handle("/share/{id}#{password}", logreq(viewUnlockShare))				// Ask for password to unlock the share
-	// http.Handle("/share/unlock", logreq(viewIndex))							// Ask for password to unlock the share
-	http.Handle("/share/unlock", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.Handle("/share/unlock", logreq(unlockShare))							// Non browsable url - verify password to unlock the share
+	// http.Handle("/share/unlock", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		r.ParseForm()
-		// r.ParseMultipartForm(math.MaxInt64)
+	// 	r.ParseForm()
+	// 	// r.ParseMultipartForm(math.MaxInt64)
 
 
-		// fmt.Println(r.Form["givenPassword"])
-        // fmt.Println("givenPasswordHash:", r.Form["givenPasswordHash"])
+	// 	// fmt.Println(r.Form["givenPassword"])
+    //     // fmt.Println("givenPasswordHash:", r.Form["givenPasswordHash"])
 	
-		// fmt.Println(r.Form)
+	// 	// fmt.Println(r.Form)
 
 
-		url := r.Header.Get("Referer")
-		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+	// 	url := r.Header.Get("Referer")
+	// 	idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
 
 
-		givenPasswordHash := r.FormValue("givenPasswordHash")
+	// 	givenPasswordHash := r.FormValue("givenPasswordHash")
 
-		sharePassword := readShare(idToUnlock)
-		hash := sha256.New()
-		hash.Write([]byte(sharePassword))
-		// sharePasswordHash1 := hash.Sum(nil)
-		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
-
+	// 	sharePassword := readShare(idToUnlock)
+	// 	hash := sha256.New()
+	// 	hash.Write([]byte(sharePassword))
+	// 	sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
 
 
-		fmt.Println("sharePasswordHash", sharePasswordHash)
-		fmt.Println("givenPasswordHash", givenPasswordHash)
+	// 	// fmt.Println("sharePasswordHash", sharePasswordHash)
+	// 	// fmt.Println("givenPasswordHash", givenPasswordHash)
 
 
-		if givenPasswordHash == sharePasswordHash {
-			fmt.Printf("YEAH !!!!!!!!!!!!!!!!!!!!!!!")
-
-			data := map[string]interface{}{
-				// "idToUnlock":    idToUnlock,
-				"sharePasswordHash":	sharePasswordHash,
-				"sharePassword":		readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-			}
+	// 	if givenPasswordHash == sharePasswordHash {
+	// 		data := map[string]interface{}{
+	// 			// "idToUnlock":    idToUnlock,
+	// 			"sharePasswordHash":	sharePasswordHash,
+	// 			"sharePassword":		readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+	// 		}
 		
-			jsonData, err := json.Marshal(data)
-			if err != nil {
-				fmt.Printf("could not marshal json: %s\n", err)
-				return
-			}
-		
+	// 		jsonData, err := json.Marshal(data)
+	// 		if err != nil {
+	// 			fmt.Printf("could not marshal json: %s\n", err)
+	// 			return
+	// 		}
 	
-			w.Write(jsonData) // write JSON to JS
-			
+	// 		w.Write(jsonData) // write JSON to JS
 
-		} else {
-			fmt.Printf("password hash mismatch")
+	// 	} else {
+	// 		fmt.Printf("password hash mismatch\n")
 
-		}
-
+	// 	}
 
 
-	}))	
+
+	// }))	
 
 
 
@@ -158,28 +151,6 @@ func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 
 		// log.Printf("path: %s", r.URL.Path)
 		log.Printf("url: %s", r.Header.Get("Referer"))
-
-
-
-		// fields := strings.SplitAfter(r.Header.Get("Referer"), "share/")
-
-		// for i, field := range fields {
-		// 	if fields == 1 {
-		// 		log.Printf("url: %s", field)
-		// 	}
-		//  }
-		 
-		//  log.Printf("url: %s", fields)
-
-		// url := r.Header.Get("Referer")
-
-		// result := strings.TrimRight(url, "share/")
-		// fmt.Println(result)
-		 
-
-
-
-
 		f(w, r)
 	})
 }
@@ -315,14 +286,9 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 	id := r.PathValue("id")
-
-	
 	password_database := readShare(id)
-
-
-
-
 	
+
 	renderTemplate(w, "view.unlock.share.html", struct {
 		Id string
 		Password string
@@ -331,6 +297,62 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 		Password: password_database,
 	})
 }
+
+
+
+
+func unlockShare(w http.ResponseWriter, r *http.Request)  {
+	// return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		r.ParseForm()
+		// r.ParseMultipartForm(math.MaxInt64)
+
+
+		// fmt.Println(r.Form["givenPassword"])
+        // fmt.Println("givenPasswordHash:", r.Form["givenPasswordHash"])
+	
+		// fmt.Println(r.Form)
+
+
+		url := r.Header.Get("Referer")
+		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+		givenPasswordHash := r.FormValue("givenPasswordHash")
+
+		sharePassword := readShare(idToUnlock)
+		hash := sha256.New()
+		hash.Write([]byte(sharePassword))
+		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
+
+
+		// fmt.Println("sharePasswordHash", sharePasswordHash)
+		// fmt.Println("givenPasswordHash", givenPasswordHash)
+
+
+		if givenPasswordHash == sharePasswordHash {
+			data := map[string]interface{}{
+				// "idToUnlock":    idToUnlock,
+				"sharePasswordHash":	sharePasswordHash,
+				"sharePassword":		readShare(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+			}
+		
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				fmt.Printf("could not marshal json: %s\n", err)
+				return
+			}
+	
+			w.Write(jsonData) // write JSON to JS
+
+		} else {
+			fmt.Printf("password hash mismatch\n")
+
+		}
+
+	// })
+}
+
 
 
 
