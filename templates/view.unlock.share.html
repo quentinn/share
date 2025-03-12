@@ -1,7 +1,4 @@
 {{ template "layout.header.html" . }}
-
-
-
 <div id="future">
     <br>
     <br>
@@ -18,22 +15,20 @@
         <label for="givenPassword">Password</label>
         <input id="givenPassword" type="text" />
 
-        <!-- just to submit with the form -->
-        <input id="givenPasswordHash" type="text" disabled />
+
+        <!-- just to submit the hash with the form -->
+        <input id="givenPasswordHash" type="text" disabled hidden />
 
         <input type="submit" value="unlock">
 
         <div id="error"></div>
-
     </form>
 
 
 
     <script>
-
         form = document.getElementById('form')
         fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
-
 
 
         // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
@@ -60,7 +55,6 @@
                 'givenPasswordHash': givenPasswordHash,
                 // 'tokenAvoidRefreshPrevious': tokenAvoidRefreshPrevious
             };
-
             var formBody = [];
             for (var property in details) {
                 var encodedKey = encodeURIComponent(property);
@@ -80,6 +74,8 @@
                 // body: new FormData(form)
                 body: formBody
             });
+
+
 
             try {
                 let result = await response.json();
@@ -118,6 +114,7 @@
         }
 
 
+
         // Function to write something on the div "error"
         function display_error(message) {
             let data = document.createElement('div')
@@ -127,11 +124,6 @@
             error.replaceWith(data);
         }
 
-
     </script>
-
 </div>
-
-
-
 {{ template "layout.footer.html" . }}

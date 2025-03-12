@@ -31,14 +31,6 @@ type App struct {
 
 
 
-// type Share struct {
-//     Id string
-//     Password string
-// }
-
-
-
-
 func main() {
 
 	createDatabase()
@@ -102,27 +94,7 @@ func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 
 
 
-// func logreqJwt(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-// 	return http.HandleFunc("/protected", login.ProtectedHandler).Methods("GET")
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-// 		// log.Printf("path: %s", r.URL.Path)
-// 		log.Printf("url: %s", r.Header.Get("Referer"))
-
-// 		f(w, r)
-// 	})
-	
-// }
-
-
-
-
 func renderTemplate(w http.ResponseWriter, name string, data interface{}) {
-	// This is inefficient - it reads the templates from the filesystem every
-	// time. This makes it much easier to develop though, so we can edit our
-	// templates and the changes will be reflected without having to restart
-	// the app.
 	t, err := template.ParseGlob("templates/*.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error %s", err.Error()), 500)
@@ -205,7 +177,6 @@ func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// var tokenAvoidRefreshPrevious = generatePassword()
 
 
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
@@ -217,11 +188,9 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view.unlock.share.html", struct {
 		Id string
 		Password string
-		// TokenAvoidRefresh string
 	}{
 		Id: id,
 		Password: password_database,
-		// TokenAvoidRefresh: tokenAvoidRefreshPrevious,
 	})
 }
 
@@ -229,16 +198,8 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 func unlockShare(w http.ResponseWriter, r *http.Request)  {
-	// return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
-		// r.ParseMultipartForm(math.MaxInt64)
-
-
-		// fmt.Println(r.Form["givenPassword"])
-        // fmt.Println("givenPasswordHash:", r.Form["givenPasswordHash"])
-	
-		// fmt.Println(r.Form)
 
 
 		url := r.Header.Get("Referer")
@@ -255,34 +216,26 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 
 
-		// tokenAvoidRefreshPrevious := r.FormValue("tokenAvoidRefreshPrevious")
-		// tokenAvoidRefreshCurrent := generatePassword()
 
-		// if tokenAvoidRefreshPrevious == tokenAvoidRefreshCurrent {
-
-			if givenPasswordHash == sharePasswordHash {
-				data := map[string]interface{}{
-					// "idToUnlock":    idToUnlock,
-					"sharePasswordHash":	sharePasswordHash,
-					"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-					// "tokenAvoidRefresh":	tokenAvoidRefreshPrevious,
-				}
-			
-				jsonData, err := json.Marshal(data)
-				if err != nil {
-					fmt.Printf("could not marshal json: %s\n", err)
-					return
-				}
-		
-				w.Write(jsonData) // write JSON to JS
-
-			} else {
-				fmt.Printf("password hash mismatch\n")
-
+		if givenPasswordHash == sharePasswordHash {
+			data := map[string]interface{}{
+				// "idToUnlock":    idToUnlock,
+				"sharePasswordHash":	sharePasswordHash,
+				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
 			}
-		// }
+			
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				fmt.Printf("could not marshal json: %s\n", err)
+				return
+			}
+		
+			w.Write(jsonData) // write JSON to JS
 
-	// })
+		} else {
+			fmt.Printf("password hash mismatch\n")
+		}
+
 }
 
 
@@ -357,31 +310,21 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
-
 	r.ParseForm()
 
 
 	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
-
 	if tokenAvoidRefresh != "" {
 
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
 		uri := r.Header.Get("Referer")		// Entire path 'http://domain:port/node1/node2/etc.../'
 		url := path.Dir(uri)				// Only the 'http://domain:port' part
-
-
-
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
-		// fmt.Println("blablabla %s", link)
-		// fmt.Println("blablabla %s", url)
-		// fmt.Println("blablabla %s", tokenAvoidRefresh)
 
 		// Create database entries
 		createSecret(id, shared_id, r.PostFormValue("mySecret"))
-		
-
 
 
 		// Display the confirmation
