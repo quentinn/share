@@ -12,7 +12,7 @@
     <br>
     <br>
     <br>
-    
+
 
     <form id="form">
         <label for="givenPassword">Password</label>
@@ -31,8 +31,9 @@
 
     <script>
 
-        let form = document.getElementById('form')
-        let fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
+        form = document.getElementById('form')
+        fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
+
 
 
         // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
@@ -105,17 +106,49 @@
 
         // Read the #fragment again to know if the form must be automatically submitted
         if (fragment) {
-            window.onload = function () {
-                // document.addEventListener("DOMContentLoaded", function (event) {
+            // window.onload = function () {
+            // document.addEventListener("DOMContentLoaded", function (event) {
 
-                // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
-                document.getElementById("givenPassword").value = fragment;
-                // document.getElementById("givenPasswordHash").value = sha256(fragment);
+            // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
+            document.getElementById("givenPassword").value = fragment;
+            document.getElementById("givenPasswordHash").value = sha256(fragment);
 
-                console.log(fragment)
-                console.log("test")
+            console.log(fragment)
+            console.log("test")
 
-                form.submit();
+            // const delay = ms => new Promise(res => setTimeout(res, ms));
+            // const submit = async () => {
+            //     await delay(2000);
+            //     console.log("Waited 5s");
+
+            //     form.submit();
+            // };
+
+            console.log("before");
+            wait(2000);
+            console.log("after");
+
+
+
+            // form.submit();
+
+            if (document.getElementById("givenPasswordHash").value) {
+                console.log("before2");
+
+                form.requestSubmit()
+                console.log("after2");
+            }
+
+
+            // }
+        }
+
+
+        function wait(ms) {
+            var start = new Date().getTime();
+            var end = start;
+            while (end < start + ms) {
+                end = new Date().getTime();
             }
         }
 
