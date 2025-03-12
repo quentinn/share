@@ -159,53 +159,53 @@ func createSecret(id string, share_id string, text string) {
 
 
 
-func readSecret(id string) string {
-	db, err := sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+// func readSecret(id string) string {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
 
-	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-	row := db.QueryRow("SELECT text FROM secret WHERE id = :id", id)
-	var text string
-	switch err := row.Scan(&text); err {
-		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println(text)
-		default:
-			panic(err)
-	}
+// 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
+// 	row := db.QueryRow("SELECT text FROM secret WHERE id = :id", id)
+// 	var text string
+// 	switch err := row.Scan(&text); err {
+// 		case sql.ErrNoRows:
+// 			fmt.Println("No rows were returned!")
+// 		case nil:
+// 			fmt.Println(text)
+// 		default:
+// 			panic(err)
+// 	}
 	
-	return text
-}
+// 	return text
+// }
 
 
 
 
-func readFile(id string) string {
-	db, err := sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+// func readFile(id string) string {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
 
 
-	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-	row := db.QueryRow("SELECT path FROM file WHERE id = :id", id)
-	var path string
-	switch err := row.Scan(&path); err {
-		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println(path)
-		default:
-			panic(err)
-	}
+// 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
+// 	row := db.QueryRow("SELECT path FROM file WHERE id = :id", id)
+// 	var path string
+// 	switch err := row.Scan(&path); err {
+// 		case sql.ErrNoRows:
+// 			fmt.Println("No rows were returned!")
+// 		case nil:
+// 			fmt.Println(path)
+// 		default:
+// 			panic(err)
+// 	}
 	
-	return path
-}
+// 	return path
+// }
 
 
 
@@ -217,12 +217,6 @@ func getShareContent(share_id string) string {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
-
-	
-// SELECT id, text FROM secret where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
-// UNION
-// SELECT id, path FROM file where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
 
 
 
