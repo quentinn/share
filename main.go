@@ -123,10 +123,15 @@ func viewIndex(w http.ResponseWriter, r *http.Request) {
 
 
 func viewCreateFile(w http.ResponseWriter, r *http.Request) {
+
+	// Generate a token that will permit to prevent unwanted record to database due to browse the upload URL without using the form
+	// The trick is that this token is used from an hidden input on the HTML form, and if it's empty it means we're not using the form
+	token := generatePassword()
+	
 	renderTemplate(w, "view.create.file.html", struct {
-		Name string
+		TokenAvoidRefresh string
 	}{
-		Name: "name to fill",
+		TokenAvoidRefresh: token,
 	})
 }
 
@@ -288,44 +293,32 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	
-	// id := uuid.NewString()
-	// url := r.Header.Get("Referer")
-	// link := strings.Join([]string{url, "/", id}, "")
+	// Ensure that a refresh of the page will not submit a new value in the database
+	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
+	if tokenAvoidRefresh != "" {
+
+		id := uuid.NewString()
+		shared_id := uuid.NewString()
+		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
+		url := path.Dir(uri)													// Only the 'http://domain:port' part
+		link := strings.Join([]string{"/share/", shared_id}, "")
+
+		
+		// Create database entries
+		createFile(id, shared_id, filePath)		
 
 
-
-	id := uuid.NewString()
-	shared_id := uuid.NewString()
-	uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
-	url := path.Dir(uri)													// Only the 'http://domain:port' part
-	link := strings.Join([]string{"/share/", shared_id}, "")
-
-	
-
-	// Create database entries
-	createFile(id, shared_id, filePath)
-
-
-
-	// // Display the confirmation
-	// renderTemplate(w, "view.confirm.file.html", struct {
-	// 	Name string
-	// }{
-	// 	Name: link,
-	// })
-	
-
-
-	// Display the confirmation
-	renderTemplate(w, "view.confirm.file.html", struct {
-		Link string				// To permit the user to click on it 
-		Url string				// To permit the user to copy it
-		Password string			// To permit the user to copy it
-	}{
-		Link: link,
-		Url: url,
-		Password: getSharePassword(shared_id),
-	})
+		// Display the confirmation
+		renderTemplate(w, "view.confirm.file.html", struct {
+			Link string				// To permit the user to click on it 
+			Url string				// To permit the user to copy it
+			Password string			// To permit the user to copy it
+		}{
+			Link: link,
+			Url: url,
+			Password: getSharePassword(shared_id),
+		})
+	}
 }
 
 
@@ -335,7 +328,7 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-
+	// Ensure that a refresh of the page will not submit a new value in the database
 	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
 	if tokenAvoidRefresh != "" {
 
