@@ -205,6 +205,7 @@ func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 }
 
 
+// var tokenAvoidRefreshPrevious = generatePassword()
 
 
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
@@ -216,9 +217,11 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "view.unlock.share.html", struct {
 		Id string
 		Password string
+		// TokenAvoidRefresh string
 	}{
 		Id: id,
 		Password: password_database,
+		// TokenAvoidRefresh: tokenAvoidRefreshPrevious,
 	})
 }
 
@@ -244,35 +247,40 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 		givenPasswordHash := r.FormValue("givenPasswordHash")
 
+
 		sharePassword := getSharePassword(idToUnlock)
 		hash := sha256.New()
 		hash.Write([]byte(sharePassword))
 		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
 
 
-		// fmt.Println("sharePasswordHash", sharePasswordHash)
-		// fmt.Println("givenPasswordHash", givenPasswordHash)
 
+		// tokenAvoidRefreshPrevious := r.FormValue("tokenAvoidRefreshPrevious")
+		// tokenAvoidRefreshCurrent := generatePassword()
 
-		if givenPasswordHash == sharePasswordHash {
-			data := map[string]interface{}{
-				// "idToUnlock":    idToUnlock,
-				"sharePasswordHash":	sharePasswordHash,
-				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-			}
+		// if tokenAvoidRefreshPrevious == tokenAvoidRefreshCurrent {
+
+			if givenPasswordHash == sharePasswordHash {
+				data := map[string]interface{}{
+					// "idToUnlock":    idToUnlock,
+					"sharePasswordHash":	sharePasswordHash,
+					"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+					// "tokenAvoidRefresh":	tokenAvoidRefreshPrevious,
+				}
+			
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Printf("could not marshal json: %s\n", err)
+					return
+				}
 		
-			jsonData, err := json.Marshal(data)
-			if err != nil {
-				fmt.Printf("could not marshal json: %s\n", err)
-				return
+				w.Write(jsonData) // write JSON to JS
+
+			} else {
+				fmt.Printf("password hash mismatch\n")
+
 			}
-	
-			w.Write(jsonData) // write JSON to JS
-
-		} else {
-			fmt.Printf("password hash mismatch\n")
-
-		}
+		// }
 
 	// })
 }
