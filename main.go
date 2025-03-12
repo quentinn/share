@@ -33,12 +33,56 @@ type App struct {
 
 func main() {
 
-	createDatabase()
 
 	server := App{
 		Port: env("PORT", "8080"),
 	}
-	server.Start()
+	
+	for id, arg := range os.Args {
+		if id == 1 {
+			switch arg {
+				case "reset":
+					os.Setenv("DELETE_DB_ON_NEXT_START", "true")
+					createDatabase()
+
+				// case "run":
+				// 	os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+				// 	createDatabase()
+				// 	server.Start()
+
+			}
+		} else if len(arg) == 0 {
+			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			createDatabase()
+			server.Start()
+		}
+	}
+
+
+
+
+	// args := os.Args
+	// if len(args) == 0 {
+	// 	os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+	// 	createDatabase()
+	// 	fmt.Println("DELETE_DB_ON_NEXT_START:", os.Getenv("DELETE_DB_ON_NEXT_START"))
+
+	// 	server := App{
+	// 		Port: env("PORT", "8080"),
+	// 	}
+	// 	server.Start()
+	// }
+
+	// if args[0] == "reset" {
+	// 	os.Setenv("DELETE_DB_ON_NEXT_START", "true")
+	// 	createDatabase()
+	// 	fmt.Println("DELETE_DB_ON_NEXT_START:", os.Getenv("DELETE_DB_ON_NEXT_START"))
+
+	// }
+
+
+
+
 }
 
 
@@ -52,11 +96,11 @@ func (a *App) Start() {
 
 	http.Handle("/file", logreq(viewCreateFile))								// Form to create a share
 	http.Handle("/file/shared", logreq(uploadFile))								// Confirmation + display the link of the share to the creator
-	http.Handle("/file/{id}", logreq(viewRevealFile))							// Reveal the share after unlocked with password
+	// http.Handle("/file/{id}", logreq(viewRevealFile))							// Reveal the share after unlocked with password
 	
 	http.Handle("/secret", logreq(viewCreateSecret))							// Form to create a share
 	http.Handle("/secret/shared", logreq(uploadSecret))							// Confirmation + display the link of the share to the creator
-	http.Handle("/secret/{id}", logreq(viewRevealSecret))						// Reveal the share after unlocked with password
+	// http.Handle("/secret/{id}", logreq(viewRevealSecret))						// Reveal the share after unlocked with password
 
 	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
 	http.Handle("/share/unlock", logreq(unlockShare))							// Non browsable url - verify password to unlock the share
@@ -154,32 +198,32 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 
 
-func viewRevealSecret(w http.ResponseWriter, r *http.Request) {
+// func viewRevealSecret(w http.ResponseWriter, r *http.Request) {
 
-	id := r.PathValue("id")
-	text := readSecret(id)
+// 	id := r.PathValue("id")
+// 	text := readSecret(id)
 
-	renderTemplate(w, "view.reveal.secret.html", struct {
-		Name string
-	}{
-		Name: text,
-	})
-}
-
-
+// 	renderTemplate(w, "view.reveal.secret.html", struct {
+// 		Name string
+// 	}{
+// 		Name: text,
+// 	})
+// }
 
 
-func viewRevealFile(w http.ResponseWriter, r *http.Request) {
 
-	id := r.PathValue("id")
-	path := readFile(id)
 
-	renderTemplate(w, "view.reveal.file.html", struct {
-		Name string
-	}{
-		Name: path,
-	})
-}
+// func viewRevealFile(w http.ResponseWriter, r *http.Request) {
+
+// 	id := r.PathValue("id")
+// 	path := readFile(id)
+
+// 	renderTemplate(w, "view.reveal.file.html", struct {
+// 		Name string
+// 	}{
+// 		Name: path,
+// 	})
+// }
 
 
 

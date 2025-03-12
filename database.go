@@ -13,31 +13,24 @@ import (
 
 	// "crypto/rand"
     // "encoding/base64"
+	"strconv"
 )
 
 
 
 
 var dbFile string = "sqlite.db"
-var DELETE_DB_ON_NEXT_START bool = false
-
-
-
-
-// func openDatabase() {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
-
-// 	return db
-// }
-
 
 
 
 func createDatabase() {
+
+	// Env var given from pseudo CLI
+	var DELETE_DB_ON_NEXT_START, err = strconv.ParseBool(os.Getenv("DELETE_DB_ON_NEXT_START"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 
 	if _, err := os.Stat(dbFile); err == nil {
 		fmt.Printf("%s found\n", dbFile);
