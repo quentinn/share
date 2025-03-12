@@ -83,7 +83,7 @@
                 // If the given password correspond to the password of the share
                 if (givenPasswordHash === result.sharePasswordHash) {
                     let data = document.createElement('div')
-                    data.innerHTML = result.sharePassword;
+                    data.innerHTML = result.getShareContent;
                     future.replaceWith(data)
                 }
             } catch (e) {

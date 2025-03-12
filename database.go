@@ -105,7 +105,7 @@ func createShare(id string) {
 
 
 
-func createFile(id string, path string) {
+func createFile(id string, share_id string, path string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -116,7 +116,7 @@ func createFile(id string, path string) {
 
 
 	// id := sql.Named("id", uuid.NewString())
-	share_id := "ok"
+	// share_id := "ok"
 
 
 	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, share_id)
@@ -125,7 +125,7 @@ func createFile(id string, path string) {
 	}
 
 
-	createShare(id)
+	createShare(share_id)
 	// readShare(createShare())
 }
 
@@ -210,7 +210,8 @@ func readFile(id string) string {
 
 
 
-func readShare(id string) string {
+// Get the content of a share
+func getShareContent(share_id string) string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -218,51 +219,82 @@ func readShare(id string) string {
 	defer db.Close()
 
 
-	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-	row := db.QueryRow("SELECT password FROM share WHERE id = :id", id)
-	var password string
-	switch err := row.Scan(&password); err {
-		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println("Row found:", password)
-		default:
-			panic(err)
-	}
 	
-	return password
-}
-
-
-
-
-func getSharePassword(id string) string {
-	db, err := sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-
-	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-	row := db.QueryRow("SELECT password FROM share WHERE id = :id", id)
-	var password string
-	switch err := row.Scan(&password); err {
-		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println("Row found:", password)
-		default:
-			panic(err)
-	}
-	
-	return password
-}
-
-
-
-// SELECT id, text FROM secret
-// where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
+// SELECT id, text FROM secret where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
 // UNION
-// SELECT id, path FROM file
-// where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
+// SELECT id, path FROM file where share_id = "8ff11545-3b0f-4c87-82d6-d0635238fa83"
+
+
+
+	row1 := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
+	var rowSecret string
+	switch err := row1.Scan(&rowSecret); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowSecret)
+		default:
+			panic(err)
+	}
+
+
+
+	row2 := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
+	var rowFile string
+	switch err := row2.Scan(&rowFile); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowFile)
+		default:
+			panic(err)
+	}
+	
+
+	var shareContent string
+	if rowSecret != "" {
+		shareContent = rowSecret
+
+		fmt.Printf("secret", shareContent)
+
+	} else if rowFile != ""  {
+		shareContent = rowFile
+		fmt.Printf("file", shareContent)
+
+	} else {
+		shareContent = "empty"
+		fmt.Printf("empty", shareContent)
+	}
+
+
+	return shareContent
+}
+
+
+
+
+// Get the password of a share
+func getSharePassword(share_id string) string {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
+	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", share_id)
+	var rowData string
+	switch err := row.Scan(&rowData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowData)
+		default:
+			panic(err)
+	}
+	
+	return rowData
+}
+
+

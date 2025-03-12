@@ -1,6 +1,26 @@
 {{ template "layout.header.html" . }}
 <h1>file shared !</h1>
 
-<p>link: <a href="{{.Name}}">{{.Name}}</a></p>
+<p>
+    form link : 
+    <a href="{{ .Link }}">{{ .Url }}{{ .Link }}</a>
+</p>
+<br>
+<br>
+<br>
+<p>
+    one click link :
+    <a href="{{ .Link }}#{{ .Password }}">{{ .Url }}{{ .Link }}#{{ .Password }}</a>
+</p>
+
+
+<p>
+    password:
+<p>
+    {{ .Password }}
+</p>
+</p>
+
+
 
 {{ template "layout.footer.html" . }}

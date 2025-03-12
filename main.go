@@ -222,6 +222,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 				// "idToUnlock":    idToUnlock,
 				"sharePasswordHash":	sharePasswordHash,
 				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+				"getShareContent":		getShareContent(idToUnlock),
 			}
 			
 			jsonData, err := json.Marshal(data)
@@ -255,9 +256,9 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer file.Close()
-	fmt.Printf("Uploaded file: %+v\n", handler.Filename)
-	fmt.Printf("File size: %+v\n", handler.Size)
-	fmt.Printf("MIME header: %+v\n", handler.Header)
+	// fmt.Printf("Uploaded file: %+v\n", handler.Filename)
+	// fmt.Printf("File size: %+v\n", handler.Size)
+	// fmt.Printf("MIME header: %+v\n", handler.Header)
 
 
 	// Create destination directory
@@ -271,8 +272,8 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 	// Create file
-	path := filepath.Join(dir, filepath.Base(handler.Filename))
-	dst, err := os.Create(path)
+	filePath := filepath.Join(dir, filepath.Base(handler.Filename))
+	dst, err := os.Create(filePath)
 	defer dst.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -287,21 +288,43 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	
-	id := uuid.NewString()
-	url := r.Header.Get("Referer")
-	link := strings.Join([]string{url, "/", id}, "")
+	// id := uuid.NewString()
+	// url := r.Header.Get("Referer")
+	// link := strings.Join([]string{url, "/", id}, "")
 
+
+
+	id := uuid.NewString()
+	shared_id := uuid.NewString()
+	uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
+	url := path.Dir(uri)													// Only the 'http://domain:port' part
+	link := strings.Join([]string{"/share/", shared_id}, "")
+
+	
 
 	// Create database entries
-	createFile(id, path)
+	createFile(id, shared_id, filePath)
 
+
+
+	// // Display the confirmation
+	// renderTemplate(w, "view.confirm.file.html", struct {
+	// 	Name string
+	// }{
+	// 	Name: link,
+	// })
+	
 
 
 	// Display the confirmation
 	renderTemplate(w, "view.confirm.file.html", struct {
-		Name string
+		Link string				// To permit the user to click on it 
+		Url string				// To permit the user to copy it
+		Password string			// To permit the user to copy it
 	}{
-		Name: link,
+		Link: link,
+		Url: url,
+		Password: getSharePassword(shared_id),
 	})
 }
 
@@ -318,8 +341,8 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
-		uri := r.Header.Get("Referer")		// Entire path 'http://domain:port/node1/node2/etc.../'
-		url := path.Dir(uri)				// Only the 'http://domain:port' part
+		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
+		url := path.Dir(uri)													// Only the 'http://domain:port' part
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
 
