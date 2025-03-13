@@ -64,26 +64,6 @@ func main() {
 
 
 
-	// args := os.Args
-	// if len(args) == 0 {
-	// 	os.Setenv("DELETE_DB_ON_NEXT_START", "false")
-	// 	createDatabase()
-	// 	fmt.Println("DELETE_DB_ON_NEXT_START:", os.Getenv("DELETE_DB_ON_NEXT_START"))
-
-	// 	server := App{
-	// 		Port: env("PORT", "8080"),
-	// 	}
-	// 	server.Start()
-	// }
-
-	// if args[0] == "reset" {
-	// 	os.Setenv("DELETE_DB_ON_NEXT_START", "true")
-	// 	createDatabase()
-	// 	fmt.Println("DELETE_DB_ON_NEXT_START:", os.Getenv("DELETE_DB_ON_NEXT_START"))
-
-	// }
-
-
 
 
 }
@@ -99,11 +79,9 @@ func (a *App) Start() {
 
 	http.Handle("/file", logreq(viewCreateFile))								// Form to create a share
 	http.Handle("/file/shared", logreq(uploadFile))								// Confirmation + display the link of the share to the creator
-	// http.Handle("/file/{id}", logreq(viewRevealFile))							// Reveal the share after unlocked with password
 	
 	http.Handle("/secret", logreq(viewCreateSecret))							// Form to create a share
 	http.Handle("/secret/shared", logreq(uploadSecret))							// Confirmation + display the link of the share to the creator
-	// http.Handle("/secret/{id}", logreq(viewRevealSecret))						// Reveal the share after unlocked with password
 
 	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
 	http.Handle("/share/unlock", logreq(unlockShare))							// Non browsable url - verify password to unlock the share
@@ -271,52 +249,6 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 
 
-
-// func unlockShare(w http.ResponseWriter, r *http.Request)  {
-
-// 		r.ParseForm()
-
-
-// 		url := r.Header.Get("Referer")
-// 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
-
-
-// 		givenPasswordHash := r.FormValue("givenPasswordHash")
-
-
-		// sharePassword := getSharePassword(idToUnlock)
-		// hash := sha256.New()
-		// hash.Write([]byte(sharePassword))
-		// sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
-
-
-
-
-// 		if givenPasswordHash == sharePasswordHash {
-// 			data := map[string]interface{}{
-// 				// "idToUnlock":    idToUnlock,
-// 				"sharePasswordHash":	sharePasswordHash,
-// 				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-// 				"getShareContent":		getShareContent(idToUnlock),
-// 			}
-			
-// 			jsonData, err := json.Marshal(data)
-// 			if err != nil {
-// 				fmt.Printf("could not marshal json: %s\n", err)
-// 				return
-// 			}
-		
-// 			w.Write(jsonData) // write JSON to JS
-
-// 		} else {
-// 			fmt.Printf("password hash mismatch\n")
-// 		}
-
-// }
-
-
-
-
 func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
@@ -348,7 +280,6 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
-
 
 
 
