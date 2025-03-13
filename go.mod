@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sethvargo/go-password v0.3.1 // indirect

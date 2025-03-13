@@ -18,6 +18,7 @@ import (
 	"encoding/json"
     "crypto/sha256"
 	// "math"
+	// "encoding/json"
 
 )
 
@@ -45,16 +46,18 @@ func main() {
 					os.Setenv("DELETE_DB_ON_NEXT_START", "true")
 					createDatabase()
 
-				// case "run":
-				// 	os.Setenv("DELETE_DB_ON_NEXT_START", "false")
-				// 	createDatabase()
-				// 	server.Start()
+				case "run":
+					os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+					createDatabase()
+					server.Start()
 
 			}
-		} else if len(arg) == 0 {
-			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
-			createDatabase()
-			server.Start()
+		// // } else if len(arg) == 0 {
+		// } else if arg[1] == nil {
+		// 	os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+		// 	createDatabase()
+		// 	server.Start()
+		// }
 		}
 	}
 
@@ -198,36 +201,6 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 
 
-// func viewRevealSecret(w http.ResponseWriter, r *http.Request) {
-
-// 	id := r.PathValue("id")
-// 	text := readSecret(id)
-
-// 	renderTemplate(w, "view.reveal.secret.html", struct {
-// 		Name string
-// 	}{
-// 		Name: text,
-// 	})
-// }
-
-
-
-
-// func viewRevealFile(w http.ResponseWriter, r *http.Request) {
-
-// 	id := r.PathValue("id")
-// 	path := readFile(id)
-
-// 	renderTemplate(w, "view.reveal.file.html", struct {
-// 		Name string
-// 	}{
-// 		Name: path,
-// 	})
-// }
-
-
-
-
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 	id := r.PathValue("id")
@@ -257,21 +230,28 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 		givenPasswordHash := r.FormValue("givenPasswordHash")
 
-
+		
 		sharePassword := getSharePassword(idToUnlock)
 		hash := sha256.New()
 		hash.Write([]byte(sharePassword))
 		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
 
 
+		shareContentMap := getShareContent(idToUnlock)
+		shareContentType := shareContentMap["type"]
+		shareContentValue := shareContentMap["value"]
 
+
+		fmt.Printf("\nsharePasswordHash", sharePasswordHash)
+		fmt.Printf("\nshareContentType", shareContentType)
+		fmt.Printf("\nshareContentValue", shareContentValue)
+	
 
 		if givenPasswordHash == sharePasswordHash {
 			data := map[string]interface{}{
-				// "idToUnlock":    idToUnlock,
-				"sharePasswordHash":	sharePasswordHash,
-				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
-				"getShareContent":		getShareContent(idToUnlock),
+				"sharePasswordHash": sharePasswordHash,
+				"shareContentType": shareContentType,
+				"shareContentValue": shareContentValue,
 			}
 			
 			jsonData, err := json.Marshal(data)
@@ -286,6 +266,87 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 			fmt.Printf("password hash mismatch\n")
 		}
 
+}
+
+
+
+
+
+// func unlockShare(w http.ResponseWriter, r *http.Request)  {
+
+// 		r.ParseForm()
+
+
+// 		url := r.Header.Get("Referer")
+// 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+// 		givenPasswordHash := r.FormValue("givenPasswordHash")
+
+
+		// sharePassword := getSharePassword(idToUnlock)
+		// hash := sha256.New()
+		// hash.Write([]byte(sharePassword))
+		// sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
+
+
+
+
+// 		if givenPasswordHash == sharePasswordHash {
+// 			data := map[string]interface{}{
+// 				// "idToUnlock":    idToUnlock,
+// 				"sharePasswordHash":	sharePasswordHash,
+// 				"sharePassword":		getSharePassword(idToUnlock),		// return the password of the share to the JS formData (this permit to avoid writing it in DOM)
+// 				"getShareContent":		getShareContent(idToUnlock),
+// 			}
+			
+// 			jsonData, err := json.Marshal(data)
+// 			if err != nil {
+// 				fmt.Printf("could not marshal json: %s\n", err)
+// 				return
+// 			}
+		
+// 			w.Write(jsonData) // write JSON to JS
+
+// 		} else {
+// 			fmt.Printf("password hash mismatch\n")
+// 		}
+
+// }
+
+
+
+
+func uploadSecret(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	// Ensure that a refresh of the page will not submit a new value in the database
+	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
+	if tokenAvoidRefresh != "" {
+
+		id := uuid.NewString()
+		shared_id := uuid.NewString()
+		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
+		url := path.Dir(uri)													// Only the 'http://domain:port' part
+		link := strings.Join([]string{"/share/", shared_id}, "")
+
+
+		// Create database entries
+		createSecret(id, shared_id, r.PostFormValue("mySecret"))
+
+
+		// Display the confirmation
+		renderTemplate(w, "view.confirm.secret.html", struct {
+			Link string				// To permit the user to click on it 
+			Url string				// To permit the user to copy it
+			Password string			// To permit the user to copy it
+		}{
+			Link: link,
+			Url: url,
+			Password: getSharePassword(shared_id),
+		})
+	}
 }
 
 
@@ -368,34 +429,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-func uploadSecret(w http.ResponseWriter, r *http.Request) {
-
-	r.ParseForm()
-
-	// Ensure that a refresh of the page will not submit a new value in the database
-	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
-	if tokenAvoidRefresh != "" {
-
-		id := uuid.NewString()
-		shared_id := uuid.NewString()
-		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
-		url := path.Dir(uri)													// Only the 'http://domain:port' part
-		link := strings.Join([]string{"/share/", shared_id}, "")
+// func downloadFile(url string, filepath string) error {
 
 
-		// Create database entries
-		createSecret(id, shared_id, r.PostFormValue("mySecret"))
 
+// 	return nil
+// }
 
-		// Display the confirmation
-		renderTemplate(w, "view.confirm.secret.html", struct {
-			Link string				// To permit the user to click on it 
-			Url string				// To permit the user to copy it
-			Password string			// To permit the user to copy it
-		}{
-			Link: link,
-			Url: url,
-			Password: getSharePassword(shared_id),
-		})
-	}
-}

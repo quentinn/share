@@ -14,6 +14,7 @@ import (
 	// "crypto/rand"
     // "encoding/base64"
 	"strconv"
+	// "encoding/json"
 )
 
 
@@ -152,59 +153,23 @@ func createSecret(id string, share_id string, text string) {
 
 
 
-// func readSecret(id string) string {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
 
-// 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-// 	row := db.QueryRow("SELECT text FROM secret WHERE id = :id", id)
-// 	var text string
-// 	switch err := row.Scan(&text); err {
-// 		case sql.ErrNoRows:
-// 			fmt.Println("No rows were returned!")
-// 		case nil:
-// 			fmt.Println(text)
-// 		default:
-// 			panic(err)
-// 	}
-	
-// 	return text
+
+// type secret struct {
+//     Type string
+// 	Text string
 // }
 
-
-
-
-// func readFile(id string) string {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
-
-
-// 	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
-// 	row := db.QueryRow("SELECT path FROM file WHERE id = :id", id)
-// 	var path string
-// 	switch err := row.Scan(&path); err {
-// 		case sql.ErrNoRows:
-// 			fmt.Println("No rows were returned!")
-// 		case nil:
-// 			fmt.Println(path)
-// 		default:
-// 			panic(err)
-// 	}
-	
-// 	return path
+// type file struct {
+//     Type string
+// 	Path string
 // }
 
 
 
 
 // Get the content of a share
-func getShareContent(share_id string) string {
+func getShareContent(share_id string) map[string]interface{} {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -213,49 +178,117 @@ func getShareContent(share_id string) string {
 
 
 
-	row1 := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
-	var rowSecret string
-	switch err := row1.Scan(&rowSecret); err {
+	rowSecret := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
+	var secretText string
+	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
 			fmt.Println("No rows were returned!")
 		case nil:
-			fmt.Println("Row found:", rowSecret)
+			fmt.Println("Row found:", secretText)
 		default:
 			panic(err)
 	}
 
 
 
-	row2 := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
-	var rowFile string
-	switch err := row2.Scan(&rowFile); err {
+	rowFile := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
+	var filePath string
+	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
 			fmt.Println("No rows were returned!")
 		case nil:
-			fmt.Println("Row found:", rowFile)
+			fmt.Println("Row found:", filePath)
 		default:
 			panic(err)
 	}
 	
 
-	var shareContent string
-	if rowSecret != "" {
-		shareContent = rowSecret
+	// var shareContent map[string]string
+	if secretText != "" {
+		return map[string]interface{}{
+			"type": "secret",
+			"value": secretText,
+		}
 
-		fmt.Printf("secret", shareContent)
-
-	} else if rowFile != ""  {
-		shareContent = rowFile
-		fmt.Printf("file", shareContent)
+	} else if filePath != ""  {
+		return map[string]interface{}{
+			"type": "file",
+			"value": filePath,
+		}
 
 	} else {
-		shareContent = "empty"
-		fmt.Printf("empty", shareContent)
+		return map[string]interface{}{
+			"type": "none",
+			"value": "none",
+		}
 	}
+	
+
+	// jsonData, err := json.Marshal(shareContent)
+	// if err != nil {
+	// 	fmt.Printf("could not marshal json: %s\n", err)
+	// 	return
+	// }
 
 
-	return shareContent
+	// fmt.Printf("json data: %s\n", jsonData)
+
+
+	// return shareContent
 }
+
+
+
+
+// // Get the content of a share
+// func getShareContent(share_id string) string {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+
+
+
+// 	row1 := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
+// 	var rowSecret string
+// 	switch err := row1.Scan(&rowSecret); err {
+// 		case sql.ErrNoRows:
+// 			fmt.Println("No rows were returned!")
+// 		case nil:
+// 			fmt.Println("Row found:", rowSecret)
+// 		default:
+// 			panic(err)
+// 	}
+
+
+
+// 	row2 := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
+// 	var rowFile string
+// 	switch err := row2.Scan(&rowFile); err {
+// 		case sql.ErrNoRows:
+// 			fmt.Println("No rows were returned!")
+// 		case nil:
+// 			fmt.Println("Row found:", rowFile)
+// 		default:
+// 			panic(err)
+// 	}
+	
+
+// 	var shareContent string
+// 	if rowSecret != "" {
+// 		shareContent = rowSecret
+
+// 	} else if rowFile != ""  {
+// 		shareContent = rowFile
+
+// 	} else {
+// 		shareContent = "empty"
+// 	}
+
+
+// 	return shareContent
+// }
 
 
 
