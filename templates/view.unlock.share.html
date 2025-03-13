@@ -61,16 +61,11 @@
                 formBody.push(encodedKey + "=" + encodedValue);
             }
             formBody = formBody.join("&");
-
-
-
-            // Form to discuss with backend
             let response = await fetch('/share/unlock', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
                 },
-                // body: new FormData(form)
                 body: formBody
             });
 
@@ -91,7 +86,7 @@
                     if (result.shareContentType === "file") {
                         shareContent = document.createElement('a')
                         shareContent.innerHTML = result.shareContentValue;
-                        shareContent.href = "test";
+                        shareContent.href = result.shareContentValue;
                     }
 
                     future.replaceWith(shareContent)

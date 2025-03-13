@@ -85,7 +85,8 @@ func (a *App) Start() {
 
 	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
 	http.Handle("/share/unlock", logreq(unlockShare))							// Non browsable url - verify password to unlock the share
-
+	http.Handle("/share/file/download", logreq(uploadFile))						// Download a shared file
+	
 
 
 	addr := fmt.Sprintf(":%s", a.Port)
@@ -288,50 +289,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Maximum upload of 10 MB files
 	r.ParseMultipartForm(10 << 20)
 
-	// Get handler for filename, size and headers
-	file, handler, err := r.FormFile("myFile")
-	if err != nil {
-		fmt.Println("Error retrieving the file")
-		fmt.Println(err)
-		return
-	}
-
-	defer file.Close()
-	// fmt.Printf("Uploaded file: %+v\n", handler.Filename)
-	// fmt.Printf("File size: %+v\n", handler.Size)
-	// fmt.Printf("MIME header: %+v\n", handler.Header)
-
-
-	// Create destination directory
-	dir := "uploads"
-	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(dir, os.ModePerm)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-
-
-	// Create file
-	filePath := filepath.Join(dir, filepath.Base(handler.Filename))
-	dst, err := os.Create(filePath)
-	defer dst.Close()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-
-	// Copy the uploaded file to the created file on the filesystem
-	if _, err := io.Copy(dst, file); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	
 	// Ensure that a refresh of the page will not submit a new value in the database
 	tokenAvoidRefresh := r.PostFormValue("TokenAvoidRefresh")
 	if tokenAvoidRefresh != "" {
+
 
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
@@ -339,11 +300,51 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		url := path.Dir(uri)													// Only the 'http://domain:port' part
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
-		
+
+
+		// Get handler for filename, size and headers
+		file, handler, err := r.FormFile("myFile")
+		if err != nil {
+			fmt.Println("Error retrieving the file")
+			fmt.Println(err)
+			return
+		}
+		defer file.Close()
+		// fmt.Printf("Uploaded file: %+v\n", handler.Filename)
+		// fmt.Printf("File size: %+v\n", handler.Size)
+		// fmt.Printf("MIME header: %+v\n", handler.Header)
+
+		// Create destination directory
+		dir := "uploads/" + id
+		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir(dir, os.ModePerm)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+
+		// Create file
+		filePath := filepath.Join(dir, filepath.Base(handler.Filename))
+		dst, err := os.Create(filePath)
+		defer dst.Close()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Copy the uploaded file to the created file on the filesystem
+		if _, err := io.Copy(dst, file); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+
+
 		// Create database entries
 		createFile(id, shared_id, filePath)		
 
 
+		
 		// Display the confirmation
 		renderTemplate(w, "view.confirm.file.html", struct {
 			Link string				// To permit the user to click on it 
@@ -360,10 +361,23 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-// func downloadFile(url string, filepath string) error {
+func downloadFile(filepath string, url string) error {
 
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
 
-// 	return nil
-// }
-
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
