@@ -79,42 +79,25 @@
             try {
                 let result = await response.json();
 
-
-                console.log(result)
-
-
                 // If the given password correspond to the password of the share
                 if (givenPasswordHash === result.sharePasswordHash) {
                     let shareContent
-                    // let shareContent = document.createElement('div')
-                    // shareContent.innerHTML = result.shareContentValue;
-
-                    // let fileUrl = concat(window.location.origin, "/", download, "/", shareContent)
 
                     if (result.shareContentType === "secret") {
                         shareContent = document.createElement('p')
                         shareContent.innerHTML = result.shareContentValue;
-
                     }
-
 
                     if (result.shareContentType === "file") {
                         shareContent = document.createElement('a')
                         shareContent.innerHTML = result.shareContentValue;
                         shareContent.href = "test";
-
                     }
 
-
-
                     future.replaceWith(shareContent)
-                    // shareContent.append(fileLink)
-
-                    document.getElementById("error").value = url;
-
                 }
             } catch (e) {
-                console.log(e);
+                // console.log(e);
 
                 if (!givenPassword) {
                     display_error('Please fill the password')
