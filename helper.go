@@ -1,14 +1,17 @@
 package main
 
 import (
-	"crypto/rand"
-    "encoding/base64"
+	"fmt"
+	"os"
 	"strings"
+    "encoding/base64"
+	"crypto/rand"
 )
 
 
 
 
+// Generate a secure string
 func generatePassword() string {
 
 	b := make([]byte, 64)
@@ -24,4 +27,15 @@ func generatePassword() string {
 
 	return password
  }
+
+
+
+
+// Delete a file or directory from filesystem
+func deletePath(path string) {
+	err := os.Remove(path)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 

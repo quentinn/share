@@ -1,20 +1,13 @@
 package main
 
 import (
-	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	"fmt"
 	"log"
 	"os"
-	"fmt"
 	"time"
-
-	// "github.com/google/uuid"
-	// "github.com/sethvargo/go-password/password"
-
-	// "crypto/rand"
-    // "encoding/base64"
 	"strconv"
-	// "encoding/json"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 
@@ -78,8 +71,6 @@ func createShare(id string) {
 	defer db.Close()
 
 
-
-	// id := sql.Named("id", uuid.NewString())
 	password := sql.Named("password", generatePassword())
 	maxopen := 3
 	expiration := sql.Named("datetime", time.Now())
@@ -90,10 +81,6 @@ func createShare(id string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-
-	// Return the ID to be able to read it just after the creation
-	// return id
 }
 
 
@@ -106,12 +93,6 @@ func createFile(id string, share_id string, path string) {
 	}
 	defer db.Close()
 
-	// openDatabase()
-
-
-	// id := sql.Named("id", uuid.NewString())
-	// share_id := "ok"
-
 
 	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, share_id)
 	if err != nil {
@@ -120,7 +101,6 @@ func createFile(id string, share_id string, path string) {
 
 
 	createShare(share_id)
-	// readShare(createShare())
 }
 
 
@@ -133,13 +113,6 @@ func createSecret(id string, share_id string, text string) {
 	}
 	defer db.Close()
 
-	// openDatabase()
-
-
-	// id := sql.Named("id", uuid.NewString())
-	// share_id := "ok"
-
-
 	_, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, share_id)
 	if err != nil {
 		log.Fatal(err)
@@ -147,7 +120,6 @@ func createSecret(id string, share_id string, text string) {
 
 
 	createShare(share_id)
-	// readShare(createShare())
 }
 
 
@@ -188,7 +160,6 @@ func getShareContent(share_id string) map[string]string {
 	}
 	
 
-	// var shareContent map[string]string
 	if secretText != "" {
 		return map[string]string{
 			"type": "secret",
@@ -221,7 +192,6 @@ func getSharePassword(share_id string) string {
 	defer db.Close()
 
 
-	// https://www.calhoun.io/querying-for-a-single-record-using-gos-database-sql-package/
 	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", share_id)
 	var rowData string
 	switch err := row.Scan(&rowData); err {
@@ -237,3 +207,54 @@ func getSharePassword(share_id string) string {
 }
 
 
+
+
+// Delete a share and also its related secrets and files (and delete file from filesystem aswell)
+func deleteShare(share_id string) {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	rowShare := db.QueryRow("DELETE from share WHERE id = :share_id", share_id)
+	var rowShareData string
+	switch err := rowShare.Scan(&rowShareData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowShareData)
+		default:
+			panic(err)
+	}
+
+
+	rowSecret := db.QueryRow("DELETE from secret WHERE share_id = :share_id", share_id)
+	var rowSecretData string
+	switch err := rowSecret.Scan(&rowSecretData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowSecretData)
+		default:
+			panic(err)
+	}
+
+
+	rowFile := db.QueryRow("DELETE from file WHERE share_id = :share_id", share_id)
+	var rowFileData string
+	switch err := rowFile.Scan(&rowFileData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println("Row found:", rowFileData)
+		default:
+			panic(err)
+	}
+
+
+	// Delete the directory containing files of the share
+	deletePath(share_id)
+
+}
