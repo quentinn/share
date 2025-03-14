@@ -16,10 +16,14 @@ import (
 	"path"
 	// "net/url"
 	"encoding/json"
-    "crypto/sha256"
+	"crypto/sha256"
 	// "math"
 	// "encoding/json"
 
+	"time"
+"io/ioutil"
+"strconv"
+"bytes"
 )
 
 
@@ -388,37 +392,34 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 	url := r.Header.Get("Referer")
 	share_id := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
-
-
 	shareContentMap := getShareContent(share_id)
-	// shareContentType := shareContentMap["type"]
-	shareContentValue := shareContentMap["value"]
-
-
-	text := "This file is very big!"
-	words := strings.Split(text, " ")
-
+	file := shareContentMap["value"]
 
 	fmt.Println("url", url)
 	fmt.Println("share_id", share_id)
-	fmt.Println("shareContentValue", shareContentValue)
+	fmt.Println("shareContentValue", file)
 
 
-	// w.Header().Add("Content-Type", "text/plain")
-	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-	w.Header().Add("Content-Disposition", "attachment; filename=" + shareContentValue)
-	w.Header().Add("Content-Length", fmt.Sprint(len(text)))
-
-	flusher, err := w.(http.Flusher)
-	if !err {
-		log.Fatal("Cannot use flusher")
+	
+	downloadBytes, err := ioutil.ReadFile(file)
+	fmt.Println("file to be sent ",file)
+	if err != nil {
+		fmt.Printf("unable to download the file: %v", err)
 	}
 
-	w.Write([]byte(words[0]))
-	flusher.Flush()
+	mime := http.DetectContentType(downloadBytes)
+	fileSize := len(string(downloadBytes))
+	fmt.Println("mime is ",mime ," filesize ",fileSize)
+	//Generate the server headers
+	w.Header().Set("Content-Type", "octet-stream")
+	w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
 
-	for i := 1; i < len(words); i++ {
-		w.Write([]byte(" " + words[i]))
-		flusher.Flush()
-	}
+
+
+	//// force it down the client's.....
+	http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
 }
