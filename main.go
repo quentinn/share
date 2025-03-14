@@ -20,10 +20,10 @@ import (
 	// "math"
 	// "encoding/json"
 
-	"time"
-"io/ioutil"
-"strconv"
-"bytes"
+// 	"time"
+// "io/ioutil"
+// "strconv"
+// "bytes"
 )
 
 
@@ -387,11 +387,51 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 // }
 
 
+// func downloadFile(w http.ResponseWriter, r *http.Request) {
+
+
+// 	url := r.Header.Get("Referer")
+// 	share_id := url[len(url)-36:]								// Just get the last 36 char of the url because the IDs are 36 char length
+// 	shareContentMap := getShareContent(share_id)
+// 	file := shareContentMap["value"]
+
+// 	fmt.Println("url", url)
+// 	fmt.Println("share_id", share_id)
+// 	fmt.Println("shareContentValue", file)
+
+
+	
+// 	downloadBytes, err := ioutil.ReadFile(file)
+// 	fmt.Println("file to be sent", file)
+// 	if err != nil {
+// 		fmt.Printf("unable to download the file: %v", err)
+// 	}
+
+// 	mime := http.DetectContentType(downloadBytes)
+// 	fileSize := len(string(downloadBytes))
+// 	fmt.Println("mime is", mime, "filesize", fileSize)
+
+
+// 	w.Header().Set("Content-Type", "octet-stream")
+// 	w.Header().Set("Content-Disposition", "attachment; filename=" + file)
+// 	w.Header().Set("Expires", "0")
+// 	w.Header().Set("Content-Transfer-Encoding", "binary")
+// 	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+// 	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+
+// 	//// force it down the client's.....
+	// http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+// }
+
+
+
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 
 	url := r.Header.Get("Referer")
-	share_id := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+	share_id := url[len(url)-36:]								// Just get the last 36 char of the url because the IDs are 36 char length
 	shareContentMap := getShareContent(share_id)
 	file := shareContentMap["value"]
 
@@ -400,26 +440,28 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("shareContentValue", file)
 
 
-	
-	downloadBytes, err := ioutil.ReadFile(file)
-	fmt.Println("file to be sent ",file)
-	if err != nil {
-		fmt.Printf("unable to download the file: %v", err)
-	}
+    w.Header().Set("Content-Type", "application/json")
 
-	mime := http.DetectContentType(downloadBytes)
-	fileSize := len(string(downloadBytes))
-	fmt.Println("mime is ",mime ," filesize ",fileSize)
-	//Generate the server headers
-	w.Header().Set("Content-Type", "octet-stream")
-	w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
-	w.Header().Set("Expires", "0")
-	w.Header().Set("Content-Transfer-Encoding", "binary")
-	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
-	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+    // // get the file name to download from url
+    // name := r.URL.Query().Get("name")
+
+    // // join to get the full file path
+    // directory := filepath.Join("files", name)
 
 
+	// fmt.Printf("dir", directory)
 
-	//// force it down the client's.....
-	http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+    // // open file (check if exists)
+    // ff, err := os.Open(directory)
+    // if err != nil {
+    //     w.WriteHeader(http.StatusInternalServerError)
+    //     json.NewEncoder(w).Encode("Unable to open file ")
+    //     return
+    // }
+
+    // force a download with the content- disposition field
+    w.Header().Set("Content-Disposition", "attachment; filename=" + file)
+
+    // serve file out.
+    http.ServeFile(w, r, file)
 }
