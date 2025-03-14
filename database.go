@@ -153,23 +153,8 @@ func createSecret(id string, share_id string, text string) {
 
 
 
-
-
-// type secret struct {
-//     Type string
-// 	Text string
-// }
-
-// type file struct {
-//     Type string
-// 	Path string
-// }
-
-
-
-
 // Get the content of a share
-func getShareContent(share_id string) map[string]interface{} {
+func getShareContent(share_id string) map[string]string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -205,90 +190,24 @@ func getShareContent(share_id string) map[string]interface{} {
 
 	// var shareContent map[string]string
 	if secretText != "" {
-		return map[string]interface{}{
+		return map[string]string{
 			"type": "secret",
 			"value": secretText,
 		}
 
 	} else if filePath != ""  {
-		return map[string]interface{}{
+		return map[string]string{
 			"type": "file",
 			"value": filePath,
 		}
 
 	} else {
-		return map[string]interface{}{
+		return map[string]string{
 			"type": "none",
 			"value": "none",
 		}
 	}
-	
-
-	// jsonData, err := json.Marshal(shareContent)
-	// if err != nil {
-	// 	fmt.Printf("could not marshal json: %s\n", err)
-	// 	return
-	// }
-
-
-	// fmt.Printf("json data: %s\n", jsonData)
-
-
-	// return shareContent
 }
-
-
-
-
-// // Get the content of a share
-// func getShareContent(share_id string) string {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
-
-
-
-// 	row1 := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
-// 	var rowSecret string
-// 	switch err := row1.Scan(&rowSecret); err {
-// 		case sql.ErrNoRows:
-// 			fmt.Println("No rows were returned!")
-// 		case nil:
-// 			fmt.Println("Row found:", rowSecret)
-// 		default:
-// 			panic(err)
-// 	}
-
-
-
-// 	row2 := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
-// 	var rowFile string
-// 	switch err := row2.Scan(&rowFile); err {
-// 		case sql.ErrNoRows:
-// 			fmt.Println("No rows were returned!")
-// 		case nil:
-// 			fmt.Println("Row found:", rowFile)
-// 		default:
-// 			panic(err)
-// 	}
-	
-
-// 	var shareContent string
-// 	if rowSecret != "" {
-// 		shareContent = rowSecret
-
-// 	} else if rowFile != ""  {
-// 		shareContent = rowFile
-
-// 	} else {
-// 		shareContent = "empty"
-// 	}
-
-
-// 	return shareContent
-// }
 
 
 

@@ -75,17 +75,17 @@ func (a *App) Start() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	http.Handle("/", logreq(viewIndex))
+	http.Handle("/", logReq(viewIndex))
 
-	http.Handle("/file", logreq(viewCreateFile))								// Form to create a share
-	http.Handle("/file/shared", logreq(uploadFile))								// Confirmation + display the link of the share to the creator
+	http.Handle("/file", logReq(viewCreateFile))								// Form to create a share
+	http.Handle("/file/shared", logReq(uploadFile))								// Confirmation + display the link of the share to the creator
 	
-	http.Handle("/secret", logreq(viewCreateSecret))							// Form to create a share
-	http.Handle("/secret/shared", logreq(uploadSecret))							// Confirmation + display the link of the share to the creator
+	http.Handle("/secret", logReq(viewCreateSecret))							// Form to create a share
+	http.Handle("/secret/shared", logReq(uploadSecret))							// Confirmation + display the link of the share to the creator
 
-	http.Handle("/share/{id}", logreq(viewUnlockShare))							// Ask for password to unlock the share
-	http.Handle("/share/unlock", logreq(unlockShare))							// Non browsable url - verify password to unlock the share
-	http.Handle("/share/file/download", logreq(uploadFile))						// Download a shared file
+	http.Handle("/share/{id}", logReq(viewUnlockShare))							// Ask for password to unlock the share
+	http.Handle("/share/unlock", logReq(unlockShare))							// Non browsable url - verify password to unlock the share
+	http.Handle("/share/uploads/{id}/{file}", logReq(downloadFile))					// Download a shared file
 	
 
 
@@ -108,7 +108,7 @@ func env(key, adefault string) string {
 
 
 
-func logreq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func logReq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// log.Printf("path: %s", r.URL.Path)
@@ -315,7 +315,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		// fmt.Printf("MIME header: %+v\n", handler.Header)
 
 		// Create destination directory
-		dir := "uploads/" + id
+		dir := "uploads/" + shared_id
 		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
 			err := os.Mkdir(dir, os.ModePerm)
 			if err != nil {
@@ -361,23 +361,64 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-func downloadFile(filepath string, url string) error {
+// func downloadFile(share_id string) {
+// 	shareContentMap := getShareContent(share_id)
+// 	shareContentType := shareContentMap["type"]
+// 	shareContentValue := shareContentMap["value"]
 
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
+// 	if shareContentType == "file" {
+// 		fmt.Println("test")
+
+
+// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+// 			// log.Printf("path: %s", r.URL.Path)
+// 			log.Printf("url: %s", r.Header.Get("Referer"))
+// 		})
+
+// 	}
+
+
+	
+// }
+
+
+func downloadFile(w http.ResponseWriter, r *http.Request) {
+
+
+	url := r.Header.Get("Referer")
+	share_id := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+	shareContentMap := getShareContent(share_id)
+	// shareContentType := shareContentMap["type"]
+	shareContentValue := shareContentMap["value"]
+
+
+	text := "This file is very big!"
+	words := strings.Split(text, " ")
+
+
+	fmt.Println("url", url)
+	fmt.Println("share_id", share_id)
+	fmt.Println("shareContentValue", shareContentValue)
+
+
+	// w.Header().Add("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	w.Header().Add("Content-Disposition", "attachment; filename=" + shareContentValue)
+	w.Header().Add("Content-Length", fmt.Sprint(len(text)))
+
+	flusher, err := w.(http.Flusher)
+	if !err {
+		log.Fatal("Cannot use flusher")
 	}
-	defer resp.Body.Close()
 
-	// Create the file
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
+	w.Write([]byte(words[0]))
+	flusher.Flush()
+
+	for i := 1; i < len(words); i++ {
+		w.Write([]byte(" " + words[i]))
+		flusher.Flush()
 	}
-	defer out.Close()
-
-	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
-	return err
 }
