@@ -43,7 +43,7 @@ func createDatabase() {
 
 		
 			sqlStmt := `
-			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration datetime, creation datetime);
+			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration text, creation datetime);
 			DELETE FROM share;
 			CREATE TABLE file (id text not null primary key, path text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 			DELETE FROM file;
@@ -64,7 +64,29 @@ func createDatabase() {
 
 
 
-func createShare(id string) {
+// func createShare(id string) {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+
+
+// 	password := sql.Named("password", generatePassword())
+// 	maxopen := 3
+// 	expiration := sql.Named("datetime", time.Now())
+// 	creation := sql.Named("datetime", time.Now())
+
+
+// 	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :datetime, :datetime)", id, password, maxopen, expiration, creation)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
+
+
+
+func createShare(id string, expirationChosen string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -72,13 +94,28 @@ func createShare(id string) {
 	defer db.Close()
 
 
+	creation := sql.Named("creation", time.Now())
 	password := sql.Named("password", generatePassword())
 	maxopen := 3
-	expiration := sql.Named("datetime", time.Now())
-	creation := sql.Named("datetime", time.Now())
+	// expirationFormatted, err := time.Parse("2025-03-30", expirationChosen)
+	// if err != nil {
+	//   panic(err)
+	// }
+
+	
+	// expirationFormatted, err := time.Parse(time.RFC3339, expirationChosen)
+	// if err != nil {
+	//   panic(err)
+	// }
+
+	expiration := sql.Named("expiration", expirationChosen)
+
+	fmt.Println("expiration      ", expiration)
+	fmt.Println("expirationChosen", expirationChosen)
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :datetime, :datetime)", id, password, maxopen, expiration, creation)
+
+	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :expiration, :creation)", id, password, maxopen, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -87,7 +124,7 @@ func createShare(id string) {
 
 
 
-func createFile(id string, share_id string, path string) {
+func createFile(id string, share_id string, path string, expiration string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -101,13 +138,13 @@ func createFile(id string, share_id string, path string) {
 	}
 
 
-	createShare(share_id)
+	createShare(share_id, expiration)
 }
 
 
 
 
-func createSecret(id string, share_id string, text string) {
+func createSecret(id string, share_id string, text string, expiration string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -120,7 +157,7 @@ func createSecret(id string, share_id string, text string) {
 	}
 
 
-	createShare(share_id)
+	createShare(share_id, expiration)
 }
 
 

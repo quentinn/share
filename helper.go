@@ -38,6 +38,3 @@ func deletePath(path string) {
 		fmt.Println(err)
 	}
 }
-
-
-

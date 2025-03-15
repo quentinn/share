@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"crypto/sha256"
+	// "time"
 
 	"github.com/google/uuid"
 
@@ -176,8 +177,10 @@ func viewCreateFile(w http.ResponseWriter, r *http.Request) {
 	
 	renderTemplate(w, "view.create.file.html", struct {
 		TokenAvoidRefresh string
+		// Expiration string
 	}{
 		TokenAvoidRefresh: token,
+		// Expiration: time.Now().String(),
 	})
 }
 
@@ -192,8 +195,10 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "view.create.secret.html", struct {
 		TokenAvoidRefresh string
+		// Expiration string
 	}{
 		TokenAvoidRefresh: token,
+		// Expiration: time.Now().String(),
 	})
 }
 
@@ -281,7 +286,7 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 
 		// Create database entries
-		createSecret(id, shared_id, r.PostFormValue("mySecret"))
+		createSecret(id, shared_id, r.PostFormValue("mySecret"), r.PostFormValue("expiration"))
 
 
 		// Display the confirmation
@@ -301,7 +306,6 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
-	// Maximum upload of 10 MB files
 	r.ParseMultipartForm(10 << 20)
 
 	// Ensure that a refresh of the page will not submit a new value in the database
@@ -365,7 +369,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 		// Create database entries
-		createFile(id, shared_id, filePath)		
+		createFile(id, shared_id, filePath, r.PostFormValue("expiration"))		
 
 
 		
