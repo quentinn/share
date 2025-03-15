@@ -33,7 +33,7 @@ func generatePassword() string {
 
 // Delete a file or directory from filesystem
 func deletePath(path string) {
-	err := os.Remove(path)
+	err := os.RemoveAll(path)
 	if err != nil {
 		fmt.Println(err)
 	}

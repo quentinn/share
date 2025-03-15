@@ -139,7 +139,7 @@ func getShareContent(share_id string) map[string]string {
 	var secretText string
 	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
+			fmt.Println("No row returned from table 'secret'")
 		case nil:
 			fmt.Println("Row found:", secretText)
 		default:
@@ -152,7 +152,7 @@ func getShareContent(share_id string) map[string]string {
 	var filePath string
 	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
+			fmt.Println("No row returned from table 'file'")
 		case nil:
 			fmt.Println("Row found:", filePath)
 		default:
@@ -196,7 +196,7 @@ func getSharePassword(share_id string) string {
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
+			fmt.Println("No row returned from table 'share'")
 		case nil:
 			fmt.Println("Row found:", rowData)
 		default:
@@ -222,9 +222,9 @@ func deleteShare(share_id string) {
 	var rowShareData string
 	switch err := rowShare.Scan(&rowShareData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println("Row found:", rowShareData)
+			fmt.Println("Row deleted from table 'share'")
+		// case nil:
+		// 	fmt.Println("Row found:", rowShareData)
 		default:
 			panic(err)
 	}
@@ -234,9 +234,9 @@ func deleteShare(share_id string) {
 	var rowSecretData string
 	switch err := rowSecret.Scan(&rowSecretData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println("Row found:", rowSecretData)
+			fmt.Println("Row deleted from table 'secret'")
+		// case nil:
+		// 	fmt.Println("Row found:", rowSecretData)
 		default:
 			panic(err)
 	}
@@ -246,15 +246,15 @@ func deleteShare(share_id string) {
 	var rowFileData string
 	switch err := rowFile.Scan(&rowFileData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No rows were returned!")
-		case nil:
-			fmt.Println("Row found:", rowFileData)
+			fmt.Println("Row deleted from table 'file'")
+		// case nil:
+		// 	fmt.Println("Row found:", rowFileData)
 		default:
 			panic(err)
 	}
 
 
 	// Delete the directory containing files of the share
-	deletePath(share_id)
+	deletePath("uploads/" + share_id)
 
 }

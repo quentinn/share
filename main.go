@@ -36,127 +36,57 @@ func main() {
 	}
 	
 
-	// args := []string(os.Args[1:])
-	// for _, arg1 := range args {
+	args := []string(os.Args[1:])
+	if len(args) >= 1 {
+		// go run share web
+		if string(os.Args[1]) == "web" {
+			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			createDatabase()
+			server.Start()		
 
-		// arg1 := string(os.Args[1])
-		// var arg2 string
+		// go run share reset
+		} else if string(os.Args[1]) == "reset" {
+			fmt.Println("Resetting database")
+			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
+			createDatabase()			
 
-
-
-		// if string(os.Args[1]) != "" {
-		// 	arg1 := string(os.Args[1])
-			
-		// 	switch arg1 {
-		// 		// go run share web
-		// 		case "web":
-		// 			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
-		// 			createDatabase()
-		// 			server.Start()
-
-		// 		// go run share reset
-		// 		case "reset":
-		// 			fmt.Println("Resetting database")
-		// 			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
-		// 			createDatabase()
-
-		// 		// go run share help
-		// 		case "help":
-		// 			fmt.Println("Share is a web service that permit to securely share files and secrets to anyone")
-		// 			fmt.Println("")
-		// 			fmt.Println("Usage:")
-		// 			fmt.Println(" - go run share web                  start web server")
-		// 			fmt.Println(" - go run share reset                delete database, it will be recreated next web server start")
-		// 			fmt.Println(" - go run share delete <share_id>    delete the share which belongs to the given id (also delete shared files if any)")
-		// 			fmt.Println("")
-		// 			fmt.Println("https://github.com/ggtrd/share")
-
-		// 		// go run share delete <share_id>
-		// 		case "delete":
-		// 		fmt.Println("Please provide a share id")
-
-		// 		case "delete", arg2:
-		// 			arg2 := string(os.Args[2])
-		// 			if arg2 != "" {
-		// 				shareId := arg2
-		// 				fmt.Println("Deleting share '" + shareId + "'")
-		// 				deleteShare(shareId)
-					
-		// 			}
-
-		// 		default:
-		// 			fmt.Println("use 'go run share help' to display usage")
-		// 			fmt.Println("")
-		// 	}
-			
-		// } else {
-		// 	fmt.Println("use 'go run share help' to display usage")
-		// 	fmt.Println("")
-
-		// }
-
-
-		args := []string(os.Args[1:])
-
-		// fmt.Println(string(os.Args[1]))
-		// fmt.Println(len(os.Args))
-
-		// fmt.Println(args)
-		// fmt.Println(len(args))
-
-		if len(args) >= 1 {
-
-			// go run share web
-			if string(os.Args[1]) == "web" {
-				os.Setenv("DELETE_DB_ON_NEXT_START", "false")
-				createDatabase()
-				server.Start()		
-
-			// go run share reset
-			} else if string(os.Args[1]) == "reset" {
-				fmt.Println("Resetting database")
-				os.Setenv("DELETE_DB_ON_NEXT_START", "true")
-				createDatabase()			
-
-			// go run share delete <share_id>
-			} else if string(os.Args[1]) == "delete" {
-				if len(args) > 1 {
-					shareId := string(os.Args[2])
-					fmt.Println("Deleting share '%s'", shareId)
-					deleteShare(shareId)
-				} else {
-					fmt.Println("Please provide a share id")
-				}
-
-			// go run share help
-			} else if string(os.Args[1]) == "help" {
-				fmt.Println("Share is a web service that permit to securely share files and secrets to anyone")
-				fmt.Println("")
-				fmt.Println("Usage:")
-				fmt.Println(" go run share web                  start web server")
-				fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
-				fmt.Println(" go run share delete <share_id>    delete the share which belongs to the given id (also delete shared files if any)")
-				fmt.Println("")
-				fmt.Println("https://github.com/ggtrd/share")
-
-			// go run share <any wrong option>
+		// go run share delete <share_id>
+		} else if string(os.Args[1]) == "delete" {
+			if len(args) > 1 {
+				shareId := string(os.Args[2])
+				fmt.Println("Deleting share '%s'", shareId)
+				deleteShare(shareId)
 			} else {
-				fmt.Println("error: unknown command")
-				fmt.Println("use 'go run share help' to display usage")
-				fmt.Println("")
+				fmt.Println("Please provide a share id")
 			}
 
-		// go run share
+		// go run share help
+		} else if string(os.Args[1]) == "help" {
+			fmt.Println("Share is a web service that permit to securely share files and secrets to anyone")
+			fmt.Println("")
+			fmt.Println("Usage:")
+			fmt.Println(" go run share web                  start web server")
+			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
+			fmt.Println(" go run share delete <share_id>    delete the share which belongs to the given id (also delete shared files if any)")
+			fmt.Println("")
+			fmt.Println("https://github.com/ggtrd/share")
+
+		// go run share <any wrong option>
 		} else {
-			fmt.Println("error: empty argument")
+			fmt.Println("error: unknown command")
 			fmt.Println("use 'go run share help' to display usage")
 			fmt.Println("")
 		}
 
+	// go run share
+	} else {
+		fmt.Println("error: empty argument")
+		fmt.Println("use 'go run share help' to display usage")
+		fmt.Println("")
+	}
 
 
 
-	// }
 }
 
 
@@ -405,10 +335,19 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		// fmt.Printf("File size: %+v\n", handler.Size)
 		// fmt.Printf("MIME header: %+v\n", handler.Header)
 
-		// Create destination directory
-		dir := "uploads/" + shared_id
+		// Create destination directory root
+		dirUploads := "uploads/"
+		if _, err := os.Stat(dirUploads); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir(dirUploads, 0700)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+
+		// Create destination directory of the share
+		dir := dirUploads + shared_id
 		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
-			err := os.Mkdir(dir, os.ModePerm)
+			err := os.Mkdir(dir, 0700)
 			if err != nil {
 				log.Println(err)
 			}
