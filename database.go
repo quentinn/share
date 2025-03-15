@@ -40,8 +40,6 @@ func createDatabase() {
 				log.Fatal(err)
 			}
 			defer db.Close()
-		
-			// openDatabase()
 
 		
 			sqlStmt := `
@@ -280,14 +278,12 @@ func periodicClean() {
 		}
 		defer db.Close()
 	
-		// rows, err := db.QueryRow("SELECT id, expiration FROM share")
 		rows, err := db.Query("SELECT id, expiration FROM share")
-	    // row, err := db.Query("SELECT * FROM search ORDER BY count LIMIT ?", limit)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer rows.Close()
-		for rows.Next() { // Iterate and fetch the records from result cursor
+		for rows.Next() {
 			var rowDataId string
 			var rowDataExpiration string
 
@@ -306,7 +302,7 @@ func periodicClean() {
 
 			// Delete share if its expiration date is before now
 			if now.After(expiration) {
-				go deleteShare(rowDataId) // Set as Goroutine to avoid database crash due to too many connexion opened
+				go deleteShare(rowDataId)	// Set as Goroutine to avoid database crash due to too many connexion opened
 			}
 
 			// if now.After(expiration) {

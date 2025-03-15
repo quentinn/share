@@ -40,9 +40,9 @@ func main() {
 	if len(args) >= 1 {
 		// go run share web
 		if string(os.Args[1]) == "web" {
+			go periodicClean()	// Goroutine to clean expired shares
 			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
 			createDatabase()
-			go periodicClean()	// Goroutine to clean expired shares
 			server.Start()		
 
 		// go run share reset
