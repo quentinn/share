@@ -132,8 +132,6 @@ func env(key, adefault string) string {
 
 func logReq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		// log.Printf("path: %s", r.URL.Path)
 		log.Printf("url: %s", r.Header.Get("Referer"))
 		f(w, r)
 	})
@@ -241,11 +239,6 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 		shareContentMap := getShareContent(idToUnlock)
 		shareContentType := shareContentMap["type"]
 		shareContentValue := shareContentMap["value"]
-
-
-		fmt.Printf("\nsharePasswordHash", sharePasswordHash)
-		fmt.Printf("\nshareContentType", shareContentType)
-		fmt.Printf("\nshareContentValue", shareContentValue)
 	
 
 		if givenPasswordHash == sharePasswordHash {
