@@ -271,8 +271,8 @@ func deleteShare(share_id string) {
 func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
-    task.Every(10).Seconds().Do(func() {
-        fmt.Println("Periodic task started at:", time.Now())
+	task.Every(1).Hours().Do(func() {
+        fmt.Println("Periodic cleaning task started at:", time.Now())
 
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
@@ -306,7 +306,7 @@ func periodicClean() {
 
 			// Delete share if its expiration date is before now
 			if now.After(expiration) {
-				deleteShare(rowDataId)
+				go deleteShare(rowDataId) // Set as Goroutine to avoid database crash due to too many connexion opened
 			}
 
 			// if now.After(expiration) {
