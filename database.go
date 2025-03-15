@@ -272,7 +272,7 @@ func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
     task.Every(10).Seconds().Do(func() {
-        fmt.Println("Scheduled task executed at:", time.Now())
+        fmt.Println("Periodic task started at:", time.Now())
 
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
@@ -290,17 +290,46 @@ func periodicClean() {
 		for rows.Next() { // Iterate and fetch the records from result cursor
 			var rowDataId string
 			var rowDataExpiration string
+
 			err := rows.Scan(&rowDataId, &rowDataExpiration)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Println()
-			fmt.Println("id", rowDataId)
-			fmt.Println("expiration", rowDataExpiration)
+
+			now := time.Now()
+			expiration, err := time.Parse(time.RFC3339, rowDataExpiration)
+			if err != nil {
+			  panic(err)
+			}
+			
+
+			// Delete share if its expiration date is before now
+			if now.After(expiration) {
+				deleteShare(rowDataId)
+			}
+
+			// if now.After(expiration) {
+			// 	fmt.Println()
+			// 	fmt.Println("EXPIRED")
+			// 	fmt.Println("id", rowDataId)
+			// 	fmt.Println("expiration", rowDataExpiration)
+			// 	fmt.Println("expiration", expiration)
+			// 	fmt.Println("now       ", now)
+
+			// } else if now.Before(expiration)  {
+				
+			// 	fmt.Println()
+			// 	fmt.Println("ALIVE")
+			// 	fmt.Println("id", rowDataId)
+			// 	fmt.Println("expiration", rowDataExpiration)
+			// 	fmt.Println("expiration", expiration)
+			// 	fmt.Println("now       ", now)
+
+			// }
 		}
 		
-		fmt.Println("-------------")
+		// fmt.Println("-------------")
 
     })
 
