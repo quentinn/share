@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/go-co-op/gocron"
+
 )
 
 
@@ -135,7 +138,7 @@ func getShareContent(share_id string) map[string]string {
 
 
 
-	rowSecret := db.QueryRow("SELECT text FROM secret where share_id = :share_id", share_id)
+	rowSecret := db.QueryRow("SELECT text FROM secret WHERE share_id = :share_id", share_id)
 	var secretText string
 	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
@@ -148,7 +151,7 @@ func getShareContent(share_id string) map[string]string {
 
 
 
-	rowFile := db.QueryRow("SELECT path FROM file where share_id = :share_id", share_id)
+	rowFile := db.QueryRow("SELECT path FROM file WHERE share_id = :share_id", share_id)
 	var filePath string
 	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
@@ -218,7 +221,7 @@ func deleteShare(share_id string) {
 	defer db.Close()
 
 
-	rowShare := db.QueryRow("DELETE from share WHERE id = :share_id", share_id)
+	rowShare := db.QueryRow("DELETE FROM share WHERE id = :share_id", share_id)
 	var rowShareData string
 	switch err := rowShare.Scan(&rowShareData); err {
 		case sql.ErrNoRows:
@@ -230,7 +233,7 @@ func deleteShare(share_id string) {
 	}
 
 
-	rowSecret := db.QueryRow("DELETE from secret WHERE share_id = :share_id", share_id)
+	rowSecret := db.QueryRow("DELETE FROM secret WHERE share_id = :share_id", share_id)
 	var rowSecretData string
 	switch err := rowSecret.Scan(&rowSecretData); err {
 		case sql.ErrNoRows:
@@ -242,7 +245,7 @@ func deleteShare(share_id string) {
 	}
 
 
-	rowFile := db.QueryRow("DELETE from file WHERE share_id = :share_id", share_id)
+	rowFile := db.QueryRow("DELETE FROM file WHERE share_id = :share_id", share_id)
 	var rowFileData string
 	switch err := rowFile.Scan(&rowFileData); err {
 		case sql.ErrNoRows:
@@ -257,4 +260,52 @@ func deleteShare(share_id string) {
 	// Delete the directory containing files of the share
 	deletePath("uploads/" + share_id)
 
+}
+
+
+
+
+
+// Set a task to run at a specific date
+// Regularly check for all share expiration date, and delete them if expired
+func periodicClean() {
+
+	task := gocron.NewScheduler(time.UTC)
+    task.Every(10).Seconds().Do(func() {
+        fmt.Println("Scheduled task executed at:", time.Now())
+
+		db, err := sql.Open("sqlite3", dbFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+	
+		// rows, err := db.QueryRow("SELECT id, expiration FROM share")
+		rows, err := db.Query("SELECT id, expiration FROM share")
+	    // row, err := db.Query("SELECT * FROM search ORDER BY count LIMIT ?", limit)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() { // Iterate and fetch the records from result cursor
+			var rowDataId string
+			var rowDataExpiration string
+			err := rows.Scan(&rowDataId, &rowDataExpiration)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println()
+			fmt.Println("id", rowDataId)
+			fmt.Println("expiration", rowDataExpiration)
+		}
+		
+		fmt.Println("-------------")
+
+    })
+
+    task.StartAsync()
+
+    // Prevent exit
+    select {}
 }

@@ -42,6 +42,7 @@ func main() {
 		if string(os.Args[1]) == "web" {
 			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
 			createDatabase()
+			go periodicClean()
 			server.Start()		
 
 		// go run share reset
