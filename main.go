@@ -73,7 +73,7 @@ func main() {
 			fmt.Println(" go run share web                  start web server")
 			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
 			fmt.Println(" go run share delete <share_id>    delete the share which belongs to the given id (also delete shared files if any)")
-			fmt.Println(" go run share backup               duplicate database (!does not backups shared files!)")
+			fmt.Println(" go run share backup               duplicate database (!does not backup shared files!)")
 			fmt.Println("")
 			fmt.Println("https://github.com/ggtrd/share")
 
