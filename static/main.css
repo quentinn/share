@@ -21,8 +21,11 @@ body {
 
 
 .dark {
-    background-color: #121212 !important;
-    color: #999 !important;
+    background-color: #121212;
+}
+
+.dark > * > h1 {
+    color: var(--color) !important;
 }
 
 
