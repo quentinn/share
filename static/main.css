@@ -1,7 +1,9 @@
 :root {
-    --color: #555bf6;
+    --color: #e9b42d;
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
+    --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
+    --lighter2-color: color-mix(in srgb, #fff, var(--color) 20%);
 
     --radius: 8px;
     --border: 3px;
@@ -9,11 +11,15 @@
 
 
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
-
 * {
     font-family: 'Lato', Helvetica, sans-serif;
     line-height: 1.5;
 }
+
+*:hover {
+    transition: 0.2s;
+}
+
 
 body {
     background-color: var(--lighter-color);
@@ -24,13 +30,40 @@ body {
     background-color: #121212;
 }
 
+
 .dark > * > h1 {
-    color: var(--color) !important;
+    color: var(--darker2-color);
+}
+
+
+.dark * .title {
+    color: var(--darker2-color);
+}
+
+
+.dark * .text {
+    color: var(--lighter2-color);
+}
+
+
+.dark * .text-box {
+    background-color: var(--darker-color);
 }
 
 
 .container {
     text-align: center;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+
+.container-left {
+    text-align: left;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 10%;
+    padding-bottom: 10%;
 }
 
 
@@ -38,9 +71,46 @@ body {
     text-decoration: none !important;
     display: inline-block;
 
-    margin: 10px;
-    padding: 8px 36px 8px 36px;
+    vertical-align: text-top;
+}
 
+
+.nav-logo {
+    width: 100px;
+    height: 100%;
+
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+
+}
+
+
+.nav-link {
+    width: 100px;
+    height: 20px;
+
+    color: var(--color);
+    /* border: 1px solid var(--color); */
+
+
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 30px;
+    padding-bottom: 0px;
+
+    text-align: center;
+
+
+    font-weight: bold;
+    font-size: 28px;
+
+}
+
+
+.nav-link:hover {
+    color: var(--darker-color);
 }
 
 
@@ -65,16 +135,36 @@ body {
 
 
 .footer {
-
     text-align: center !important;
     position: fixed;
     bottom: 0;
-
 }
 
 
 h1 {
+    font-size: 36px !important;
+}
+
+
+.title {
+    color: var(--color);
+    font-weight: bold;
+    font-size: 22px;
+}
+
+
+.text {
     color: var(--darker-color);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+
+.text-box {
+    padding: 16px 32px 16px 32px;
+    background-color: var(--lighter2-color);
+    border-radius: var(--radius);
+    word-wrap: break-word;
 }
 
 
@@ -95,8 +185,10 @@ h1 {
     border-top: none;
     border-bottom: 3px solid;
 
-    color: var(--darker-color) !important;
+    color: var(--lighter-color) !important;
     font-weight: bold;
+
+    font-size: 20px;
 }
 
 
@@ -166,6 +258,4 @@ textarea {
     max-width: 100%;
 
     outline: none;
-
-
 }
