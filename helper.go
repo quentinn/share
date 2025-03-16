@@ -6,6 +6,8 @@ import (
 	"strings"
     "encoding/base64"
 	"crypto/rand"
+	"time"
+	"io"
 )
 
 
@@ -38,3 +40,41 @@ func deletePath(path string) {
 		fmt.Println(err)
 	}
 }
+
+
+
+
+// Copy/paste a file and automatically name it with current datetime
+func backupFile(sourceFile string) {
+
+	t := time.Now()
+	now := fmt.Sprintf("%d-%02d-%02d_%02d-%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+
+
+	// Open the source file 
+	source, err := os.Open(sourceFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer source.Close()
+ 
+
+	// Create the destination file
+	destination, err := os.Create(sourceFile + "." + now)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer destination.Close()
+
+
+	// Copy the contents of source to destination file
+  	_, err = io.Copy(destination, source)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+
+
+

@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"encoding/json"
 	"crypto/sha256"
-	// "time"
 
 	"github.com/google/uuid"
 
@@ -44,13 +43,13 @@ func main() {
 			go periodicClean()	// Goroutine to clean expired shares
 			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
 			createDatabase()
-			server.Start()		
+			server.Start()
 
 		// go run share reset
 		} else if string(os.Args[1]) == "reset" {
 			fmt.Println("Resetting database")
 			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
-			createDatabase()			
+			createDatabase()
 
 		// go run share delete <share_id>
 		} else if string(os.Args[1]) == "delete" {
@@ -62,6 +61,10 @@ func main() {
 				fmt.Println("Please provide a share id")
 			}
 
+		// go run share backup
+		} else if string(os.Args[1]) == "backup" {
+			backupFile("sqlite.db")
+
 		// go run share help
 		} else if string(os.Args[1]) == "help" {
 			fmt.Println("Share is a web service that permit to securely share files and secrets to anyone")
@@ -70,6 +73,7 @@ func main() {
 			fmt.Println(" go run share web                  start web server")
 			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
 			fmt.Println(" go run share delete <share_id>    delete the share which belongs to the given id (also delete shared files if any)")
+			fmt.Println(" go run share backup               duplicate database (!does not backups shared files!)")
 			fmt.Println("")
 			fmt.Println("https://github.com/ggtrd/share")
 
