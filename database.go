@@ -43,7 +43,7 @@ func createDatabase() {
 
 		
 			sqlStmt := `
-			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration text, creation datetime);
+			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration text, creation text);
 			DELETE FROM share;
 			CREATE TABLE file (id text not null primary key, path text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 			DELETE FROM file;
@@ -94,25 +94,13 @@ func createShare(id string, expirationChosen string) {
 	defer db.Close()
 
 
-	creation := sql.Named("creation", time.Now())
+
+	t := time.Now()
+	now := fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+	creation := sql.Named("creation", now)
 	password := sql.Named("password", generatePassword())
 	maxopen := 3
-	// expirationFormatted, err := time.Parse("2025-03-30", expirationChosen)
-	// if err != nil {
-	//   panic(err)
-	// }
-
-	
-	// expirationFormatted, err := time.Parse(time.RFC3339, expirationChosen)
-	// if err != nil {
-	//   panic(err)
-	// }
-
 	expiration := sql.Named("expiration", expirationChosen)
-
-	fmt.Println("expiration      ", expiration)
-	fmt.Println("expirationChosen", expirationChosen)
-
 
 
 	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :expiration, :creation)", id, password, maxopen, expiration, creation)
@@ -306,8 +294,10 @@ func deleteShare(share_id string) {
 func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
-	task.Every(1).Hours().Do(func() {
-        fmt.Println("Periodic cleaning task started at:", time.Now())
+	// task.Every(1).Hours().Do(func() {
+	task.Every(1).Minutes().Do(func() {
+	// task.Every(4).Seconds().Do(func() {
+		fmt.Println("Periodic cleaning task started at:", time.Now())
 
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
@@ -331,11 +321,30 @@ func periodicClean() {
 
 
 			now := time.Now()
-			expiration, err := time.Parse(time.RFC3339, rowDataExpiration)
+			timeLayout := "2006-01-02T15:04"
+			expiration, err := time.Parse(timeLayout, rowDataExpiration)
 			if err != nil {
-			  panic(err)
+				log.Fatal(err)
 			}
+
+			// fmt.Println("now               " + now.String())
+			// fmt.Println("expiration        " + expiration.String())
+			// fmt.Println("rowDataExpiration " + rowDataExpiration)
+
+
+			// // expiration, err := time.Parse(time.RFC3339, rowDataExpiration)
+			// expiration, err := time.Parse(`"`+time.RFC3339+`"`, `"`+rowDataExpiration+`"`)
+			// if err != nil {
+			//   panic(err)
+			// }
 			
+			// expiration, err := time.Parse(fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute()), rowDataExpiration)
+			// if err != nil {
+			//   panic(err)
+			// }
+			// expiration := fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+
+
 
 			// Delete share if its expiration date is before now
 			if now.After(expiration) {
@@ -345,19 +354,19 @@ func periodicClean() {
 			// if now.After(expiration) {
 			// 	fmt.Println()
 			// 	fmt.Println("EXPIRED")
-			// 	fmt.Println("id", rowDataId)
-			// 	fmt.Println("expiration", rowDataExpiration)
-			// 	fmt.Println("expiration", expiration)
-			// 	fmt.Println("now       ", now)
+			// 	fmt.Println("id            ", rowDataId)
+			// 	fmt.Println("expiration row", rowDataExpiration)
+			// 	fmt.Println("expiration    ", expiration)
+			// 	fmt.Println("now           ", now)
 
 			// } else if now.Before(expiration)  {
 				
 			// 	fmt.Println()
 			// 	fmt.Println("ALIVE")
-			// 	fmt.Println("id", rowDataId)
-			// 	fmt.Println("expiration", rowDataExpiration)
-			// 	fmt.Println("expiration", expiration)
-			// 	fmt.Println("now       ", now)
+			// 	fmt.Println("id            ", rowDataId)
+			// 	fmt.Println("expiration row", rowDataExpiration)
+			// 	fmt.Println("expiration    ", expiration)
+			// 	fmt.Println("now           ", now)
 
 			// }
 		}

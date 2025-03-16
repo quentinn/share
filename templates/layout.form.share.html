@@ -6,8 +6,8 @@
 <br><br>
 
 
-<!-- <input required id="expiration" type="datetime-local" name="expiration"> -->
-<input required id="expiration" type="date" name="expiration">
+<input required id="expiration" type="datetime-local" name="expiration">
+<!-- <input required id="expiration" type="date" name="expiration"> -->
 <label for="expiration">Expiration date</label>
 
 <br><br>
@@ -19,7 +19,8 @@
 
 
 <script>
-    var date = new Date();
+    // var date = new Date();
+    var date = new Date().toLocaleString();
     date.setMonth(date.getMonth() + 3);
     expiration = document.getElementById('expiration')
     expiration.valueAsDate = date
