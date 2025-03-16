@@ -1,0 +1,168 @@
+:root {
+    --color: #555bf6;
+    --darker-color: color-mix(in srgb, #000, var(--color) 40%);
+    --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
+
+    --radius: 8px;
+    --border: 3px;
+}
+
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
+
+* {
+    font-family: 'Lato', Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+body {
+    background-color: var(--lighter-color);
+}
+
+
+.dark {
+    background-color: #121212 !important;
+    color: #999 !important;
+}
+
+
+.container {
+    text-align: center;
+}
+
+
+.nav-item {
+    text-decoration: none !important;
+    display: inline-block;
+
+    margin: 10px;
+    padding: 8px 36px 8px 36px;
+
+}
+
+
+.right {
+    position: fixed;
+    right: 0;
+}
+
+
+/* .logo {
+    margin: 10px;
+    padding: 8px 36px 8px 36px;
+
+    background-color: none;
+    border: none;
+} */
+
+
+.logo>img {
+    width: 110px;
+}
+
+
+.footer {
+
+    text-align: center !important;
+    position: fixed;
+    bottom: 0;
+
+}
+
+
+h1 {
+    color: var(--darker-color);
+}
+
+
+.button {
+    text-align: center !important;
+
+    width: 200px !important;
+
+    margin: 10px;
+    padding: 24px 36px 24px 36px;
+
+    border-radius: var(--radius);
+    background-color: var(--color);
+
+    border-color: var(--darker-color) !important;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 3px solid;
+
+    color: var(--darker-color) !important;
+    font-weight: bold;
+}
+
+
+.button:hover {
+    cursor: pointer;
+}
+
+
+.button:active {
+    cursor: press;
+
+    padding: 24px 36px 24px 36px;
+    background-color: var(--darker-color);
+}
+
+
+input[type=file] {
+
+    width: 70%;
+    height: 300px;
+    /* margin: 10px; */
+    /* padding: 36% 64% 36% 64%; */
+    text-align: center !important;
+    padding: 12px 20px;
+
+    border-color: var(--color) !important;
+    border: var(--border) dashed;
+    border-radius: var(--radius);
+    max-width: 100%;
+
+    /* color: transparent; */
+
+}
+
+
+input[type=file]::file-selector-button {
+    visibility: hidden;
+
+}
+
+
+input[type=file]:hover {
+
+    cursor: pointer;
+
+}
+
+
+textarea {
+    width: 70%;
+    height: 300px;
+
+    background-color: transparent;
+    padding: 12px 20px;
+
+
+    border-color: var(--color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+    max-width: 100%;
+
+
+    resize: none;
+
+    font-size: 18px;
+
+    max-width: 100%;
+
+    outline: none;
+
+
+}
