@@ -227,54 +227,6 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 
-// func unlockShare(w http.ResponseWriter, r *http.Request)  {
-
-// 		r.ParseForm()
-
-
-// 		url := r.Header.Get("Referer")
-// 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
-
-
-// 		givenPasswordHash := r.FormValue("givenPasswordHash")
-
-		
-// 		sharePassword := getSharePassword(idToUnlock)
-// 		hash := sha256.New()
-// 		hash.Write([]byte(sharePassword))
-// 		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
-
-
-// 		shareContentMap := getShareContent(idToUnlock)
-// 		shareContentType := shareContentMap["type"]
-// 		shareContentValue := shareContentMap["value"]
-	
-
-// 		if givenPasswordHash == sharePasswordHash {
-// 			data := map[string]interface{}{
-// 				"sharePasswordHash": sharePasswordHash,
-// 				"shareContentType": shareContentType,
-// 				"shareContentValue": shareContentValue,
-// 			}
-			
-// 			jsonData, err := json.Marshal(data)
-// 			if err != nil {
-// 				fmt.Printf("could not marshal json: %s\n", err)
-// 				return
-// 			}
-		
-// 			w.Write(jsonData) // write JSON to JS
-
-// 		} else {
-// 			fmt.Printf("password hash mismatch\n")
-// 		}
-
-// }
-
-
-
-
-
 func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 		r.ParseForm()
@@ -342,7 +294,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 			} else {
 				// Or delete the share because the maxopen has been reached
-				go deleteShare(idToUnlock)
+				go deleteShare(idToUnlock) // This should never comes here, but why don't leave this ?
 			}
 			
 
