@@ -1,10 +1,10 @@
 {{ template "layout.header.html" . }}
-<h1>file</h1>
+<h1>Share a file</h1>
 
 <form action="/file/shared" method="post" enctype="multipart/form-data">
     <input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}"/>
 
-	<input required type="file" name="myFile" />
+	<input required type="file" name="myFile"/>
 
 	{{ template "layout.form.share.html" . }}
 </form>
