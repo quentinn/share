@@ -227,6 +227,54 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 
+// func unlockShare(w http.ResponseWriter, r *http.Request)  {
+
+// 		r.ParseForm()
+
+
+// 		url := r.Header.Get("Referer")
+// 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+// 		givenPasswordHash := r.FormValue("givenPasswordHash")
+
+		
+// 		sharePassword := getSharePassword(idToUnlock)
+// 		hash := sha256.New()
+// 		hash.Write([]byte(sharePassword))
+// 		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
+
+
+// 		shareContentMap := getShareContent(idToUnlock)
+// 		shareContentType := shareContentMap["type"]
+// 		shareContentValue := shareContentMap["value"]
+	
+
+// 		if givenPasswordHash == sharePasswordHash {
+// 			data := map[string]interface{}{
+// 				"sharePasswordHash": sharePasswordHash,
+// 				"shareContentType": shareContentType,
+// 				"shareContentValue": shareContentValue,
+// 			}
+			
+// 			jsonData, err := json.Marshal(data)
+// 			if err != nil {
+// 				fmt.Printf("could not marshal json: %s\n", err)
+// 				return
+// 			}
+		
+// 			w.Write(jsonData) // write JSON to JS
+
+// 		} else {
+// 			fmt.Printf("password hash mismatch\n")
+// 		}
+
+// }
+
+
+
+
+
 func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 		r.ParseForm()
@@ -250,23 +298,56 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 		shareContentValue := shareContentMap["value"]
 	
 
+		shareOpenMap := getShareOpen(idToUnlock)
+		shareCurrentOpen := shareOpenMap["currentopen"]
+		shareMaxOpen := shareOpenMap["maxopen"]
+
+
+		fmt.Println("shareCurrentOpen", shareCurrentOpen)
+		fmt.Println("shareMaxOpen", shareMaxOpen)
+
+		// Check if password match
 		if givenPasswordHash == sharePasswordHash {
-			data := map[string]interface{}{
-				"sharePasswordHash": sharePasswordHash,
-				"shareContentType": shareContentType,
-				"shareContentValue": shareContentValue,
+
+			// Check if the share has not expired
+			if shareCurrentOpen < shareMaxOpen {
+
+				// Increment opened count
+				updateShareOpen(idToUnlock)
+
+				data := map[string]interface{}{
+					"sharePasswordHash": sharePasswordHash,
+					"shareContentType": shareContentType,
+					"shareContentValue": shareContentValue,
+				}
+				
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Printf("could not marshal json: %s\n", err)
+					return
+				}
+			
+				w.Write(jsonData) // write JSON to JS
+
+
+				// Check if this open is the last allowed and delete it, if it is (many 2 letters "i" words here ^^)
+				shareOpenMap := getShareOpen(idToUnlock)
+				shareCurrentOpen := shareOpenMap["currentopen"]
+				shareMaxOpen := shareOpenMap["maxopen"]
+				if shareCurrentOpen >= shareMaxOpen {
+					go deleteShare(idToUnlock)
+				}
+
+
+
+			} else {
+				// Or delete the share because the maxopen has been reached
+				go deleteShare(idToUnlock)
 			}
 			
-			jsonData, err := json.Marshal(data)
-			if err != nil {
-				fmt.Printf("could not marshal json: %s\n", err)
-				return
-			}
-		
-			w.Write(jsonData) // write JSON to JS
 
 		} else {
-			fmt.Printf("password hash mismatch\n")
+			fmt.Println("password hash mismatch")
 		}
 
 }
@@ -290,7 +371,7 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 
 		// Create database entries
-		createSecret(id, shared_id, r.PostFormValue("mySecret"), r.PostFormValue("expiration"))
+		createSecret(id, shared_id, r.PostFormValue("mySecret"), r.PostFormValue("expiration"), r.PostFormValue("maxopen"))
 
 
 		// Display the confirmation
@@ -373,7 +454,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 		// Create database entries
-		createFile(id, shared_id, filePath, r.PostFormValue("expiration"))		
+		createFile(id, shared_id, filePath, r.PostFormValue("expiration"), r.PostFormValue("maxopen"))
 
 
 		

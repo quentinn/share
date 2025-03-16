@@ -44,7 +44,7 @@ func createDatabase() {
 
 		
 			sqlStmt := `
-			CREATE TABLE share (id text not null primary key, password text, maxopen int, expiration text, creation text);
+			CREATE TABLE share (id text not null primary key, password text, maxopen int, currentopen int, expiration text, creation text);
 			DELETE FROM share;
 			CREATE TABLE file (id text not null primary key, path text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 			DELETE FROM file;
@@ -66,7 +66,7 @@ func createDatabase() {
 
 
 
-func createShare(id string, expirationChosen string) {
+func createShare(id string, expirationGiven string, maxopenGiven string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -80,11 +80,12 @@ func createShare(id string, expirationChosen string) {
 
 	creation := sql.Named("creation", now)
 	password := sql.Named("password", generatePassword())
-	maxopen := 3
-	expiration := sql.Named("expiration", expirationChosen)
+	maxopen := sql.Named("maxopen", maxopenGiven)
+	currentopen := 0
+	expiration := sql.Named("expiration", expirationGiven)
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :expiration, :creation)", id, password, maxopen, expiration, creation)
+	_, err = db.Exec("INSERT INTO share(id, password, maxopen, currentopen, expiration, creation) values(:id, :password, :maxopen, :currentopen, :expiration, :creation)", id, password, maxopen, currentopen, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +94,7 @@ func createShare(id string, expirationChosen string) {
 
 
 
-func createFile(id string, share_id string, path string, expiration string) {
+func createFile(id string, share_id string, path string, expiration string, maxopen string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -107,13 +108,13 @@ func createFile(id string, share_id string, path string, expiration string) {
 	}
 
 
-	createShare(share_id, expiration)
+	createShare(share_id, expiration, maxopen)
 }
 
 
 
 
-func createSecret(id string, share_id string, text string, expiration string) {
+func createSecret(id string, share_id string, text string, expiration string, maxopen string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -126,7 +127,7 @@ func createSecret(id string, share_id string, text string, expiration string) {
 	}
 
 
-	createShare(share_id, expiration)
+	createShare(share_id, expiration, maxopen)
 }
 
 
@@ -212,6 +213,79 @@ func getSharePassword(share_id string) string {
 	
 	return rowData
 }
+
+
+
+
+// Get the password of a share
+func getShareOpen(share_id string) map[string]string {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	row := db.QueryRow("SELECT currentopen, maxopen FROM share WHERE id = :share_id", share_id)
+	var rowDataCurrentOpen string
+	var rowDataMaxOpen string
+	switch err := row.Scan(&rowDataCurrentOpen, &rowDataMaxOpen); err {
+		case sql.ErrNoRows:
+			fmt.Println("No row returned from table 'share'")
+		case nil:
+			fmt.Println("Rows found:", rowDataCurrentOpen, "and", rowDataMaxOpen)
+		default:
+			panic(err)
+	}
+
+	
+	return map[string]string{
+		"currentopen": rowDataCurrentOpen,
+		"maxopen": rowDataMaxOpen,
+	}
+
+}
+
+
+
+
+// Get the password of a share
+func updateShareOpen(share_id string) {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	row := db.QueryRow("SELECT currentopen FROM share WHERE id = :share_id", share_id)
+	var rowDataCurrentOpen string
+	switch err := row.Scan(&rowDataCurrentOpen); err {
+		case sql.ErrNoRows:
+			fmt.Println("No row returned from table 'share'")
+		case nil:
+			fmt.Println("Rows found:", rowDataCurrentOpen)
+		default:
+			panic(err)
+	}
+
+
+	// Increment the open (meaning it has been opened one time)
+	// currentopen := rowDataCurrentOpen + "1"
+	currentopenInt, _ := strconv.Atoi(rowDataCurrentOpen)
+	currentopen := currentopenInt + 1
+
+	fmt.Println("rowDataCurrentOpen ", rowDataCurrentOpen)
+	fmt.Println("currentopen        ", currentopen)
+
+	_, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, share_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+}
+
 
 
 
