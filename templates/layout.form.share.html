@@ -19,9 +19,36 @@
 
 
 <script>
-    // var date = new Date();
-    var date = new Date().toLocaleString();
-    date.setMonth(date.getMonth() + 3);
+    // var date = new Date().toLocaleString();
+    // date.setMonth(date.getMonth() + 3);
+    // expiration = document.getElementById('expiration')
+    // expiration.valueAsDate = date
+
+
+
+    var defaultExpiration = new Date();
+    defaultExpiration.setMinutes(defaultExpiration.getMinutes() - defaultExpiration.getTimezoneOffset());
+    defaultExpiration.setHours(defaultExpiration.getHours() + 168);
+
+
+
+    var min = new Date();
+    min.setMinutes(min.getMinutes() - min.getTimezoneOffset());
+    min.setHours(min.getHours());
+
+
+    var max = new Date();
+    max.setMinutes(max.getMinutes() - max.getTimezoneOffset());
+    max.setHours(max.getHours() + 504);
+
+
+
     expiration = document.getElementById('expiration')
-    expiration.valueAsDate = date
+    expiration.value = defaultExpiration.toISOString().slice(0, 16);
+    expiration.min = min.toISOString().slice(0, 16);
+    expiration.max = max.toISOString().slice(0, 16);
+
+
+
+
 </script>

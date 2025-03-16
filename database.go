@@ -270,7 +270,7 @@ func deleteShare(share_id string) {
 
 
 // Set a task to run at a specific date
-// Regularly check for all share expiration date, and delete them if expired
+// Regularly check for all shares expiration date, and delete them if expired
 func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
