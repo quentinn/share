@@ -20,6 +20,7 @@ var dbFile string = "sqlite.db"
 
 
 
+
 func createDatabase() {
 
 	// Env var given from pseudo CLI
@@ -64,27 +65,6 @@ func createDatabase() {
 
 
 
-// func createShare(id string) {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer db.Close()
-
-
-// 	password := sql.Named("password", generatePassword())
-// 	maxopen := 3
-// 	expiration := sql.Named("datetime", time.Now())
-// 	creation := sql.Named("datetime", time.Now())
-
-
-// 	_, err = db.Exec("INSERT INTO share(id, password, maxopen, expiration, creation) values(:id, :password, :maxopen, :datetime, :datetime)", id, password, maxopen, expiration, creation)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
-
-
 
 func createShare(id string, expirationChosen string) {
 	db, err := sql.Open("sqlite3", dbFile)
@@ -97,6 +77,7 @@ func createShare(id string, expirationChosen string) {
 
 	t := time.Now()
 	now := fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+
 	creation := sql.Named("creation", now)
 	password := sql.Named("password", generatePassword())
 	maxopen := 3
@@ -288,15 +269,12 @@ func deleteShare(share_id string) {
 
 
 
-
 // Set a task to run at a specific date
 // Regularly check for all share expiration date, and delete them if expired
 func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
-	// task.Every(1).Hours().Do(func() {
 	task.Every(1).Minutes().Do(func() {
-	// task.Every(4).Seconds().Do(func() {
 		fmt.Println("Periodic cleaning task started at:", time.Now())
 
 		db, err := sql.Open("sqlite3", dbFile)
@@ -326,24 +304,6 @@ func periodicClean() {
 			if err != nil {
 				log.Fatal(err)
 			}
-
-			// fmt.Println("now               " + now.String())
-			// fmt.Println("expiration        " + expiration.String())
-			// fmt.Println("rowDataExpiration " + rowDataExpiration)
-
-
-			// // expiration, err := time.Parse(time.RFC3339, rowDataExpiration)
-			// expiration, err := time.Parse(`"`+time.RFC3339+`"`, `"`+rowDataExpiration+`"`)
-			// if err != nil {
-			//   panic(err)
-			// }
-			
-			// expiration, err := time.Parse(fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute()), rowDataExpiration)
-			// if err != nil {
-			//   panic(err)
-			// }
-			// expiration := fmt.Sprintf("%d-%02d-%02dT%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
-
 
 
 			// Delete share if its expiration date is before now
