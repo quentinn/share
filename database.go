@@ -28,13 +28,11 @@ func createDatabase() {
 	// reset						=> delete then create db (and create if if not exists)		=> DELETE_DB_ON_NEXT_START = true
 
 
-
 	// Env var given from pseudo CLI
 	var DELETE_DB_ON_NEXT_START, err = strconv.ParseBool(os.Getenv("DELETE_DB_ON_NEXT_START"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 
 	var query = `
@@ -45,7 +43,6 @@ func createDatabase() {
 	CREATE TABLE secret (id text not null primary key, text text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 	DELETE FROM secret;
 	`
-
 	
 	
 	// Reset database only if the user has decided to
@@ -56,7 +53,7 @@ func createDatabase() {
 			os.Remove(dbFile)
 		}
 	
-		// Create + open the database
+		// Open connexion
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
 			log.Fatal(err)
@@ -78,7 +75,7 @@ func createDatabase() {
 		// Check if file exists to create it if not
 		if ! fileExists(dbFile) {
 			
-			// Create + open the database
+			// Open connexion
 			db, err := sql.Open("sqlite3", dbFile)
 			if err != nil {
 				log.Fatal(err)
@@ -98,41 +95,6 @@ func createDatabase() {
 		}
 
 	}
-
-	// // Delete database only if the user has decided to.
-	// if DELETE_DB_ON_NEXT_START == true {
-			
-	// 	// Delete the file if exists
-	// 	if _, err := os.Stat(dbFile); err == nil {
-	// 		os.Remove(dbFile)
-	// 	}
-
-	// 	// Create + open the database
-	// 	db, err := sql.Open("sqlite3", dbFile)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	defer db.Close()
-
-
-	// 	query := `
-	// 	CREATE TABLE share (id text not null primary key, password text, maxopen int, currentopen int, expiration text, creation text);
-	// 	DELETE FROM share;
-	// 	CREATE TABLE file (id text not null primary key, path text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
-	// 	DELETE FROM file;
-	// 	CREATE TABLE secret (id text not null primary key, text text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
-	// 	DELETE FROM secret;
-	// 	`
-
-	// 	// Create tables
-	// 	_, err = db.Exec(query)
-	// 	if err != nil {
-	// 		log.Printf("%q: %s\n", err, query)
-	// 		return
-	// 	}
-
-	// 	fmt.Printf("%s ready\n", dbFile);
-	// }
 }
 
 
