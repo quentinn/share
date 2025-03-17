@@ -6,8 +6,8 @@ Share is a web service that permit to securely share files and secrets to anyone
 
 ## Install from sources
 ```
-git clone git@github.com:ggtrd/share.git
-cd share
+git clone git@github.com:ggtrd/share.git \
+cd share \
 go mod tidy
 ```
 ```
