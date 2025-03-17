@@ -117,7 +117,7 @@ func (a *App) Start() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	http.Handle("/", logReq(viewIndex))
+	http.Handle("/", http.RedirectHandler("/secret", http.StatusSeeOther))		// Redirect to /secret by default
 
 	http.Handle("/file", logReq(viewCreateFile))								// Form to create a share
 	http.Handle("/file/shared", logReq(uploadFile))								// Confirmation + display the link of the share to the creator
@@ -342,7 +342,7 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 
 
 		// Display the confirmation
-		renderTemplate(w, "view.confirm.secret.html", struct {
+		renderTemplate(w, "view.confirm.share.html", struct {
 			Link string				// To permit the user to click on it 
 			Url string				// To permit the user to copy it
 			Password string			// To permit the user to copy it
@@ -426,7 +426,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 		
 		// Display the confirmation
-		renderTemplate(w, "view.confirm.file.html", struct {
+		renderTemplate(w, "view.confirm.share.html", struct {
 			Link string				// To permit the user to click on it 
 			Url string				// To permit the user to copy it
 			Password string			// To permit the user to copy it
