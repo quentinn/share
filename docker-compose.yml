@@ -2,5 +2,5 @@ services:
   share:
     image: share:latest
     ports:
-      - "8000:80"
+      - "8080:8080"
     restart: unless-stopped
