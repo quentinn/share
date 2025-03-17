@@ -1,6 +1,6 @@
 # Share
 
-Share is a web service that permit to securely share files and secrets to anyone
+Share is a web service that permit to securely share files and secrets to anyone.
 
 
 ## Install from sources
@@ -27,10 +27,8 @@ docker compose up -d
 
 ## Use the CLI
 
-if runned with Docker:
-```
-docker exec compose up -d
-```
+> [!TIP] if runned with Docker:
+> ```docker exec -it share-share-1 sh```
 
 ```
 go run share help
