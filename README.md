@@ -32,7 +32,7 @@ docker compose up -d
 ## Use the CLI
 
 > if runned with Docker:
-> ```docker exec -it share-share-1 sh```
+> ```docker exec -it <container> sh```
 
 ```
 go run share help
