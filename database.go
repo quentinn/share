@@ -29,20 +29,22 @@ func createDatabase() {
 		log.Fatal(err)
 	}
 
-
-	if _, err := os.Stat(dbFile); err == nil {
-		fmt.Printf("%s found\n", dbFile);
-
 		// Delete database only if the user has decided to.
 		if DELETE_DB_ON_NEXT_START == true {
-			os.Remove(dbFile)
+			
+			// Delete the file if exists
+			if _, err := os.Stat(dbFile); err == nil {
+				os.Remove(dbFile)
+			}
+
+			// Create + open the database
 			db, err := sql.Open("sqlite3", dbFile)
 			if err != nil {
 				log.Fatal(err)
 			}
 			defer db.Close()
 
-		
+
 			sqlStmt := `
 			CREATE TABLE share (id text not null primary key, password text, maxopen int, currentopen int, expiration text, creation text);
 			DELETE FROM share;
@@ -51,16 +53,16 @@ func createDatabase() {
 			CREATE TABLE secret (id text not null primary key, text text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 			DELETE FROM secret;
 			`
+
+			// Create tables
 			_, err = db.Exec(sqlStmt)
 			if err != nil {
 				log.Printf("%q: %s\n", err, sqlStmt)
 				return
 			}
+
+			fmt.Printf("%s ready\n", dbFile);
 		}
-		
-	}
-
-
 }
 
 
