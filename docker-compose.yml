@@ -1,0 +1,5 @@
+services:
+  share:
+    image: share:latest
+    ports:
+     - "80:8080"
