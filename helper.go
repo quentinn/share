@@ -78,3 +78,11 @@ func backupFile(sourceFile string) {
 
 
 
+// Check if a file exists
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+	   return false
+	}
+	return !info.IsDir()
+ }
