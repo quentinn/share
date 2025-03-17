@@ -65,6 +65,19 @@ func main() {
 		} else if string(os.Args[1]) == "backup" {
 			backupFile("sqlite.db")
 
+		// go run share list
+		} else if string(os.Args[1]) == "list" {
+			listShareOpen()
+
+		// go run share password <share_id>
+		} else if string(os.Args[1]) == "password" {
+			if len(args) > 1 {
+				shareId := string(os.Args[2])
+				getSharePassword(shareId)
+			} else {
+				fmt.Println("Please provide a share id")
+			}
+
 		// go run share help
 		} else if string(os.Args[1]) == "help" {
 			fmt.Println("Share is a web service that permit to securely share files and secrets to anyone")

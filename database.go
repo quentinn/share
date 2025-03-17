@@ -378,6 +378,37 @@ func deleteShare(share_id string) {
 
 
 
+// Get list of shares
+func listShareOpen() {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	rows, err := db.Query("SELECT id, creation, expiration FROM share")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var id string
+	var creation string
+	var expiration string
+	for rows.Next() {
+		err := rows.Scan(&id, &creation, &expiration)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("ID:" + id + "; Creted:" + creation + "; Expire:" + expiration)
+
+	}
+}
+
+
+
+
 // Set a task to run at a specific date
 // Regularly check for all shares expiration date, and delete them if expired
 func periodicClean() {
