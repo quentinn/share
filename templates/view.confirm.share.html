@@ -1,0 +1,40 @@
+{{ template "layout.header.html" . }}
+<h1 class="title">Share created !</h1>
+
+
+<div class="container-left">
+
+    <div>
+        <div class="title">
+            Share link
+            <div class="text text-box">
+                {{ .Url }}{{ .Link }}
+            </div>
+        </div>
+        <br>
+
+        <div class="title">
+            Password
+
+            <div class="text text-box">
+                {{ .Password }}
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <div class="title">
+        One click link
+
+        <div class="text text-box">
+            {{ .Url }}{{ .Link }}#{{ .Password }}
+        </div>
+    </div>
+
+</div>
+
+
+{{ template "layout.footer.html" . }}
