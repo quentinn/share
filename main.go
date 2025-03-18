@@ -177,17 +177,6 @@ func renderTemplate(w http.ResponseWriter, name string, data interface{}) {
 
 
 
-func viewIndex(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "view.index.html", struct {
-		Name string
-	}{
-		Name: "name to fill",
-	})
-}
-
-
-
-
 func viewCreateFile(w http.ResponseWriter, r *http.Request) {
 
 	// Generate a token that will permit to prevent unwanted record to database due to browse the upload URL without using the form
