@@ -12,10 +12,13 @@ import (
 	"html/template"
 	"net/http"
 	"encoding/json"
-	"crypto/sha256"
+	// "crypto/sha256"
 
 	"github.com/google/uuid"
 
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
+    "github.com/ProtonMail/gopenpgp/v3/constants"
+	"github.com/ProtonMail/gopenpgp/v3/profile"
 )
 
 
@@ -231,80 +234,196 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 
-func unlockShare(w http.ResponseWriter, r *http.Request)  {
+// func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
-		r.ParseForm()
-
-
-		url := r.Header.Get("Referer")
-		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+// 		r.ParseForm()
 
 
-		givenPasswordHash := r.FormValue("givenPasswordHash")
+// 		url := r.Header.Get("Referer")
+// 		idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+// 		givenPasswordHash := r.FormValue("givenPasswordHash")
 
 		
-		sharePassword := getSharePassword(idToUnlock)
-		hash := sha256.New()
-		hash.Write([]byte(sharePassword))
-		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
+// 		sharePassword := getSharePassword(idToUnlock)
+// 		hash := sha256.New()
+// 		hash.Write([]byte(sharePassword))
+// 		sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
 
 
-		shareContentMap := getShareContent(idToUnlock)
-		shareContentType := shareContentMap["type"]
-		shareContentValue := shareContentMap["value"]
+// 		shareContentMap := getShareContent(idToUnlock)
+// 		shareContentType := shareContentMap["type"]
+// 		shareContentValue := shareContentMap["value"]
 	
 
-		shareOpenMap := getShareOpen(idToUnlock)
-		shareCurrentOpen := shareOpenMap["currentopen"]
-		shareMaxOpen := shareOpenMap["maxopen"]
+// 		shareOpenMap := getShareOpen(idToUnlock)
+// 		shareCurrentOpen := shareOpenMap["currentopen"]
+// 		shareMaxOpen := shareOpenMap["maxopen"]
 
 
-		fmt.Println("shareCurrentOpen", shareCurrentOpen)
-		fmt.Println("shareMaxOpen", shareMaxOpen)
+// 		fmt.Println("shareCurrentOpen", shareCurrentOpen)
+// 		fmt.Println("shareMaxOpen", shareMaxOpen)
 
-		// Check if password match
-		if givenPasswordHash == sharePasswordHash {
+// 		// Check if password match
+// 		if givenPasswordHash == sharePasswordHash {
 
-			// Check if the share has not expired
-			if shareCurrentOpen < shareMaxOpen {
+// 			// Check if the share has not expired
+// 			if shareCurrentOpen < shareMaxOpen {
 
-				// Increment opened count
-				updateShareOpen(idToUnlock)
+// 				// Increment opened count
+// 				updateShareOpen(idToUnlock)
 
-				data := map[string]interface{}{
-					"sharePasswordHash": sharePasswordHash,
-					"shareContentType": shareContentType,
-					"shareContentValue": shareContentValue,
-				}
+// 				data := map[string]interface{}{
+// 					"sharePasswordHash": sharePasswordHash,
+// 					"shareContentType": shareContentType,
+// 					"shareContentValue": shareContentValue,
+// 				}
 				
-				jsonData, err := json.Marshal(data)
-				if err != nil {
-					fmt.Printf("could not marshal json: %s\n", err)
-					return
-				}
+// 				jsonData, err := json.Marshal(data)
+// 				if err != nil {
+// 					fmt.Printf("could not marshal json: %s\n", err)
+// 					return
+// 				}
 			
-				w.Write(jsonData) // write JSON to JS
+// 				w.Write(jsonData) // write JSON to JS
 
 
-				// Check if this open is the last allowed and delete it, if it is (many 2 letters "i" words here ^^)
-				shareOpenMap := getShareOpen(idToUnlock)
-				shareCurrentOpen := shareOpenMap["currentopen"]
-				shareMaxOpen := shareOpenMap["maxopen"]
-				if shareCurrentOpen >= shareMaxOpen {
-					go deleteShare(idToUnlock)
-				}
+// 				// Check if this open is the last allowed and delete it, if it is (many 2 letters "i" words here ^^)
+// 				shareOpenMap := getShareOpen(idToUnlock)
+// 				shareCurrentOpen := shareOpenMap["currentopen"]
+// 				shareMaxOpen := shareOpenMap["maxopen"]
+// 				if shareCurrentOpen >= shareMaxOpen {
+// 					go deleteShare(idToUnlock)
+// 				}
 
 
 
-			} else {
-				// Or delete the share because the maxopen has been reached
-				go deleteShare(idToUnlock) // This should never comes here, but why don't leave this ?
+// 			} else {
+// 				// Or delete the share because the maxopen has been reached
+// 				go deleteShare(idToUnlock) // This should never comes here, but why don't leave this ?
+// 			}
+			
+
+// 		} else {
+// 			fmt.Println("password hash mismatch")
+// 		}
+
+// }
+
+
+
+func ExamplePGPHandle_Encryption_password() {
+
+}
+
+
+
+func unlockShare(w http.ResponseWriter, r *http.Request)  {
+
+	r.ParseForm()
+
+
+	url := r.Header.Get("Referer")
+	idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
+
+
+	// givenPasswordHash := r.FormValue("givenPasswordHash")
+
+	
+	// sharePassword := getSharePassword(idToUnlock)
+	// hash := sha256.New()
+	// hash.Write([]byte(sharePassword))
+	// sharePasswordHash := fmt.Sprintf("%x", []byte(hash.Sum(nil)))
+
+
+
+
+	
+	// Generate a PGP key to send to frontend
+	var (
+		name = "Share"
+		id = idToUnlock
+		passphrase = []byte("LongSecret")
+	)
+	pgp := crypto.PGPWithProfile(profile.Default())
+
+
+	keyGenHandle := pgp.KeyGeneration().AddUserId(name, id).New()
+	rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("id            ", id)
+	fmt.Println("passphrase    ", passphrase)
+	fmt.Println("pgp           ", pgp)
+	fmt.Println("keyGenHandle  ", keyGenHandle)
+	fmt.Println("rsaKeyHigh    ", rsaKeyHigh)
+
+
+
+
+
+
+
+	shareContentMap := getShareContent(idToUnlock)
+	shareContentType := shareContentMap["type"]
+	shareContentValue := shareContentMap["value"]
+
+
+	shareOpenMap := getShareOpen(idToUnlock)
+	shareCurrentOpen := shareOpenMap["currentopen"]
+	shareMaxOpen := shareOpenMap["maxopen"]
+
+
+	fmt.Println("shareCurrentOpen", shareCurrentOpen)
+	fmt.Println("shareMaxOpen", shareMaxOpen)
+
+	// Check if password match
+	// if givenPasswordHash == sharePasswordHash {
+
+		// Check if the share has not expired
+		if shareCurrentOpen < shareMaxOpen {
+
+			// Increment opened count
+			updateShareOpen(idToUnlock)
+
+			data := map[string]interface{}{
+				// "sharePasswordHash": sharePasswordHash,
+				"shareContentType": shareContentType,
+				"shareContentValue": shareContentValue,
 			}
 			
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				fmt.Printf("could not marshal json: %s\n", err)
+				return
+			}
+		
+			w.Write(jsonData) // write JSON to JS
+
+
+			// Check if this open is the last allowed and delete it, if it is (many 2 letters "i" words here ^^)
+			shareOpenMap := getShareOpen(idToUnlock)
+			shareCurrentOpen := shareOpenMap["currentopen"]
+			shareMaxOpen := shareOpenMap["maxopen"]
+			if shareCurrentOpen >= shareMaxOpen {
+				go deleteShare(idToUnlock)
+			}
+
+
 
 		} else {
-			fmt.Println("password hash mismatch")
+			// Or delete the share because the maxopen has been reached
+			go deleteShare(idToUnlock) // This should never comes here, but why don't leave this ?
 		}
+		
+
+	// } else {
+	// 	fmt.Println("password hash mismatch")
+	// }
 
 }
 
