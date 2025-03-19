@@ -17,8 +17,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
-    "github.com/ProtonMail/gopenpgp/v3/constants"
-	"github.com/ProtonMail/gopenpgp/v3/profile"
+    // "github.com/ProtonMail/gopenpgp/v3/constants"
+	// "github.com/ProtonMail/gopenpgp/v3/profile"
 )
 
 
@@ -218,16 +218,40 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
-	id := r.PathValue("id")
-	password_database := getSharePassword(id)
+	shareId := r.PathValue("id")
+	sharePassword := getSharePassword(shareId)
+
+
+	// pgpPassword := []byte(generatePassword())
+
+
 	
+	pgp := crypto.PGP()
+	keyGenHandle := pgp.KeyGeneration().AddUserId(shareId, sharePassword).New()
+	keyPrivate, _ := keyGenHandle.GenerateKey()
+	keyPublic, _ := keyPrivate.ToPublic()
+	keyPrivateChain, _ := keyPrivate.Armor()
+	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
+
+
+	fmt.Println(keyPrivate.Armor())
+	fmt.Println("genHandle  ", keyGenHandle)
+	fmt.Println("keyPrivate ", keyPrivate)
+	fmt.Println("keyPublic  ", keyPublic)
+	fmt.Println("privk      ", keyPrivateChain)
+	fmt.Println("pubk       ", keyPublicChain)
+	fmt.Println("pgp        ", pgp)
+
+
 
 	renderTemplate(w, "view.unlock.share.html", struct {
-		Id string
-		Password string
+		ShareId string
+		SharePassword string
+		PgpKeyPublic string
 	}{
-		Id: id,
-		Password: password_database,
+		ShareId: shareId,
+		SharePassword: sharePassword,
+		PgpKeyPublic: keyPublicChain,
 	})
 }
 
@@ -313,11 +337,6 @@ func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 
 
-func ExamplePGPHandle_Encryption_password() {
-
-}
-
-
 
 func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
@@ -340,27 +359,27 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 
 	
-	// Generate a PGP key to send to frontend
-	var (
-		name = "Share"
-		id = idToUnlock
-		passphrase = []byte("LongSecret")
-	)
-	pgp := crypto.PGPWithProfile(profile.Default())
+	// // Generate a PGP key to send to frontend
+	// var (
+	// 	name = "Share"
+	// 	id = idToUnlock
+	// 	passphrase = []byte("LongSecret")
+	// )
+	// pgp := crypto.PGPWithProfile(profile.Default())
 
 
-	keyGenHandle := pgp.KeyGeneration().AddUserId(name, id).New()
-	rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// keyGenHandle := pgp.KeyGeneration().AddUserId(name, id).New()
+	// rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	fmt.Println("id            ", id)
-	fmt.Println("passphrase    ", passphrase)
-	fmt.Println("pgp           ", pgp)
-	fmt.Println("keyGenHandle  ", keyGenHandle)
-	fmt.Println("rsaKeyHigh    ", rsaKeyHigh)
+	// fmt.Println("id            ", id)
+	// fmt.Println("passphrase    ", passphrase)
+	// fmt.Println("pgp           ", pgp)
+	// fmt.Println("keyGenHandle  ", keyGenHandle)
+	// fmt.Println("rsaKeyHigh    ", rsaKeyHigh)
 
 
 
