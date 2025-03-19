@@ -78,101 +78,102 @@
 
                 // put keys in backtick (``) to avoid errors caused by spaces or tabs
                 // const publicKey = `{{ .PgpKeyPublic }}`
-                const publicKey = '{{ .PgpKeyPublic }}'
+                // const publicKey = '{{ .PgpKeyPublic }}'
+                const publicKey = await openpgp.readKey({ armoredKey: `{{ .PgpKeyPublic }}` });
                 // console.log(publicKey);
 
                 const pgpMessageEncrypted = await openpgp.encrypt({
                     message: await openpgp.createMessage({ text: givenPassword }),
-                    encryptionKeys: '{{ .PgpKeyPublic }}',
+                    encryptionKeys: publicKey,
                     // passwords: "superstrongpassword",
                 });
-                // console.log(pgpMessageEncrypted);
+            console.log(pgpMessageEncrypted);
 
 
 
 
 
 
-                // Payload to send to backend
-                var details = {
-                    // 'givenPasswordHash': givenPasswordHash,
-                    'pgpMessageEncrypted': pgpMessageEncrypted,
-                };
-                var formBody = [];
-                for (var property in details) {
-                    var encodedKey = encodeURIComponent(property);
-                    var encodedValue = encodeURIComponent(details[property]);
-                    formBody.push(encodedKey + "=" + encodedValue);
+            // Payload to send to backend
+            var details = {
+                // 'givenPasswordHash': givenPasswordHash,
+                'pgpMessageEncrypted': pgpMessageEncrypted,
+            };
+            var formBody = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            let response = await fetch('/share/unlock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: formBody
+            });
+
+
+
+            try {
+                let result = await response.json();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // If the given password correspond to the password of the share
+                // if (givenPasswordHash === result.sharePasswordHash) {
+                let shareContent
+
+                if (result.shareContentType === "secret") {
+                    shareContent = document.createElement('p')
+                    shareContent.innerHTML = result.shareContentValue;
                 }
-                formBody = formBody.join("&");
-                let response = await fetch('/share/unlock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    body: formBody
-                });
 
-
-
-                try {
-                    let result = await response.json();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    // If the given password correspond to the password of the share
-                    // if (givenPasswordHash === result.sharePasswordHash) {
-                    let shareContent
-
-                    if (result.shareContentType === "secret") {
-                        shareContent = document.createElement('p')
-                        shareContent.innerHTML = result.shareContentValue;
-                    }
-
-                    if (result.shareContentType === "file") {
-                        shareContent = document.createElement('a')
-                        shareContent.innerHTML = result.shareContentValue;
-                        shareContent.href = result.shareContentValue;
-                    }
-
-                    shareContent.className = 'text';
-                    shareContent.className = 'text-box';
-
-                    future.replaceWith(shareContent)
-                    // }
-                } catch (e) {
-                    // console.log(e);
-
-                    if (!givenPassword) {
-                        display_error('Please fill the password')
-                    } else {
-                        display_error('Wrong password')
-                    }
+                if (result.shareContentType === "file") {
+                    shareContent = document.createElement('a')
+                    shareContent.innerHTML = result.shareContentValue;
+                    shareContent.href = result.shareContentValue;
                 }
+
+                shareContent.className = 'text';
+                shareContent.className = 'text-box';
+
+                future.replaceWith(shareContent)
+                // }
+            } catch (e) {
+                // console.log(e);
+
+                if (!givenPassword) {
+                    display_error('Please fill the password')
+                } else {
+                    display_error('Wrong password')
+                }
+            }
             };
 
 
