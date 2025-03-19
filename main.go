@@ -216,42 +216,61 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 
 
+// func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
+
+// 	id := r.PathValue("id")
+// 	password_database := getSharePassword(id)
+
+
+// 	renderTemplate(w, "view.unlock.share.html", struct {
+// 		Id string
+// 		Password string
+// 	}{
+// 		Id: id,
+// 		Password: password_database,
+// 	})
+// }
+
+
+
+
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {
 
 	shareId := r.PathValue("id")
-	sharePassword := getSharePassword(shareId)
+	// sharePassword := getSharePassword(shareId)
 
 
 	// pgpPassword := []byte(generatePassword())
 
 
 	
-	pgp := crypto.PGP()
-	keyGenHandle := pgp.KeyGeneration().AddUserId(shareId, sharePassword).New()
-	keyPrivate, _ := keyGenHandle.GenerateKey()
-	keyPublic, _ := keyPrivate.ToPublic()
-	keyPrivateChain, _ := keyPrivate.Armor()
-	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
+	// pgp := crypto.PGP()
+	// // keyGenHandle := pgp.KeyGeneration().AddUserId(shareId, sharePassword).New()
+	// keyGenHandle := pgp.KeyGeneration().AddUserId("share", shareId).New()
+	// keyPrivate, _ := keyGenHandle.GenerateKey()
+	// keyPublic, _ := keyPrivate.ToPublic()
+	// keyPrivateChain, _ := keyPrivate.Armor()
+	// keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
 
 
-	fmt.Println(keyPrivate.Armor())
-	fmt.Println("genHandle  ", keyGenHandle)
-	fmt.Println("keyPrivate ", keyPrivate)
-	fmt.Println("keyPublic  ", keyPublic)
-	fmt.Println("privk      ", keyPrivateChain)
-	fmt.Println("pubk       ", keyPublicChain)
-	fmt.Println("pgp        ", pgp)
+	// fmt.Println(keyPrivate.Armor())
+	// fmt.Println("genHandle            ", keyGenHandle)
+	// fmt.Println("keyPrivate           ", keyPrivate)
+	// fmt.Println("keyPublic            ", keyPublic)
+	// fmt.Println("keyPrivateChain      ", keyPrivateChain)
+	// fmt.Println("keyPublicChain       ", keyPublicChain)
+	// fmt.Println("pgp                  ", pgp)
 
 
 
 	renderTemplate(w, "view.unlock.share.html", struct {
 		ShareId string
-		SharePassword string
+		// SharePassword string
 		PgpKeyPublic string
 	}{
 		ShareId: shareId,
-		SharePassword: sharePassword,
-		PgpKeyPublic: keyPublicChain,
+		// SharePassword: sharePassword,
+		PgpKeyPublic: getShareKeyPublic(shareId),
 	})
 }
 
@@ -358,28 +377,72 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 
 
 
-	
-	// // Generate a PGP key to send to frontend
-	// var (
-	// 	name = "Share"
-	// 	id = idToUnlock
-	// 	passphrase = []byte("LongSecret")
-	// )
-	// pgp := crypto.PGPWithProfile(profile.Default())
+	pgpMessageEncrypted := r.FormValue("pgpMessageEncrypted")
 
 
-	// keyGenHandle := pgp.KeyGeneration().AddUserId(name, id).New()
-	// rsaKeyHigh, err := keyGenHandle.GenerateKeyWithSecurity(constants.HighSecurity)
+
+
+
+
+
+
+	// // Decrypt PGP message
+	// // shareGpgKeyPrivate := getShareKeyPrivate(idToUnlock)
+	// shareGpgKeyPrivate, err := crypto.NewKeyFromArmored(getShareKeyPrivate(idToUnlock))
+	// fmt.Println("shareGpgKeyPublic =>>>>>", shareGpgKeyPrivate)
+
+
+	// pgp := crypto.PGP()
+
+	// decHandle, err := pgp.Decryption().DecryptionKey(shareGpgKeyPrivate).New()
 	// if err != nil {
 	// 	fmt.Println(err)
+	// }
+
+	// armored, err := pgpMessage.Armor()
+	// if err != nil {
 	// 	return
 	// }
 
-	// fmt.Println("id            ", id)
-	// fmt.Println("passphrase    ", passphrase)
-	// fmt.Println("pgp           ", pgp)
-	// fmt.Println("keyGenHandle  ", keyGenHandle)
-	// fmt.Println("rsaKeyHigh    ", rsaKeyHigh)
+	// decrypted, err := decHandle.Decrypt(armored, crypto.Armor)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// myMessage := decrypted.Bytes()
+	// fmt.Println("myMessage =>>>>>", myMessage)
+
+
+
+
+	// Decrypt armored encrypted message using the private key and obtain the plaintext
+	privateKey, err := crypto.NewKeyFromArmored(getShareKeyPrivate(idToUnlock))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer privateKey.ClearPrivateParams()
+	pgp := crypto.PGP()
+	decHandle, err := pgp.
+		Decryption().
+		DecryptionKey(privateKey).
+		New()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	decrypted, err := decHandle.Decrypt([]byte(pgpMessageEncrypted), crypto.Armor)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("decrypted ------>>>>>>>>>>", decrypted.String())
+
+
+
+
+
+
+
 
 
 

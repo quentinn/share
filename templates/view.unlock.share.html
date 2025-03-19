@@ -21,10 +21,39 @@
         </form>
 
 
+        <!-- <script src="../static/openpgp.min.js"> -->
 
-        <script>
-            form = document.getElementById('form')
-            fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
+        <script type="module">
+            import * as openpgp from '../static/openpgp.min.mjs';
+
+
+            // import openpgp from '../static/openpgp.min.js'
+            // const openpgp = require('../static/openpgp.min.js')
+            // import * as openpgp from '../static/openpgp.min.mjs';
+            // const openpgp = require('../static/openpgp.min.mjs');
+
+
+
+
+
+
+            // (async () => {
+            //     // put keys in backtick (``) to avoid errors caused by spaces or tabs
+            //     const publicKey = `{{ .PgpKeyPublic }}`
+            //     console.log(publicKey);
+
+            //     const encrypted = await openpgp.encrypt({
+            //         message: await openpgp.createMessage({ text: "givenPassword" }),
+            //         encryptionKeys: publicKey,
+            //     });
+            //     console.log(encrypted);
+
+            // })();
+
+
+
+            let form = document.getElementById('form')
+            let fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
 
 
             // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
@@ -46,9 +75,28 @@
 
 
 
+
+                // put keys in backtick (``) to avoid errors caused by spaces or tabs
+                // const publicKey = `{{ .PgpKeyPublic }}`
+                const publicKey = '{{ .PgpKeyPublic }}'
+                // console.log(publicKey);
+
+                const pgpMessageEncrypted = await openpgp.encrypt({
+                    message: await openpgp.createMessage({ text: givenPassword }),
+                    // encryptionKeys: '{{ .PgpKeyPublic }}',
+                    passwords: "superstrongpassword",
+                });
+                // console.log(pgpMessageEncrypted);
+
+
+
+
+
+
                 // Payload to send to backend
                 var details = {
-                    'givenPasswordHash': givenPasswordHash,
+                    // 'givenPasswordHash': givenPasswordHash,
+                    'pgpMessageEncrypted': pgpMessageEncrypted,
                 };
                 var formBody = [];
                 for (var property in details) {
@@ -70,26 +118,52 @@
                 try {
                     let result = await response.json();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     // If the given password correspond to the password of the share
-                    if (givenPasswordHash === result.sharePasswordHash) {
-                        let shareContent
+                    // if (givenPasswordHash === result.sharePasswordHash) {
+                    let shareContent
 
-                        if (result.shareContentType === "secret") {
-                            shareContent = document.createElement('p')
-                            shareContent.innerHTML = result.shareContentValue;
-                        }
-
-                        if (result.shareContentType === "file") {
-                            shareContent = document.createElement('a')
-                            shareContent.innerHTML = result.shareContentValue;
-                            shareContent.href = result.shareContentValue;
-                        }
-
-                        shareContent.className = 'text';
-                        shareContent.className = 'text-box';
-
-                        future.replaceWith(shareContent)
+                    if (result.shareContentType === "secret") {
+                        shareContent = document.createElement('p')
+                        shareContent.innerHTML = result.shareContentValue;
                     }
+
+                    if (result.shareContentType === "file") {
+                        shareContent = document.createElement('a')
+                        shareContent.innerHTML = result.shareContentValue;
+                        shareContent.href = result.shareContentValue;
+                    }
+
+                    shareContent.className = 'text';
+                    shareContent.className = 'text-box';
+
+                    future.replaceWith(shareContent)
+                    // }
                 } catch (e) {
                     // console.log(e);
 
