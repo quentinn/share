@@ -1,20 +1,23 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
+
 :root {
     --color: #e9b42d;
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
     --lighter2-color: color-mix(in srgb, #fff, var(--color) 20%);
+    --error-color: #FF4141;
 
     --radius: 8px;
     --border: 3px;
 }
 
 
-@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 * {
     font-family: 'Lato', Helvetica, sans-serif;
     line-height: 1.5;
 }
+
 
 *:hover {
     transition: 0.2s;
@@ -31,7 +34,7 @@ body {
 }
 
 
-.dark > * > h1 {
+.dark>*>h1 {
     color: var(--darker2-color);
 }
 
@@ -57,15 +60,24 @@ body {
     padding-right: 10%;
     padding-top: 2%;
     padding-bottom: 2%;
+
+
+    /* border: 1px solid red; */
 }
 
 
 .container-left {
     text-align: left;
-    padding-left: 10%;
-    padding-right: 10%;
+    /* padding-left: 10%;
+    padding-right: 10%; */
     padding-top: 10%;
     padding-bottom: 10%;
+
+    /* margin-left: 10%;
+    margin-right: 10%; */
+    
+    
+    /* border: 1px solid red; */
 }
 
 
@@ -155,6 +167,14 @@ h1 {
 }
 
 
+.label {
+    color: var(--color);
+    font-weight: bold;
+    font-size: 22px;
+    text-align: left !important;
+}
+
+
 .text {
     color: var(--darker-color);
     font-weight: bold;
@@ -173,7 +193,7 @@ h1 {
 .button {
     text-align: center !important;
 
-    width: 200px !important;
+    width: 200px;
 
     margin: 10px;
     padding: 24px 36px 24px 36px;
@@ -202,8 +222,30 @@ h1 {
 .button:active {
     cursor: press;
 
-    padding: 24px 36px 24px 36px;
+    /* padding: 24px 36px 24px 36px; */
     background-color: var(--darker-color);
+}
+
+
+input[type=password] {
+
+    width: 100%;
+    padding: 12px 20px 12px 20px;
+
+    border-color: var(--color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+    background-color: transparent;
+    outline: none;
+    
+    font-weight: bold;
+    font-size: 16px;
+
+    display: block;
+
+    box-sizing: border-box;
+
 }
 
 
@@ -260,4 +302,32 @@ textarea {
     max-width: 100%;
 
     outline: none;
+}
+
+
+.notification {
+    z-index: 999;
+    position: absolute;
+    
+    top: 10px;
+    left: 25%;
+    right: 25%;
+    margin-left: auto;
+    margin-right: auto;
+
+    padding: 12px 20px;
+    width: 30%;
+
+    border-color: var(--error-color) !important;
+    background-color: var(--error-color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+    
+    color: var(--lighter-color);
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+
+
 }
