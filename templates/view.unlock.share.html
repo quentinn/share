@@ -11,26 +11,17 @@
             <label for="givenPassword">Password</label>
             <input id="givenPassword" type="password" />
 
-
-            <!-- just to submit the hash with the form -->
-            <input id="givenPasswordHash" type="password" disabled hidden />
-
             <input type="submit" value="unlock">
 
             <div id="error"></div>
         </form>
 
 
-
+        <script src="../static/openpgp.min.js"></script>
         <script>
-            form = document.getElementById('form')
-            fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
 
-
-            // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
-            document.getElementById("givenPassword").addEventListener("input", function () {
-                document.getElementById("givenPasswordHash").value = sha256(this.value);
-            });
+            let form = document.getElementById('form')
+            let fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
 
 
             // This permit to send data to /share/unlock without reloading the HTML.
@@ -42,13 +33,21 @@
                 let future = document.getElementById('future')                                  // Element that will be replaced with the content of the share
                 let error = document.getElementById('error')                                    // Element to display error like wrong passwords
                 let givenPassword = document.getElementById('givenPassword').value              // Password given by the user
-                let givenPasswordHash = document.getElementById('givenPasswordHash').value      // Hash of the password given by the user to send to backend
+
+
+                // Encrypt givenPassword with the PGP public key of the share generated from backend
+                // Using OpenPGP.js
+                const publicKey = await openpgp.readKey({ armoredKey: `{{ .PgpKeyPublic }}` });
+                const pgpMessageEncrypted = await openpgp.encrypt({
+                    message: await openpgp.createMessage({ text: givenPassword }),
+                    encryptionKeys: publicKey,
+                });
 
 
 
                 // Payload to send to backend
                 var details = {
-                    'givenPasswordHash': givenPasswordHash,
+                    'pgpMessageEncrypted': pgpMessageEncrypted,
                 };
                 var formBody = [];
                 for (var property in details) {
@@ -69,27 +68,23 @@
 
                 try {
                     let result = await response.json();
+                    let shareContent
 
-                    // If the given password correspond to the password of the share
-                    if (givenPasswordHash === result.sharePasswordHash) {
-                        let shareContent
-
-                        if (result.shareContentType === "secret") {
-                            shareContent = document.createElement('p')
-                            shareContent.innerHTML = result.shareContentValue;
-                        }
-
-                        if (result.shareContentType === "file") {
-                            shareContent = document.createElement('a')
-                            shareContent.innerHTML = result.shareContentValue;
-                            shareContent.href = result.shareContentValue;
-                        }
-
-                        shareContent.className = 'text';
-                        shareContent.className = 'text-box';
-
-                        future.replaceWith(shareContent)
+                    if (result.shareContentType === "secret") {
+                        shareContent = document.createElement('p')
+                        shareContent.innerHTML = result.shareContentValue;
                     }
+
+                    if (result.shareContentType === "file") {
+                        shareContent = document.createElement('a')
+                        shareContent.innerHTML = result.shareContentValue;
+                        shareContent.href = result.shareContentValue;
+                    }
+
+                    shareContent.className = 'text';
+                    shareContent.className = 'text-box';
+
+                    future.replaceWith(shareContent)
                 } catch (e) {
                     // console.log(e);
 
@@ -107,10 +102,9 @@
             if (fragment) {
                 // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
                 document.getElementById("givenPassword").value = fragment;
-                document.getElementById("givenPasswordHash").value = sha256(fragment);
 
 
-                if (document.getElementById("givenPasswordHash").value) {
+                if (document.getElementById("givenPassword").value) {
                     // requestSubmit permit to use the submit button of the form 
                     form.requestSubmit()
                 }
@@ -121,7 +115,9 @@
             // Function to write something on the div "error"
             function display_error(message) {
                 let data = document.createElement('div')
-                data.setAttribute("id", "error");               // Set the ID to always replace the same element with the error
+
+                // Set the ID to always replace the same element with the error
+                data.setAttribute("id", "error");
 
                 data.innerHTML = message;
                 error.replaceWith(data);

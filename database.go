@@ -11,6 +11,8 @@ import (
 
 	"github.com/go-co-op/gocron"
 
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
+
 )
 
 
@@ -36,7 +38,7 @@ func createDatabase() {
 
 
 	var query = `
-	CREATE TABLE share (id text not null primary key, password text, maxopen int, currentopen int, expiration text, creation text);
+	CREATE TABLE share (id text not null primary key, pgpkeypublic text, pgpkeyprivate text, password text, maxopen int, currentopen int, expiration text, creation text);
 	DELETE FROM share;
 	CREATE TABLE file (id text not null primary key, path text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
 	DELETE FROM file;
@@ -120,7 +122,15 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 	expiration := sql.Named("expiration", expirationGiven)
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, maxopen, currentopen, expiration, creation) values(:id, :password, :maxopen, :currentopen, :expiration, :creation)", id, password, maxopen, currentopen, expiration, creation)
+	pgp := crypto.PGP()
+	keyGenHandle := pgp.KeyGeneration().AddUserId("share", id).New()
+	keyPrivate, _ := keyGenHandle.GenerateKey()
+	keyPublic, _ := keyPrivate.ToPublic()
+	keyPrivateChain, _ := keyPrivate.Armor()
+	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
+
+
+	_, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -236,6 +246,58 @@ func getSharePassword(share_id string) string {
 
 
 	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", share_id)
+	var rowData string
+	switch err := row.Scan(&rowData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No row returned from table 'share'")
+		case nil:
+			fmt.Println("Row found:", rowData)
+		default:
+			panic(err)
+	}
+	
+	return rowData
+}
+
+
+
+
+// Get the GPG public key of a share
+func getShareKeyPublic(share_id string) string {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	row := db.QueryRow("SELECT pgpkeypublic FROM share WHERE id = :share_id", share_id)
+	var rowData string
+	switch err := row.Scan(&rowData); err {
+		case sql.ErrNoRows:
+			fmt.Println("No row returned from table 'share'")
+		case nil:
+			fmt.Println("Row found:", rowData)
+		default:
+			panic(err)
+	}
+	
+	return rowData
+}
+
+
+
+
+// Get the GPG private key of a share
+func getShareKeyPrivate(share_id string) string {
+	db, err := sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+
+	row := db.QueryRow("SELECT pgpkeyprivate FROM share WHERE id = :share_id", share_id)
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
