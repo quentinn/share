@@ -42,3 +42,6 @@ go run share help
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Disclaimer
+OpenPGP is used to cipher password when unlocking the password of a share (to avoid brute-force passwords attempts). It doesn't cipher anything else, please consider using HTTPS with a TLS certificate.

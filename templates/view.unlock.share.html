@@ -83,8 +83,8 @@
 
                 const pgpMessageEncrypted = await openpgp.encrypt({
                     message: await openpgp.createMessage({ text: givenPassword }),
-                    // encryptionKeys: '{{ .PgpKeyPublic }}',
-                    passwords: "superstrongpassword",
+                    encryptionKeys: '{{ .PgpKeyPublic }}',
+                    // passwords: "superstrongpassword",
                 });
                 // console.log(pgpMessageEncrypted);
 
