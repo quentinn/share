@@ -120,8 +120,6 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 	maxopen := sql.Named("maxopen", maxopenGiven)
 	currentopen := 0
 	expiration := sql.Named("expiration", expirationGiven)
-	// pgpkeypublic := sql.Named("pgpkeypublic", pgpKeyPublic)
-	// pgpkeyprivate := sql.Named("pgpkeyprivate", pgpKeyPrivate)
 
 
 	pgp := crypto.PGP()
@@ -131,12 +129,8 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 	keyPrivateChain, _ := keyPrivate.Armor()
 	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
 
-	// keyPrivateChain = "superstrongpassword"
-
-
 
 	_, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
-	// _, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
 	if err != nil {
 		log.Fatal(err)
 	}
