@@ -42,7 +42,7 @@ go run share help
 
 ## Reverse proxy example
 
-# Apache HTTP Server with authentication on share creation
+### Apache HTTP Server with authentication on share creation
 ```sudo a2enmod ssl proxy proxy_http```
 
 /etc/apache/sites-available/001-share.conf
