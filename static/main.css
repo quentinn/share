@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #e9b42d;
+    --color: #5024e0;
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
@@ -38,7 +38,6 @@ body {
     color: var(--darker2-color);
 }
 
-
 .dark * .title {
     color: var(--darker2-color);
 }
@@ -51,6 +50,42 @@ body {
 
 .dark * .text-box {
     background-color: var(--darker-color);
+}
+
+
+.dark * .button {
+    background-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * textarea {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=file] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=password] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=number] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=datetime-local] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
 }
 
 
@@ -294,8 +329,6 @@ input[type=file] {
 
     width: 70%;
     height: 300px;
-    /* margin: 10px; */
-    /* padding: 36% 64% 36% 64%; */
     text-align: center !important;
     padding: 12px 20px;
 
@@ -303,19 +336,19 @@ input[type=file] {
     border: var(--border) dashed;
     border-radius: var(--radius);
     max-width: 100%;
+
+    font-weight: bold;
+    font-size: 18px;
 }
 
 
 input[type=file]::file-selector-button {
     visibility: hidden;
-
 }
 
 
 input[type=file]:hover {
-
     cursor: pointer;
-
 }
 
 
