@@ -1,7 +1,10 @@
 FROM golang:bookworm
 
 WORKDIR /app
-COPY ./*.go ./go.mod ./go.sum *.md ./
+COPY ./*.go ./
+COPY ./go.mod ./
+COPY ./go.sum ./
+COPY ./*.md ./
 COPY templates/ ./templates/
 COPY static/ ./static/
 
