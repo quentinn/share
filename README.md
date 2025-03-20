@@ -47,7 +47,7 @@ go run share help
 sudo a2enmod ssl proxy proxy_http
 ```
 
-/etc/apache/sites-available/001-share.conf
+> /etc/apache/sites-available/001-share.conf
 ```
 ServerName share.<domain>
 
