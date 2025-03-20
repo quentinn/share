@@ -14,5 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
+    - name: Docker login
+      env:
+        DOCKERHUB_LOG: ${{secrets.DOCKERHUB_LOG}
+        DOCKERHUB_PWD: ${{secrets.DOCKERHUB_PWD}}
+      run: |
+        docker login -u $DOCKERHUB_LOG -p $DOCKERHUB_PWD 
+    - name: Docker build
       run: docker build . --file Dockerfile --tag ggtrd/share:$(date +%s)
+      
+    - name: Docker push
+      run: docker push ggtrd/share
