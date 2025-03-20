@@ -1,20 +1,23 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
+
 :root {
-    --color: #e9b42d;
+    --color: #5024e0;
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
     --lighter2-color: color-mix(in srgb, #fff, var(--color) 20%);
+    --error-color: #FF4141;
 
     --radius: 8px;
     --border: 3px;
 }
 
 
-@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 * {
     font-family: 'Lato', Helvetica, sans-serif;
     line-height: 1.5;
 }
+
 
 *:hover {
     transition: 0.2s;
@@ -31,10 +34,9 @@ body {
 }
 
 
-.dark > * > h1 {
+.dark>*>h1 {
     color: var(--darker2-color);
 }
-
 
 .dark * .title {
     color: var(--darker2-color);
@@ -51,21 +53,71 @@ body {
 }
 
 
+.dark * .button {
+    background-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * textarea {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=file] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=password] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=number] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
+.dark * input[type=datetime-local] {
+    border-color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
+}
+
+
 .container {
     text-align: center;
     padding-left: 10%;
     padding-right: 10%;
     padding-top: 2%;
     padding-bottom: 2%;
+
+
+    /* border: 1px solid red; */
 }
 
 
 .container-left {
     text-align: left;
-    padding-left: 10%;
-    padding-right: 10%;
-    padding-top: 10%;
+    padding-top: 5%;
     padding-bottom: 10%;
+
+
+    /* border: 1px solid red; */
+}
+
+
+.container-center-inline > div {
+
+    display: inline-block;
+    margin-left: 30px;
+    margin-right: 30px;
+
+    /* border: 1px solid red; */
 }
 
 
@@ -155,6 +207,14 @@ h1 {
 }
 
 
+.label {
+    color: var(--color);
+    font-weight: bold;
+    font-size: 22px;
+    text-align: left !important;
+}
+
+
 .text {
     color: var(--darker-color);
     font-weight: bold;
@@ -173,7 +233,7 @@ h1 {
 .button {
     text-align: center !important;
 
-    width: 200px !important;
+    width: 200px;
 
     margin: 10px;
     padding: 24px 36px 24px 36px;
@@ -202,8 +262,66 @@ h1 {
 .button:active {
     cursor: press;
 
-    padding: 24px 36px 24px 36px;
+    /* padding: 24px 36px 24px 36px; */
     background-color: var(--darker-color);
+}
+
+
+input[type=number] {
+
+    width: 300px;
+    padding: 12px 20px 12px 20px;
+
+    background-color: transparent;
+    border-color: var(--color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+    font-weight: bold;
+    font-size: 16px;
+
+    display: block;
+    outline: none;
+    box-sizing: border-box;
+}
+
+
+input[type=datetime-local] {
+
+    width: 300px;
+    padding: 12px 20px 12px 20px;
+
+    background-color: transparent;
+    border-color: var(--color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+    font-weight: bold;
+    font-size: 16px;
+
+    display: block;
+    outline: none;
+    box-sizing: border-box;
+}
+
+
+input[type=password] {
+
+    width: 100%;
+    padding: 12px 20px 12px 20px;
+
+    background-color: transparent;
+    border-color: var(--color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+
+    font-weight: bold;
+    font-size: 16px;
+
+    display: block;
+    outline: none;
+    box-sizing: border-box;
 }
 
 
@@ -211,8 +329,6 @@ input[type=file] {
 
     width: 70%;
     height: 300px;
-    /* margin: 10px; */
-    /* padding: 36% 64% 36% 64%; */
     text-align: center !important;
     padding: 12px 20px;
 
@@ -221,43 +337,61 @@ input[type=file] {
     border-radius: var(--radius);
     max-width: 100%;
 
-    /* color: transparent; */
-
+    font-weight: bold;
+    font-size: 18px;
 }
 
 
 input[type=file]::file-selector-button {
     visibility: hidden;
-
 }
 
 
 input[type=file]:hover {
-
     cursor: pointer;
-
 }
 
 
 textarea {
     width: 70%;
     height: 300px;
-
-    background-color: transparent;
+    max-width: 100%;
     padding: 12px 20px;
 
-
+    background-color: transparent;
     border-color: var(--color) !important;
     border: var(--border) solid;
     border-radius: var(--radius);
-    max-width: 100%;
 
-
-    resize: none;
-
+    font-weight: bold;
     font-size: 18px;
 
-    max-width: 100%;
-
+    resize: none;
     outline: none;
+}
+
+
+.notification {
+    z-index: 999;
+    position: absolute;
+
+    top: 10px;
+    left: 25%;
+    right: 25%;
+    margin-left: auto;
+    margin-right: auto;
+
+    padding: 12px 20px;
+    width: 30%;
+
+    border-color: var(--error-color) !important;
+    background-color: var(--error-color) !important;
+    border: var(--border) solid;
+    border-radius: var(--radius);
+
+
+    color: var(--lighter-color);
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
 }

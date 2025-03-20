@@ -1,137 +1,151 @@
 {{ template "layout.header.html" . }}
-<div class="container">
 
-    <h1 class="title">Share content</h1>
+<h1 class="title" id="title">Unlock share</h1>
 
-    <div id="future">
-        <h1 class="title">Unlock share</h1>
+<div id="future">
 
+    <form id="form">
 
-        <form id="form">
+        <div class="label">
             <label for="givenPassword">Password</label>
-            <input id="givenPassword" type="password" />
+        </div>
+        <input id="givenPassword" type="password" />
 
-            <input type="submit" value="unlock">
+        <br>
+        <br>
 
-            <div id="error"></div>
-        </form>
+        <input type="submit" value="Unlock" class="button">
 
-
-        <script src="../static/openpgp.min.js"></script>
-        <script>
-
-            let form = document.getElementById('form')
-            let fragment = decodeURIComponent(window.location.hash.substring(1))        // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
+    </form>
 
 
-            // This permit to send data to /share/unlock without reloading the HTML.
-            // The URL is configured in Go side to return the password
-            form.onsubmit = async (e) => {
+    <script src="../static/openpgp.min.js"></script>
+    <script>
 
-                e.preventDefault();
-
-                let future = document.getElementById('future')                                  // Element that will be replaced with the content of the share
-                let error = document.getElementById('error')                                    // Element to display error like wrong passwords
-                let givenPassword = document.getElementById('givenPassword').value              // Password given by the user
+        let form = document.getElementById('form');
+        let fragment = decodeURIComponent(window.location.hash.substring(1));       // decodeURIComponent is used because the text is coming from an URL, some char might needs to be decoded (like '=' is '%3d' for example)
 
 
-                // Encrypt givenPassword with the PGP public key of the share generated from backend
-                // Using OpenPGP.js
-                const publicKey = await openpgp.readKey({ armoredKey: `{{ .PgpKeyPublic }}` });
-                const pgpMessageEncrypted = await openpgp.encrypt({
-                    message: await openpgp.createMessage({ text: givenPassword }),
-                    encryptionKeys: publicKey,
-                });
+        // This permit to send data to /share/unlock without reloading the HTML.
+        // The URL is configured in Go side to return the password
+        form.onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            let future = document.getElementById('future');                         // Element that will be replaced with the content of the share
+            let givenPassword = document.getElementById('givenPassword').value;     // Password given by the user
 
 
-
-                // Payload to send to backend
-                var details = {
-                    'pgpMessageEncrypted': pgpMessageEncrypted,
-                };
-                var formBody = [];
-                for (var property in details) {
-                    var encodedKey = encodeURIComponent(property);
-                    var encodedValue = encodeURIComponent(details[property]);
-                    formBody.push(encodedKey + "=" + encodedValue);
-                }
-                formBody = formBody.join("&");
-                let response = await fetch('/share/unlock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    body: formBody
-                });
+            // Encrypt givenPassword with the PGP public key of the share generated from backend
+            // Using OpenPGP.js
+            const publicKey = await openpgp.readKey({ armoredKey: `{{ .PgpKeyPublic }}` });
+            const pgpMessageEncrypted = await openpgp.encrypt({
+                message: await openpgp.createMessage({ text: givenPassword }),
+                encryptionKeys: publicKey,
+            });
 
 
 
-                try {
-                    let result = await response.json();
-                    let shareContent
-
-                    if (result.shareContentType === "secret") {
-                        shareContent = document.createElement('p')
-                        shareContent.innerHTML = result.shareContentValue;
-                    }
-
-                    if (result.shareContentType === "file") {
-                        shareContent = document.createElement('a')
-                        shareContent.innerHTML = result.shareContentValue;
-                        shareContent.href = result.shareContentValue;
-                    }
-
-                    shareContent.className = 'text';
-                    shareContent.className = 'text-box';
-
-                    future.replaceWith(shareContent)
-                } catch (e) {
-                    // console.log(e);
-
-                    if (!givenPassword) {
-                        display_error('Please fill the password')
-                    } else {
-                        display_error('Wrong password')
-                    }
-                }
+            // Payload to send to backend
+            var details = {
+                'pgpMessageEncrypted': pgpMessageEncrypted,
             };
+            var formBody = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            let response = await fetch('/share/unlock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: formBody
+            });
 
 
 
-            // Read the #fragment again to know if the form must be automatically submitted
-            if (fragment) {
-                // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
-                document.getElementById("givenPassword").value = fragment;
+            try {
+                let result = await response.json();
+                let shareContent;
+
+                // Just to replace the title displayed on the page
+                let title = document.getElementById('title');
+                title.innerHTML = "Share content";
 
 
-                if (document.getElementById("givenPassword").value) {
-                    // requestSubmit permit to use the submit button of the form 
-                    form.requestSubmit()
+                if (result.shareContentType === "secret") {
+                    shareContent = document.createElement('p');
+                    shareContent.innerHTML = result.shareContentValue;
+                }
+
+                if (result.shareContentType === "file") {                  
+                    shareFile = document.createElement('a');
+                    shareFile.innerHTML = result.shareContentValue;
+                    shareFile.href = result.shareContentValue;
+
+
+                    shareContent = document.createElement('p');
+                    shareContent.appendChild(shareFile);
+
+                }
+
+                shareContent.className = 'text';
+                shareContent.className = 'text-box';
+
+                future.replaceWith(shareContent)
+            } catch (e) {
+                // console.log(e);
+
+                if (!givenPassword) {
+                    display_error('Please fill the password');
+                } else {
+                    display_error('Wrong password');
                 }
             }
+        };
 
 
 
-            // Function to write something on the div "error"
-            function display_error(message) {
-                let data = document.createElement('div')
+        // Read the #fragment again to know if the form must be automatically submitted
+        if (fragment) {
+            // Automatically set the checksum of the password in the hidden input 'givenPasswordHash' to be able to send it through the form
+            document.getElementById("givenPassword").value = fragment;
 
-                // Set the ID to always replace the same element with the error
-                data.setAttribute("id", "error");
 
-                data.innerHTML = message;
-                error.replaceWith(data);
+            if (document.getElementById("givenPassword").value) {
+                // requestSubmit permit to use the submit button of the form 
+                form.requestSubmit();
             }
+        }
 
 
 
-            function downloadFile() {
+        // Function to write something on the div "error"
+        function display_error(message) {
+            let error = document.createElement('div');
 
-            }
+            // Set the ID to always replace the same element with the error
+            error.setAttribute("id", "error");
+
+            error.innerHTML = message;
+            error.className = 'notification';
+
+            document.body.appendChild(error);
+
+            // Automatically delete notification after few seconds
+            setTimeout(function () {
+                document.body.removeChild(error);
+            }, 3000);
+
+        }
 
 
-        </script>
-    </div>
+
+
+    </script>
 </div>
 
 {{ template "layout.footer.html" . }}
