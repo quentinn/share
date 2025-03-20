@@ -12,6 +12,9 @@ go mod tidy \
 go build
 ```
 ```
+./share help
+```
+```
 ./share web
 ```
 
@@ -47,11 +50,9 @@ docker compose up -d
 ```
 sudo a2enmod ssl proxy proxy_http
 ```
-
 ```
 /etc/apache2/sites-available/001-share.conf
 ```
-
 ```
 ServerName share.<domain>
 
@@ -90,7 +91,6 @@ ServerName share.<domain>
 	ProxyPassReverse / http://0.0.0.0:8080/
 </VirtualHost>
 ```
-
 ```
 sudo a2ensite 001-share.conf
 ```
