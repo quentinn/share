@@ -8,10 +8,11 @@ Share is a web service that permit to securely share files and secrets to anyone
 ```
 git clone git@github.com:ggtrd/share.git \
 cd share \
-go mod tidy
+go mod tidy \
+go build
 ```
 ```
-go run share web
+./share web
 ```
 
 <br>
@@ -35,7 +36,7 @@ docker compose up -d
 > ```docker exec -it <container> sh```
 
 ```
-go run share help
+./share help
 ```
 
 <br>
