@@ -47,13 +47,13 @@
 
 
             // Payload to send to backend
-            var details = {
+            let details = {
                 'pgpMessageEncrypted': pgpMessageEncrypted,
             };
-            var formBody = [];
-            for (var property in details) {
-                var encodedKey = encodeURIComponent(property);
-                var encodedValue = encodeURIComponent(details[property]);
+            let formBody = [];
+            for (let property in details) {
+                let encodedKey = encodeURIComponent(property);
+                let encodedValue = encodeURIComponent(details[property]);
                 formBody.push(encodedKey + "=" + encodedValue);
             }
             formBody = formBody.join("&");
@@ -82,7 +82,7 @@
                 }
 
                 if (result.shareContentType === "file") {                  
-                    shareFile = document.createElement('a');
+                    let shareFile = document.createElement('a');
                     shareFile.innerHTML = result.shareContentValue;
                     shareFile.href = result.shareContentValue;
 
