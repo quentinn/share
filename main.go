@@ -51,7 +51,7 @@ func main() {
 			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
 			createDatabase()
 
-		// go run share delete <share_id>
+		// go run share delete <shareId>
 		} else if string(os.Args[1]) == "delete" {
 			if len(args) > 1 {
 				shareId := string(os.Args[2])
@@ -69,7 +69,7 @@ func main() {
 		} else if string(os.Args[1]) == "list" {
 			listShareOpen()
 
-		// go run share password <share_id>
+		// go run share password <shareId>
 		} else if string(os.Args[1]) == "password" {
 			if len(args) > 1 {
 				shareId := string(os.Args[2])
@@ -87,8 +87,8 @@ func main() {
 			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
 			fmt.Println(" go run share backup               duplicate database (!does not backup shared files!)")
 			fmt.Println(" go run share list                 get list of all the shares id")
-			fmt.Println(" go run share password <share_id>  get the password of a share")
-			fmt.Println(" go run share delete <share_id>    delete a share (also delete related shared files if any)")
+			fmt.Println(" go run share password <shareId>  get the password of a share")
+			fmt.Println(" go run share delete <shareId>    delete a share (also delete related shared files if any)")
 			fmt.Println("")
 			fmt.Println("https://github.com/ggtrd/share")
 
@@ -447,8 +447,8 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 
 	url := r.Header.Get("Referer")
-	share_id := url[len(url)-36:]	// Just get the last 36 char of the url because the IDs are 36 char length
-	shareContentMap := getShareContent(share_id)
+	shareId := url[len(url)-36:]	// Just get the last 36 char of the url because the IDs are 36 char length
+	shareContentMap := getShareContent(shareId)
 	file := shareContentMap["value"]
 
     w.Header().Set("Content-Type", "application/json")
