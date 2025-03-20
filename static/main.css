@@ -30,7 +30,7 @@ body {
 
 
 .dark {
-    background-color: #121212;
+    background-color: color-mix(in srgb, #000, var(--color) 5%);
 }
 
 
