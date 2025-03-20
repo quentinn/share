@@ -21,6 +21,7 @@ go build
 <br>
 
 ## Install with Docker
+[Docker Hub](https://hub.docker.com/r/ggtrd/share)
 
 ### Get docker-compose.yml
 ```
@@ -103,5 +104,5 @@ OpenPGP is used to cipher the password of a share when unlocking. It doesn't cip
 <br>
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE file](https://github.com/ggtrd/share/blob/main/LICENSE.md) for details.
 

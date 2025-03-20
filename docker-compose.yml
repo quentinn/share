@@ -1,6 +1,6 @@
 services:
   share:
-    image: share:latest
+    image: ggtrd/share:latest
     ports:
       - "8080:8080"
     restart: unless-stopped
