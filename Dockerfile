@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:bookworm
 
 WORKDIR /app
 COPY *.go go.mod go.sum *.md ./
