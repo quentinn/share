@@ -94,7 +94,7 @@ sudo a2ensite 001-share.conf
 <br>
 
 ## Disclaimer
-OpenPGP is used to cipher password when unlocking the password of a share (to avoid brute-force passwords attempts). It doesn't cipher anything else, please consider using HTTPS with a TLS certificate.
+OpenPGP is used to cipher the password of a share when unlocking. It doesn't cipher anything else (like file download for example), please consider using HTTPS with a TLS certificate.
 
 <br>
 
