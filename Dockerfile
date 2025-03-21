@@ -9,7 +9,8 @@ COPY static/ ./static/
 # - Download dependencies
 # - Build
 # - Force create the sqlite.db file to avoid app not start
-RUN go mod tidy \
+RUN go get -u \
+ && go mod tidy \
  && go build -o share \
  && ./share reset
 
