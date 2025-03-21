@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker login
+      env:
+        DOCKERHUB_LOG: ${{ secrets.DOCKERHUB_LOG }}
+        DOCKERHUB_PWD: ${{ secrets.DOCKERHUB_PWD }}
+      run: |
+        docker login -u $DOCKERHUB_LOG -p $DOCKERHUB_PWD 
+    - name: Docker build
+      run: docker build . --file Dockerfile --tag ggtrd/share:latest
+      
+    - name: Docker push
+      run: docker push ggtrd/share

@@ -25,9 +25,9 @@ var dbFile string = "sqlite.db"
 
 func createDatabase() {
 
-	// first start					=> create db												=> DELETE_DB_ON_NEXT_START = false
-	// running without reset		=> do nothing												=> DELETE_DB_ON_NEXT_START = false
-	// reset						=> delete then create db (and create if if not exists)		=> DELETE_DB_ON_NEXT_START = true
+	// first start             => create db                                            => DELETE_DB_ON_NEXT_START = false
+	// running without reset   => do nothing                                           => DELETE_DB_ON_NEXT_START = false
+	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB_ON_NEXT_START = true
 
 
 	// Env var given from pseudo CLI
@@ -139,7 +139,7 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 
 
 
-func createFile(id string, share_id string, path string, expiration string, maxopen string) {
+func createFile(id string, shareId string, path string, expiration string, maxopen string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -147,39 +147,39 @@ func createFile(id string, share_id string, path string, expiration string, maxo
 	defer db.Close()
 
 
-	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, share_id)
+	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 
-	createShare(share_id, expiration, maxopen)
+	createShare(shareId, expiration, maxopen)
 }
 
 
 
 
-func createSecret(id string, share_id string, text string, expiration string, maxopen string) {
+func createSecret(id string, shareId string, text string, expiration string, maxopen string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, share_id)
+	_, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 
-	createShare(share_id, expiration, maxopen)
+	createShare(shareId, expiration, maxopen)
 }
 
 
 
 
 // Get the content of a share
-func getShareContent(share_id string) map[string]string {
+func getShareContent(shareId string) map[string]string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -188,7 +188,7 @@ func getShareContent(share_id string) map[string]string {
 
 
 
-	rowSecret := db.QueryRow("SELECT text FROM secret WHERE share_id = :share_id", share_id)
+	rowSecret := db.QueryRow("SELECT text FROM secret WHERE share_id = :share_id", shareId)
 	var secretText string
 	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
@@ -201,7 +201,7 @@ func getShareContent(share_id string) map[string]string {
 
 
 
-	rowFile := db.QueryRow("SELECT path FROM file WHERE share_id = :share_id", share_id)
+	rowFile := db.QueryRow("SELECT path FROM file WHERE share_id = :share_id", shareId)
 	var filePath string
 	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
@@ -237,7 +237,7 @@ func getShareContent(share_id string) map[string]string {
 
 
 // Get the password of a share
-func getSharePassword(share_id string) string {
+func getSharePassword(shareId string) string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -245,7 +245,7 @@ func getSharePassword(share_id string) string {
 	defer db.Close()
 
 
-	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", share_id)
+	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", shareId)
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
@@ -263,7 +263,7 @@ func getSharePassword(share_id string) string {
 
 
 // Get the GPG public key of a share
-func getShareKeyPublic(share_id string) string {
+func getShareKeyPublic(shareId string) string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -271,7 +271,7 @@ func getShareKeyPublic(share_id string) string {
 	defer db.Close()
 
 
-	row := db.QueryRow("SELECT pgpkeypublic FROM share WHERE id = :share_id", share_id)
+	row := db.QueryRow("SELECT pgpkeypublic FROM share WHERE id = :share_id", shareId)
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
@@ -289,7 +289,7 @@ func getShareKeyPublic(share_id string) string {
 
 
 // Get the GPG private key of a share
-func getShareKeyPrivate(share_id string) string {
+func getShareKeyPrivate(shareId string) string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -297,7 +297,7 @@ func getShareKeyPrivate(share_id string) string {
 	defer db.Close()
 
 
-	row := db.QueryRow("SELECT pgpkeyprivate FROM share WHERE id = :share_id", share_id)
+	row := db.QueryRow("SELECT pgpkeyprivate FROM share WHERE id = :share_id", shareId)
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
@@ -315,7 +315,7 @@ func getShareKeyPrivate(share_id string) string {
 
 
 // Get the password of a share
-func getShareOpen(share_id string) map[string]string {
+func getShareOpen(shareId string) map[string]string {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -323,7 +323,7 @@ func getShareOpen(share_id string) map[string]string {
 	defer db.Close()
 
 
-	row := db.QueryRow("SELECT currentopen, maxopen FROM share WHERE id = :share_id", share_id)
+	row := db.QueryRow("SELECT currentopen, maxopen FROM share WHERE id = :share_id", shareId)
 	var rowDataCurrentOpen string
 	var rowDataMaxOpen string
 	switch err := row.Scan(&rowDataCurrentOpen, &rowDataMaxOpen); err {
@@ -347,7 +347,7 @@ func getShareOpen(share_id string) map[string]string {
 
 
 // Get the password of a share
-func updateShareOpen(share_id string) {
+func updateShareOpen(shareId string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -355,7 +355,7 @@ func updateShareOpen(share_id string) {
 	defer db.Close()
 
 
-	row := db.QueryRow("SELECT currentopen FROM share WHERE id = :share_id", share_id)
+	row := db.QueryRow("SELECT currentopen FROM share WHERE id = :share_id", shareId)
 	var rowDataCurrentOpen string
 	switch err := row.Scan(&rowDataCurrentOpen); err {
 		case sql.ErrNoRows:
@@ -375,7 +375,7 @@ func updateShareOpen(share_id string) {
 	fmt.Println("rowDataCurrentOpen ", rowDataCurrentOpen)
 	fmt.Println("currentopen        ", currentopen)
 
-	_, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, share_id)
+	_, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -388,7 +388,7 @@ func updateShareOpen(share_id string) {
 
 
 // Delete a share and also its related secrets and files (and delete file from filesystem aswell)
-func deleteShare(share_id string) {
+func deleteShare(shareId string) {
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Fatal(err)
@@ -396,7 +396,7 @@ func deleteShare(share_id string) {
 	defer db.Close()
 
 
-	rowShare := db.QueryRow("DELETE FROM share WHERE id = :share_id", share_id)
+	rowShare := db.QueryRow("DELETE FROM share WHERE id = :share_id", shareId)
 	var rowShareData string
 	switch err := rowShare.Scan(&rowShareData); err {
 		case sql.ErrNoRows:
@@ -408,7 +408,7 @@ func deleteShare(share_id string) {
 	}
 
 
-	rowSecret := db.QueryRow("DELETE FROM secret WHERE share_id = :share_id", share_id)
+	rowSecret := db.QueryRow("DELETE FROM secret WHERE share_id = :share_id", shareId)
 	var rowSecretData string
 	switch err := rowSecret.Scan(&rowSecretData); err {
 		case sql.ErrNoRows:
@@ -420,7 +420,7 @@ func deleteShare(share_id string) {
 	}
 
 
-	rowFile := db.QueryRow("DELETE FROM file WHERE share_id = :share_id", share_id)
+	rowFile := db.QueryRow("DELETE FROM file WHERE share_id = :share_id", shareId)
 	var rowFileData string
 	switch err := rowFile.Scan(&rowFileData); err {
 		case sql.ErrNoRows:
@@ -433,7 +433,7 @@ func deleteShare(share_id string) {
 
 
 	// Delete the directory containing files of the share
-	deletePath("uploads/" + share_id)
+	deletePath("uploads/" + shareId)
 
 }
 

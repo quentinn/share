@@ -1,20 +1,19 @@
-FROM golang:latest
+FROM golang:bookworm
 
 WORKDIR /app
-COPY *.go go.mod go.sum *.md ./
+COPY go.mod *.go *.md ./
 COPY templates/ ./templates/
 COPY static/ ./static/
 
-RUN go mod tidy
-RUN go build -o share
-# RUN CGO_ENABLED=0 GOOS=linux go build -o /share
 
-# Force create the sqlite.db file to avoid app not start
-# This uses the pseudo CLI of Share
-RUN ./share reset
-# RUN go run share reset
+# - Download dependencies
+# - Build
+# - Force create the sqlite.db file to avoid app not start
+RUN go mod tidy \
+ && go build -o share \
+ && ./share reset
+
 
 EXPOSE 8080
 
 CMD ["./share", "web"]
-# CMD ["go", "run", "share", "web"]
