@@ -29,19 +29,19 @@
 
 
 <script>
-    let defaultExpiration = new Date();
+    var defaultExpiration = new Date();
     defaultExpiration.setMinutes(defaultExpiration.getMinutes() - defaultExpiration.getTimezoneOffset());
     defaultExpiration.setHours(defaultExpiration.getHours() + 168);
 
-    let min = new Date();
+    var min = new Date();
     min.setMinutes(min.getMinutes() - min.getTimezoneOffset());
     min.setHours(min.getHours());
 
-    let max = new Date();
+    var max = new Date();
     max.setMinutes(max.getMinutes() - max.getTimezoneOffset());
     max.setHours(max.getHours() + 504);
 
-    let expiration = document.getElementById('expiration')
+    expiration = document.getElementById('expiration')
     expiration.value = defaultExpiration.toISOString().slice(0, 16);
     expiration.min = min.toISOString().slice(0, 16);
     expiration.max = max.toISOString().slice(0, 16);

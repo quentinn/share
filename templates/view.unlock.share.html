@@ -6,10 +6,14 @@
 
     <form id="form">
 
-        <div class="label">
-            <label for="givenPassword">Password</label>
+        <div class="container-center-inline">
+            <div>
+                <div class="label">
+                    <label for="givenPassword">Password</label>
+                </div>
+                <input id="givenPassword" type="password" />
+            </div>
         </div>
-        <input id="givenPassword" type="password" />
 
         <br>
         <br>
@@ -47,13 +51,13 @@
 
 
             // Payload to send to backend
-            let details = {
+            var details = {
                 'pgpMessageEncrypted': pgpMessageEncrypted,
             };
-            let formBody = [];
-            for (let property in details) {
-                let encodedKey = encodeURIComponent(property);
-                let encodedValue = encodeURIComponent(details[property]);
+            var formBody = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
                 formBody.push(encodedKey + "=" + encodedValue);
             }
             formBody = formBody.join("&");
@@ -81,8 +85,8 @@
                     shareContent.innerHTML = result.shareContentValue;
                 }
 
-                if (result.shareContentType === "file") {                  
-                    let shareFile = document.createElement('a');
+                if (result.shareContentType === "file") {
+                    shareFile = document.createElement('a');
                     shareFile.innerHTML = result.shareContentValue;
                     shareFile.href = result.shareContentValue;
 
