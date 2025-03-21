@@ -1,39 +1,38 @@
 {{ template "layout.header.html" . }}
 <h1 class="title">Share created !</h1>
 
+<div class="container-center-inline">
+    <div class="container-left">
 
-<div class="container-left">
-
-    <div>
-        <div class="title">
+        <div class="label">
             Share link
             <div class="text text-box">
                 {{ .Url }}{{ .Link }}
             </div>
         </div>
+
         <br>
 
-        <div class="title">
+        <div class="label">
             Password
-
             <div class="text text-box">
                 {{ .Password }}
             </div>
         </div>
-    </div>
 
-    <br>
-    <br>
-    <br>
 
-    <div class="title">
-        One click link
+        <br>
+        <br>
 
-        <div class="text text-box">
-            {{ .Url }}{{ .Link }}#{{ .Password }}
+
+        <div class="label">
+            One click link
+            <div class="text text-box">
+                {{ .Url }}{{ .Link }}#{{ .Password }}
+            </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
 
