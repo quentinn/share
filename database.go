@@ -18,7 +18,7 @@ import (
 
 
 
-var dbFile string = "sqlite.db"
+var dbFile string = "database/sqlite.db"
 
 
 
@@ -29,6 +29,9 @@ func createDatabase() {
 	// init                    => create db if not exists                              => DELETE_DB = false
 	// running without reset   => do nothing, then run webserver                       => DELETE_DB = false
 	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB = true
+
+
+	createPath("database")
 
 
 	// Env var given from pseudo CLI
@@ -47,7 +50,7 @@ func createDatabase() {
 	DELETE FROM secret;
 	`
 	
-	
+
 	// Reset database only if the user has decided to
 	if DELETE_DB == true {
 

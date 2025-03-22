@@ -28,7 +28,21 @@ func generatePassword() string {
 
 
 	return password
- }
+}
+
+
+
+
+// Delete a file or directory from filesystem
+func createPath(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err := os.Mkdir(path, 0700)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
 
 
 
