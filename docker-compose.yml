@@ -1,11 +1,13 @@
 services:
   share:
-    image: share:local
+    image: ggtrd/share:latest
     ports:
       - "8080:8080"
     restart: unless-stopped
     volumes:
-      - share:/share
+      - share-db:/share/db
+      - share-data:/share/data
 
 volumes:
-  share:
+  share-db:
+  share-data:

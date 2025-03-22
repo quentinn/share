@@ -45,7 +45,15 @@ func main() {
 			createDatabase()
 			server.Start()
 
+		// go run share init
+		// (= setup database at the first installation)
+		} else if string(os.Args[1]) == "init" {
+			fmt.Println("Initializing database")
+			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			createDatabase()
+
 		// go run share reset
+		// (= reset database)
 		} else if string(os.Args[1]) == "reset" {
 			fmt.Println("Resetting database")
 			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
@@ -84,6 +92,7 @@ func main() {
 			fmt.Println("")
 			fmt.Println("Usage:")
 			fmt.Println(" go run share web                  start web server")
+			fmt.Println(" go run share init                 create database if not exists")
 			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
 			fmt.Println(" go run share backup               duplicate database (!does not backup shared files!)")
 			fmt.Println(" go run share list                 get list of all the shares id")
