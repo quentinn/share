@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #5024e0;
+    --color: #1691f5;
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
