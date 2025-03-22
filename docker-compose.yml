@@ -5,9 +5,9 @@ services:
       - "8080:8080"
     restart: unless-stopped
     volumes:
-      - share-db:/share/db
-      - share-data:/share/data
+      - share-database:/share/database
+      - share-uploads:/share/uploads
 
 volumes:
-  share-db:
-  share-data:
+  share-database:
+  share-uploads:

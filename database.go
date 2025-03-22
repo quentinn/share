@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 	"strconv"
+	"path/filepath"
+
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -18,8 +20,8 @@ import (
 
 
 
-var dbFile string = "database/sqlite.db"
-
+// var dbFile string = "sqlite.db"
+var dbFile string = filepath.Join("database", "sqlite.db")
 
 
 
