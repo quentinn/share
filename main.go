@@ -41,22 +41,22 @@ func main() {
 		// go run share web
 		if string(os.Args[1]) == "web" {
 			go periodicClean()	// Goroutine to clean expired shares
-			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			os.Setenv("DELETE_DB", "false")
 			createDatabase()
 			server.Start()
 
 		// go run share init
 		// (= setup database at the first installation)
 		} else if string(os.Args[1]) == "init" {
-			fmt.Println("Initializing database")
-			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			fmt.Println("Looking for database")
+			os.Setenv("DELETE_DB", "false")
 			createDatabase()
 
 		// go run share reset
 		// (= reset database)
 		} else if string(os.Args[1]) == "reset" {
 			fmt.Println("Resetting database")
-			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
+			os.Setenv("DELETE_DB", "true")
 			createDatabase()
 
 		// go run share delete <shareId>

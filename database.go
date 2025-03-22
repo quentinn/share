@@ -25,13 +25,14 @@ var dbFile string = "sqlite.db"
 
 func createDatabase() {
 
-	// first start             => create db                                            => DELETE_DB_ON_NEXT_START = false
-	// running without reset   => do nothing                                           => DELETE_DB_ON_NEXT_START = false
-	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB_ON_NEXT_START = true
+	// first start             => create db if not exists, then run webserver          => DELETE_DB = false
+	// init                    => create db if not exists                              => DELETE_DB = false
+	// running without reset   => do nothing, then run webserver                       => DELETE_DB = false
+	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB = true
 
 
 	// Env var given from pseudo CLI
-	var DELETE_DB_ON_NEXT_START, err = strconv.ParseBool(os.Getenv("DELETE_DB_ON_NEXT_START"))
+	var DELETE_DB, err = strconv.ParseBool(os.Getenv("DELETE_DB"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +49,7 @@ func createDatabase() {
 	
 	
 	// Reset database only if the user has decided to
-	if DELETE_DB_ON_NEXT_START == true {
+	if DELETE_DB == true {
 
 		// Check if file exists
 		if fileExists(dbFile) {
