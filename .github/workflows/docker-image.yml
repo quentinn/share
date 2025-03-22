@@ -43,27 +43,32 @@ on:
       - '*'
 
 jobs:
-  docker:
+  build_docker_images:
+    name: Build Docker Image To Dockerhub
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Code Checkout
         uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: meta
+      - name: Extract Metadata
         uses: docker/metadata-action@v5
+        id: meta
         with:
-          images: ggtrd/share
+          images: |
+            ggtrd/share
+          tags: |
+            type=semver,pattern={{version}}
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      - name: Docker Login
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_LOG }}
-          password: ${{ secrets.DOCKERHUB_PWD }}
+          username: ${{secrets.DOCKERHUB_LOG}}
+          password: ${{secrets.DOCKERHUB_PWD}}
+          logout: true
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      - name: Docker Build And Push
+        uses: docker/build-push-action@v5
         with:
           context: .
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
