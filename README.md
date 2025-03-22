@@ -1,10 +1,11 @@
 # Share
-
 Share is a web service that permit to securely share files and secrets to anyone.
 
-Main features are:
-- Automatic shares expiration based on given date or maximum unlock allowed
-- Basic shares links and passwords, and also one-click links
+## Features
+- Share secrets
+- Share large files
+- Automatic expiration based on given date or maximum unlock allowed
+- Basic links and passwords, and also one-click links
 - Automatic strong password generation
 - [GopenPGP](https://gopenpgp.org/) and [OpenPGP.js](https://openpgpjs.org/) encryption to ensure security of the share password
 - Customizable with your own logo and color
@@ -12,8 +13,6 @@ Main features are:
 - No account management
 - CLI available to perform admin tasks
 - Reverse proxy example that shows how to protect share creations and set public access on the unlock pages
-
-<br>
 
 ## Install from sources
 ```
@@ -28,8 +27,6 @@ go build
 ```
 ./share web
 ```
-
-<br>
 
 ## Install with Docker
 <a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
@@ -55,8 +52,6 @@ docker compose up -d
 ```
 ./share help
 ```
-
-<br>
 
 ## Reverse proxy example
 
@@ -109,13 +104,8 @@ ServerName share.<domain>
 sudo a2ensite 001-share.conf
 ```
 
-<br>
-
 ## Disclaimer
 OpenPGP is used to cipher the password of a share when unlocking. It doesn't cipher anything else (like file download for example), please consider using HTTPS with a TLS certificate.
 
-<br>
-
 ## License
 This project is licensed under the MIT License. See the [LICENSE file](https://github.com/ggtrd/share/blob/main/LICENSE.md) for details.
-
