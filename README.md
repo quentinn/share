@@ -53,6 +53,20 @@ docker compose up -d
 ./share help
 ```
 
+
+## Customization
+> Customization are handled within '/static/custom' directory.
+> A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
+
+- To change the logo, it must be under '/static/custom/logo.png'
+- To change the color, the '/static/custom/theme.css' must be edited with this format:
+```
+:root {
+    --color: #000000;
+}
+```
+> Note: you can edit the whole CSS theme with this file, but an automatic theme will be calculated with the single color of the example above.
+
 ## Reverse proxy example
 
 ### Apache HTTP Server with authentication on share creation
