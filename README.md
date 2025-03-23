@@ -73,11 +73,9 @@ docker compose up -d
 }
 ```
 
-<br>
-
-
 > **Note:** default is to only set a color in this file (an automatic theme color will be calculated from this single color), but you can also configure the whole CSS theme with this file.
 
+<br>
 
 ## Reverse proxy example
 
