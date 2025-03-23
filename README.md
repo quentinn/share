@@ -1,4 +1,7 @@
 # Share
+<a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
+<a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
+
 Share is a web service that permit to securely share files and secrets to anyone.
 
 ## Features
@@ -33,11 +36,8 @@ go build
 <br>
 
 ## Install with Docker
-<a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
-<a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
 
-
-### Get docker-compose.yml
+**Get docker-compose.yml**
 ```
 curl -O https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml
 ```
@@ -50,7 +50,7 @@ docker compose up -d
 
 ## Use the CLI
 
-> if runned with Docker:
+> If runned with Docker:
 > ```docker exec -it <container> sh```
 
 ```
@@ -60,18 +60,20 @@ docker compose up -d
 <br>
 
 ## Customization
-> Customization are handled within **/static/custom** directory.
-
+> Customization are handled within ```/static/custom``` directory. \
 > A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
 
+\
 
-- To change the logo, it must be under **/static/custom/logo.png**
-- To change the color, the **/static/custom/theme.css** must be edited with this format:
+- To change the logo, it must be under ```/static/custom/logo.png```
+- To change the color, the ```/static/custom/theme.css``` must be edited with this format:
 ```
 :root {
     --color: #000000;
 }
 ```
+
+\
 
 
 > **Note:** default is to only set a color in this file (an automatic theme color will be calculated from this single color), but you can also configure the whole CSS theme with this file.
