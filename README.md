@@ -63,7 +63,6 @@ docker compose up -d
 > Customization are handled within ```/static/custom``` directory. \
 > A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
 
-<br>
 
 - To change the logo, it must be under ```/static/custom/logo.png```
 
