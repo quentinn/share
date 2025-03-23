@@ -60,11 +60,11 @@ docker compose up -d
 <br>
 
 ## Customization
-> Customization are handled within ```/static/custom``` directory.
-> \n
+> Customization are handled within ```/static/custom``` directory. 
+> <br>
 > A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
 
-\n
+<br>
 
 - To change the logo, it must be under ```/static/custom/logo.png```
 - To change the color, the ```/static/custom/theme.css``` must be edited with this format:
@@ -74,7 +74,7 @@ docker compose up -d
 }
 ```
 
-\n
+<br>
 
 
 > **Note:** default is to only set a color in this file (an automatic theme color will be calculated from this single color), but you can also configure the whole CSS theme with this file.
