@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Share</title>
 
+  <link rel="stylesheet" href="../static/custom/theme.css">
   <link rel="stylesheet" href="../static/main.css">
 </head>
 
@@ -21,28 +22,30 @@
   </script>
 
 
-  <a href="/" class="nav-item logo">
-    <img src="../static/logo.png" alt="Home" class="nav-logo">
-  </a>
+  <div class="container-nav">
+    <a href="/" class="nav-item logo">
+      <img src="../static/custom/logo.png" alt="Home" class="nav-logo">
+    </a>
 
-  <a href="/file" class="nav-item">
-    <div class="nav-link">
-      File
+    <a href="/file" class="nav-item">
+      <div class="nav-link">
+        File
+      </div>
+    </a>
+
+    <a href="/secret" class="nav-item">
+      <div class="nav-link">
+        Secret
+      </div>
+    </a>
+
+
+    <div class="nav-item right">
+      <input type="checkbox" id="toggle" name="toggle" />
+      <label for="toggle"></label>
     </div>
-  </a>
 
-  <a href="/secret" class="nav-item">
-    <div class="nav-link">
-      Secret
-    </div>
-  </a>
-
-
-  <div class="nav-item right">
-    <input type="checkbox" id="toggle" name="toggle" />
-    <label for="toggle"></label>
   </div>
-
 
   <div class="content">
     <div class="container">
