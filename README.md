@@ -65,7 +65,8 @@ docker compose up -d
 
 <br>
 
-- To change the logo, it must be under ```/static/custom/logo.png``` \
+- To change the logo, it must be under ```/static/custom/logo.png```
+
 - To change the color, the ```/static/custom/theme.css``` must be edited with this format:
 ```
 :root {
