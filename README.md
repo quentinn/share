@@ -14,6 +14,8 @@ Share is a web service that permit to securely share files and secrets to anyone
 - CLI available to perform admin tasks
 - Reverse proxy example that shows how to protect share creations and set public access on the unlock pages
 
+<br>
+
 ## Install from sources
 ```
 git clone git@github.com:ggtrd/share.git \
@@ -27,6 +29,8 @@ go build
 ```
 ./share web
 ```
+
+<br>
 
 ## Install with Docker
 <a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
@@ -53,6 +57,7 @@ docker compose up -d
 ./share help
 ```
 
+<br>
 
 ## Customization
 > Customization are handled within '/static/custom' directory.
@@ -66,6 +71,8 @@ docker compose up -d
 }
 ```
 > Note: you can edit the whole CSS theme with this file, but an automatic theme will be calculated with the single color of the example above.
+
+<br>
 
 ## Reverse proxy example
 
@@ -118,8 +125,12 @@ ServerName share.<domain>
 sudo a2ensite 001-share.conf
 ```
 
+<br>
+
 ## Disclaimer
 OpenPGP is used to cipher the password of a share when unlocking. It doesn't cipher anything else (like file download for example), please consider using HTTPS with a TLS certificate.
+
+<br>
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE file](https://github.com/ggtrd/share/blob/main/LICENSE.md) for details.
