@@ -1,6 +1,21 @@
 # Share
+<a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
+<a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
 
 Share is a web service that permit to securely share files and secrets to anyone.
+
+## Features
+- Share secrets
+- Share large files
+- Automatic expiration based on given date or maximum unlock allowed
+- Basic links and passwords, and also one-click links
+- Automatic strong password generation
+- [GopenPGP](https://gopenpgp.org/) and [OpenPGP.js](https://openpgpjs.org/) encryption to ensure security of the share password
+- Customizable with your own logo and color
+- Self-hosted solution
+- No account management
+- CLI available to perform admin tasks
+- Reverse proxy example that shows how to protect share creations and set public access on the unlock pages
 
 <br>
 
@@ -21,9 +36,8 @@ go build
 <br>
 
 ## Install with Docker
-[Docker Hub](https://hub.docker.com/r/ggtrd/share)
 
-### Get docker-compose.yml
+**Get docker-compose.yml**
 ```
 curl -O https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml
 ```
@@ -36,11 +50,36 @@ docker compose up -d
 
 ## Use the CLI
 
-> if runned with Docker:
+> If runned with Docker:
 > ```docker exec -it <container> sh```
 
 ```
 ./share help
+```
+
+<br>
+
+## Customization
+> Customizations are handled within ```/static/custom``` directory. \
+> A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
+
+### Logo
+- Drop an image under ```/static/custom/logo.png```
+- Overwrite logo size
+```static/custom/theme.css
+#logo>img {
+    max-width: 200px;
+}
+
+```
+
+### Color
+- Overwrite color
+> A color theme will be automatically calculated from this color
+```static/custom/theme.css
+:root {
+    --color: #000000;
+}
 ```
 
 <br>
@@ -105,4 +144,3 @@ OpenPGP is used to cipher the password of a share when unlocking. It doesn't cip
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE file](https://github.com/ggtrd/share/blob/main/LICENSE.md) for details.
-

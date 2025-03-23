@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #1691f5;
+    --color: #1691f5; /*this default color will be overwritten from custom/theme.css*/
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
@@ -90,20 +90,27 @@ body {
 }
 
 
+#logo>img {
+    max-width: 130px;
+
+    padding-left: 36px;
+    padding-right: 18px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+
 .right {
     position: fixed;
     right: 0;
 }
 
 
-.container {   
+.container {
     text-align: center;
     padding-left: 10%;
     padding-right: 10%;
-    padding-top: 2%;
+    padding-top: 0;
     padding-bottom: 5%;
-
-    background-color: var(--lighter-color);
 
     border: var(--debug)
 }
@@ -117,7 +124,6 @@ body {
 
 
 .container-center-inline>div {
-
     display: inline-block;
     margin-left: 30px;
     margin-right: 30px;
@@ -127,7 +133,8 @@ body {
 
 
 .container-nav {
-    text-align: left;
+    /* height: 100px; */
+    max-height: 100px;
 
     border: var(--debug)
 }
@@ -140,19 +147,6 @@ body {
     vertical-align: text-top;
 }
 
-
-.nav-logo {
-    width: 100px;
-    height: 100%;
-
-    padding-left: 36px;
-    padding-right: 18px;
-    padding-top: 18px;
-    padding-bottom: 18px;
-
-}
-
-
 .nav-link {
     width: 100px;
     height: 20px;
@@ -163,6 +157,7 @@ body {
     padding-right: 0px;
     padding-top: 30px;
     padding-bottom: 0px;
+
 
     text-align: center;
 
@@ -182,7 +177,6 @@ body {
 
 
 .footer {
-
     height: 30px;
     margin-top: -30px;
 
@@ -214,14 +208,9 @@ body {
 }
 
 
-.logo>img {
-    width: 110px;
-}
-
-
 h1 {
     font-size: 30px !important;
-    margin: 0;
+    margin: 0 0 20px 0;
 }
 
 
@@ -297,7 +286,6 @@ h1 {
 
 
 input[type=number] {
-
     width: 250px;
     padding: 12px 20px 12px 20px;
 
@@ -316,7 +304,6 @@ input[type=number] {
 
 
 input[type=datetime-local] {
-
     width: 250px;
     padding: 12px 20px 12px 20px;
 
@@ -335,7 +322,6 @@ input[type=datetime-local] {
 
 
 input[type=password] {
-
     width: 800px;
     padding: 12px 20px 12px 20px;
 
@@ -355,7 +341,6 @@ input[type=password] {
 
 
 input[type=file] {
-
     width: 800px;
     height: 100px;
     text-align: center !important;
@@ -382,7 +367,6 @@ input[type=file]:hover {
 
 
 textarea {
-
     width: 800px;
     height: 100px;
     max-width: 100%;

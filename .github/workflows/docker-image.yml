@@ -1,30 +1,36 @@
 name: Docker Image CI
 
 on:
-  push:
-    tags:
-      - '*'
-  # push:
-  #   branches: [ "main" ]
-  # pull_request:
-  #   branches: [ "main" ]
+  release:
+    types: [published]
 
 jobs:
-
-  build:
-
+  build_docker_images:
+    name: Build Docker Image To Dockerhub
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Docker login
-      env:
-        DOCKERHUB_LOG: ${{ secrets.DOCKERHUB_LOG }}
-        DOCKERHUB_PWD: ${{ secrets.DOCKERHUB_PWD }}
-      run: |
-        docker login -u $DOCKERHUB_LOG -p $DOCKERHUB_PWD 
-    - name: Docker build
-      run: docker build . --file Dockerfile --tag ggtrd/share:latest
-      
-    - name: Docker push
-      run: docker push ggtrd/share
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Metadata
+        uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: |
+            ggtrd/share
+          tags: |
+            type=semver,pattern={{version}}
+
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{secrets.DOCKERHUB_LOG}}
+          password: ${{secrets.DOCKERHUB_PWD}}
+          logout: true
+
+      - name: Docker Build And Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}

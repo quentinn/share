@@ -1,4 +1,7 @@
+go.sum
 LICENSE.md
 *.db
 share
 uploads
+database
+static/custom

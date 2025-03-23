@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 	"strconv"
+	"path/filepath"
+
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -18,20 +20,24 @@ import (
 
 
 
-var dbFile string = "sqlite.db"
-
+// var dbFile string = "sqlite.db"
+var dbFile string = filepath.Join("database", "sqlite.db")
 
 
 
 func createDatabase() {
 
-	// first start             => create db                                            => DELETE_DB_ON_NEXT_START = false
-	// running without reset   => do nothing                                           => DELETE_DB_ON_NEXT_START = false
-	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB_ON_NEXT_START = true
+	// first start             => create db if not exists, then run webserver          => DELETE_DB = false
+	// init                    => create db if not exists                              => DELETE_DB = false
+	// running without reset   => do nothing, then run webserver                       => DELETE_DB = false
+	// reset                   => delete then create db (and create if if not exists)  => DELETE_DB = true
+
+
+	createPath("database")
 
 
 	// Env var given from pseudo CLI
-	var DELETE_DB_ON_NEXT_START, err = strconv.ParseBool(os.Getenv("DELETE_DB_ON_NEXT_START"))
+	var DELETE_DB, err = strconv.ParseBool(os.Getenv("DELETE_DB"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,9 +52,9 @@ func createDatabase() {
 	DELETE FROM secret;
 	`
 	
-	
+
 	// Reset database only if the user has decided to
-	if DELETE_DB_ON_NEXT_START == true {
+	if DELETE_DB == true {
 
 		// Check if file exists
 		if fileExists(dbFile) {

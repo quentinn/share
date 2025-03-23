@@ -41,14 +41,22 @@ func main() {
 		// go run share web
 		if string(os.Args[1]) == "web" {
 			go periodicClean()	// Goroutine to clean expired shares
-			os.Setenv("DELETE_DB_ON_NEXT_START", "false")
+			os.Setenv("DELETE_DB", "false")
 			createDatabase()
 			server.Start()
 
+		// go run share init
+		// (= setup database at the first installation)
+		} else if string(os.Args[1]) == "init" {
+			fmt.Println("Looking for database")
+			os.Setenv("DELETE_DB", "false")
+			createDatabase()
+
 		// go run share reset
+		// (= reset database)
 		} else if string(os.Args[1]) == "reset" {
 			fmt.Println("Resetting database")
-			os.Setenv("DELETE_DB_ON_NEXT_START", "true")
+			os.Setenv("DELETE_DB", "true")
 			createDatabase()
 
 		// go run share delete <shareId>
@@ -84,11 +92,12 @@ func main() {
 			fmt.Println("")
 			fmt.Println("Usage:")
 			fmt.Println(" go run share web                  start web server")
+			fmt.Println(" go run share init                 create database if not exists")
 			fmt.Println(" go run share reset                delete database, it will be recreated next web server start")
 			fmt.Println(" go run share backup               duplicate database (!does not backup shared files!)")
 			fmt.Println(" go run share list                 get list of all the shares id")
-			fmt.Println(" go run share password <shareId>  get the password of a share")
-			fmt.Println(" go run share delete <shareId>    delete a share (also delete related shared files if any)")
+			fmt.Println(" go run share password <shareId>   get the password of a share")
+			fmt.Println(" go run share delete <shareId>     delete a share (also delete related shared files if any)")
 			fmt.Println("")
 			fmt.Println("https://github.com/ggtrd/share")
 
@@ -209,6 +218,8 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 		// Expiration: time.Now().String(),
 	})
 }
+
+
 
 
 func viewUnlockShare(w http.ResponseWriter, r *http.Request) {

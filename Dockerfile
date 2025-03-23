@@ -1,6 +1,6 @@
 FROM golang:bookworm
 
-WORKDIR /app
+WORKDIR /share
 COPY go.mod *.go *.md ./
 COPY templates/ ./templates/
 COPY static/ ./static/
@@ -12,7 +12,7 @@ COPY static/ ./static/
 RUN go get -u \
  && go mod tidy \
  && go build -o share \
- && ./share reset
+ && ./share init
 
 
 EXPOSE 8080
