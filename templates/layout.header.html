@@ -11,7 +11,6 @@
 <body>
 
   <script>
-
     // Dark mode
     window.onload = function () {
       const toggle = document.getElementById('toggle');
@@ -19,12 +18,49 @@
         document.body.classList.toggle('dark', e.target.checked)
       })
     }
+
+  
+    // Detect if a logo has been given or display the default one if not
+    checkIfImageExists('/static/custom/logo.png', (exists) => {
+      if (exists) {
+        let logoImg = document.createElement('img');
+        logoImg.setAttribute("src", "../static/custom/logo.png");
+
+        let logo = document.getElementById('logo');
+        logo.appendChild(logoImg)
+      } else {
+        let logoImg = document.createElement('img');
+        logoImg.setAttribute("src", "../static/default-logo.png");
+
+        let logo = document.getElementById('logo');
+        logo.appendChild(logoImg)
+      }
+    });
+
+    function checkIfImageExists(url, callback) {
+      const img = new Image();
+      img.src = url;
+
+      if (img.complete) {
+        callback(true);
+      } else {
+        img.onload = () => {
+          callback(true);
+        };
+
+        img.onerror = () => {
+          callback(false);
+        };
+      }
+    }
   </script>
 
 
   <div class="container-nav">
-    <a href="/" class="nav-item logo">
-      <img src="../static/custom/logo.png" alt="Home" class="nav-logo">
+    <a href="/" class="nav-item">
+      <div  id="logo">
+        <!-- <img src="../static/custom/logo.png" alt="Home" class="nav-logo"> -->
+      </div>
     </a>
 
     <a href="/file" class="nav-item">

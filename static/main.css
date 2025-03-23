@@ -90,20 +90,28 @@ body {
 }
 
 
+#logo>img {
+    max-width: 130px;
+    /* height: 100%; */
+
+    padding-left: 36px;
+    padding-right: 18px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+
 .right {
     position: fixed;
     right: 0;
 }
 
 
-.container {   
+.container {
     text-align: center;
     padding-left: 10%;
     padding-right: 10%;
     padding-top: 0;
     padding-bottom: 5%;
-
-    background-color: var(--lighter-color);
 
     border: var(--debug)
 }
@@ -140,17 +148,6 @@ body {
     vertical-align: text-top;
 }
 
-
-.nav-logo {
-
-    padding-left: 36px;
-    padding-right: 18px;
-    padding-top: 18px;
-    padding-bottom: 18px;
-
-}
-
-
 .nav-link {
     width: 100px;
     height: 20px;
@@ -161,6 +158,7 @@ body {
     padding-right: 0px;
     padding-top: 30px;
     padding-bottom: 0px;
+
 
     text-align: center;
 
@@ -208,11 +206,6 @@ body {
 
 .footer-link:hover {
     color: color-mix(in srgb, #000, var(--lighter2-color) 60%);
-}
-
-
-.logo>img {
-    width: 110px;
 }
 
 
