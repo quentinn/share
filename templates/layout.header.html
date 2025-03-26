@@ -11,55 +11,45 @@
 <body>
 
   <script>
-    // Dark mode
     window.onload = function () {
+
+      // Dark mode
       const toggle = document.getElementById('toggle');
       toggle.addEventListener('change', (e) => {
         document.body.classList.toggle('dark', e.target.checked)
       })
-    }
 
-  
-    // Detect if a logo has been given or display the default one if not
-    checkIfImageExists('/static/custom/logo.png', (exists) => {
-      if (exists) {
-        let logoImg = document.createElement('img');
-        logoImg.setAttribute("src", "../static/custom/logo.png");
-
-        let logo = document.getElementById('logo');
-        logo.appendChild(logoImg)
+      // Logo
+      if (checkUrl('/static/custom/logo.png')) {
+        setLogo('../static/custom/logo.png');
       } else {
-        let logoImg = document.createElement('img');
-        logoImg.setAttribute("src", "../static/default-logo.png");
-
-        let logo = document.getElementById('logo');
-        logo.appendChild(logoImg)
-      }
-    });
-
-    function checkIfImageExists(url, callback) {
-      const img = new Image();
-      img.src = url;
-
-      if (img.complete) {
-        callback(true);
-      } else {
-        img.onload = () => {
-          callback(true);
-        };
-
-        img.onerror = () => {
-          callback(false);
-        };
+        setLogo('../static/default-logo.png');
       }
     }
+
+
+    function setLogo(fileLogo) {
+      let logoImg = document.createElement('img');
+      logoImg.setAttribute('src', fileLogo);
+
+      let logo = document.getElementById('logo');
+      logo.appendChild(logoImg)
+    }
+
+
+    function checkUrl(url) {
+      var http = new XMLHttpRequest();
+      http.open('HEAD', url, false);
+      http.send();
+      return http.status == 200;
+    }
+
   </script>
 
 
   <div class="container-nav">
     <a href="/" class="nav-item">
       <div id="logo">
-        <!-- <img src="../static/custom/logo.png" alt="Home" class="nav-logo"> -->
       </div>
     </a>
 
