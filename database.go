@@ -545,7 +545,7 @@ func periodicCleanExpiredShares() {
 func periodicCleanOrphansFiles() {
 
 	task := gocron.NewScheduler(time.UTC)
-	task.Every(5).Seconds().Do(func() {
+	task.Every(1).Minutes().Do(func() {
 		log.Println("task: periodic clean of orphans files")
 
 		// Detect files from another function to be able to watch future uploads
