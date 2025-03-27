@@ -40,7 +40,8 @@ func main() {
 	if len(args) >= 1 {
 		// go run share web
 		if string(os.Args[1]) == "web" {
-			go periodicClean()	// Goroutine to clean expired shares
+			go periodicCleanExpiredShares()		// Goroutine to clean expired shares
+			// go periodicCleanOrphansFiles()		// Goroutine to clean orphans files
 			os.Setenv("DELETE_DB", "false")
 			createDatabase()
 			server.Start()
@@ -141,7 +142,7 @@ func (a *App) Start() {
 
 
 	addr := fmt.Sprintf(":%s", a.Port)
-	log.Printf("web : starting app on %s", addr)
+	log.Printf(" web: starting app on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
@@ -161,7 +162,7 @@ func env(key, adefault string) string {
 
 func logReq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("url : %s", r.Header.Get("Referer"))
+		log.Printf(" web: %s", r.Header.Get("Referer"))
 		f(w, r)
 	})
 }
@@ -239,7 +240,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 	r.ParseForm()
 
 
-	url := r.Header.Get("Referer")
+	 url:= r.Header.Get("Referer")
 	idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
 
 
@@ -251,19 +252,19 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 	// Using GopenPGP
 	privateKey, err := crypto.NewKeyFromArmored(getShareKeyPrivate(idToUnlock))
 	if err != nil {
-		log.Println("err : ", err)
+		log.Println("err :", err)
 		return
 	}
 	defer privateKey.ClearPrivateParams()
 	pgp := crypto.PGP()
 	decHandle, err := pgp.Decryption().DecryptionKey(privateKey).New()
 	if err != nil {
-		log.Println("err : ", err)
+		log.Println("err :", err)
 		return
 	}
 	decrypted, err := decHandle.Decrypt([]byte(pgpMessageEncrypted), crypto.Armor)
 	if err != nil {
-		log.Println("err : ", err)
+		log.Println("err :", err)
 		return
 	}
 
@@ -339,7 +340,7 @@ func uploadSecret(w http.ResponseWriter, r *http.Request) {
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
 		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
-		url := path.Dir(uri)													// Only the 'http://domain:port' part
+		 url:= path.Dir(uri)													// Only the 'http://domain:port' part
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
 
@@ -374,7 +375,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
 		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
-		url := path.Dir(uri)													// Only the 'http://domain:port' part
+		 url:= path.Dir(uri)													// Only the 'http://domain:port' part
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
 
@@ -450,13 +451,18 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 
-	url := r.Header.Get("Referer")
+	url:= r.Header.Get("Referer")
 	shareId := url[len(url)-36:]	// Just get the last 36 char of the url because the IDs are 36 char length
 	shareContentMap := getShareContent(shareId)
 	file := shareContentMap["value"]
 
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Content-Disposition", "attachment; filename=" + file)
 
-    http.ServeFile(w, r, file)
+	// // Increment the download counter of the file
+	// updateFileCurrentDownload(shareId)
+
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Disposition", "attachment; filename=" + file)
+
+	http.ServeFile(w, r, file)
 }

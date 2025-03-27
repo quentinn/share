@@ -20,7 +20,7 @@ func generatePassword() string {
 	b := make([]byte, 64)
 	_, err := rand.Read(b)
 	if err != nil {
-	   panic(err)
+	   log.Println("err :", err)
 	}
 
 	password := base64.StdEncoding.EncodeToString(b)
