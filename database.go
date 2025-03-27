@@ -7,7 +7,7 @@ import (
 	"time"
 	"strconv"
 	"path/filepath"
-	// "io/ioutil"
+	"io/ioutil"
 
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
@@ -57,16 +57,6 @@ func createDatabase() {
 	DELETE FROM secret;
 	`
 
-
-	// var query = `
-	// CREATE TABLE share (id text not null primary key, pgpkeypublic text, pgpkeyprivate text, password text, maxopen int, currentopen int, expiration text, creation text);
-	// DELETE FROM share;
-	// CREATE TABLE file (id text not null primary key, path text, share_id text, currentdownload int, FOREIGN KEY(share_id) REFERENCES share(id));
-	// DELETE FROM file;
-	// CREATE TABLE secret (id text not null primary key, text text, share_id text, FOREIGN KEY(share_id) REFERENCES share(id));
-	// DELETE FROM secret;
-	// `
-	
 
 	// Reset database only if the user has decided to
 	if DELETE_DB == true {
@@ -453,12 +443,8 @@ func deleteShare(shareId string) {
 
 
 
-
-
 	// // Delete the directory containing files of the share
 	// deletePath("uploads/" + shareId)
-
-
 	
 }
 
@@ -496,70 +482,6 @@ func listShareOpen() {
 
 
 
-// // Get the number of time that a file has been downloaded
-// func getFileCurrentDownload(shareId string) string {
-// 	db,  err:= sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-// 	defer db.Close()
-
-
-// 	row := db.QueryRow("SELECT currentdownload FROM file WHERE share_id = :share_id", shareId)
-// 	var rowDataCurrentDownload string
-// 	switch  err:= row.Scan(&rowDataCurrentDownload); err {
-// 		case sql.ErrNoRows:
-// 			log.Println(rowNotFound, "file")
-// 		case nil:
-// 			log.Println(rowFound, "file")
-// 		default:
-// 			log.Println(" err:", err)
-// 	}
-
-	
-// 	return rowDataCurrentDownload
-
-// }
-
-
-
-
-// // Update the number of times a file has been downloaded
-// func updateFileCurrentDownload(shareId string) {
-// 	db,  err:= sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-// 	defer db.Close()
-
-
-// 	row := db.QueryRow("SELECT currentdownload FROM file WHERE share_id = :share_id", shareId)
-// 	var rowDataCurrentOpen string
-// 	switch  err:= row.Scan(&rowDataCurrentOpen); err {
-// 		case sql.ErrNoRows:
-// 			log.Println(rowNotFound, "share")
-// 		case nil:
-// 			log.Println(rowFound, "share")
-// 		default:
-// 			log.Println(" err:", err)
-// 	}
-
-
-// 	// Increment the open (meaning it has been opened one time)
-// 	currentdownloadInt, _ := strconv.Atoi(rowDataCurrentOpen)
-// 	currentdownload := currentdownloadInt + 1
-
-
-// 	_, err = db.Exec("UPDATE file SET currentdownload = :currentdownload WHERE share_id = :share_id", currentdownload, shareId)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-// }
-
-
-
-
-
 // Set a task to run at a specific date
 // Regularly check for all shares expiration date, and delete them if expired
 func periodicCleanExpiredShares() {
@@ -568,22 +490,26 @@ func periodicCleanExpiredShares() {
 	task.Every(1).Minutes().Do(func() {
 		log.Println("task: periodic clean of expired shares")
 
+
 		db,  err:= sql.Open("sqlite3", dbFile)
 		if err != nil {
 			log.Println(" err:", err)
 		}
 		defer db.Close()
 	
+
 		rows,  err:= db.Query("SELECT id, expiration FROM share")
 		if err != nil {
 			log.Println(" err:", err)
 		}
 		defer rows.Close()
+
+
 		for rows.Next() {
 			var rowDataId string
 			var rowDataExpiration string
 
-			 err:= rows.Scan(&rowDataId, &rowDataExpiration)
+			err:= rows.Scan(&rowDataId, &rowDataExpiration)
 			if err != nil {
 				log.Println(" err:", err)
 			}
@@ -615,113 +541,85 @@ func periodicCleanExpiredShares() {
 
 
 
-// // Task to delete files front filesystem when their shares don't exist anymore (because maxopen value has been reached)
-// func periodicCleanOrphansFiles() {
+// Task to delete files front filesystem when their shares don't exist anymore (because maxopen value has been reached)
+func periodicCleanOrphansFiles() {
 
-// 	task := gocron.NewScheduler(time.UTC)
-// 	task.Every(10).Seconds().Do(func() {
-// 		log.Println("task: periodic clean of orphans files")
+	task := gocron.NewScheduler(time.UTC)
+	task.Every(5).Seconds().Do(func() {
+		log.Println("task: periodic clean of orphans files")
 
-// 		// // Detect files from another function to be able to watch future uploads
-// 		// detectOrphansFiles()
+		// Detect files from another function to be able to watch future uploads
+		detectOrphansFiles()
+		
+    })
+
+    task.StartAsync()
+
+    // Prevent exit
+    select {}
+}
 
 
 
 
+// Task to delete files from filesystem when their shares don't exist anymore (because maxopen value has been reached)
+func detectOrphansFiles() {
 
-// 		db,  err:= sql.Open("sqlite3", dbFile)
-// 		if err != nil {
-// 			log.Println(" err:", err)
-// 		}
-// 		defer db.Close()
-	
-	
-// 		rows,  err:= db.Query("SELECT id FROM share")
-// 		if err != nil {
-// 			log.Println(" err:", err)
-// 		}
-// 		defer rows.Close()
-	
-// 		var id string
-// 		for rows.Next() {
-// 			err:= rows.Scan(&id)
-// 			if err != nil {
-// 				log.Println(" err:", err)
-// 			}
+	dirUploads := "uploads/"
 
+
+	files,  err:= ioutil.ReadDir(dirUploads)
+    if err != nil {
+        log.Println(" err:", err)
+    }
+
+
+	db,  err:= sql.Open("sqlite3", dbFile)
+	if err != nil {
+		log.Println(" err:", err)
+	}
+	defer db.Close()
+
+
+	for _, file := range files {
+
+		shareId := file.Name()											// Get the id from the directory name at 'upload/<id>' 
+		shareIdPath := dirUploads + shareId
+
+
+		// Get file creation date
+		fileInfo, err := os.Stat(shareIdPath) 
+		if err != nil {
+			log.Println(" err:", err)
+		}
+		fileInfoTime := fileInfo.ModTime()								// The directory should never change, so modification date = creation date
+		extendedExpirationDate := fileInfoTime.Add(24 * time.Hour)		// Create a "fake" extended expiration date for the file (this will permit to check if we consider the file can be deleted or not)
+
+		now := time.Now()
+
+
+		// Search for a database record corresponding to 'uploads/<id>/' directory
+		row := db.QueryRow("SELECT id FROM share WHERE id = :share_id", shareId)
+		var rowDataId string
+		var readyToDelete bool
+		switch  err:= row.Scan(&rowDataId); err {
+			case sql.ErrNoRows:
+				readyToDelete = true
+			case nil:
+				readyToDelete = false
+			default:
+				log.Println(" err:", err)
+		}
 
 		
-// 			shareOpenMap := getShareOpen(id)
-// 			shareCurrentOpen := shareOpenMap["currentopen"]
 
-// 			// Detect if a file has been downloaded a superior number of times that its share can be opened
-// 			if getFileCurrentDownload(id) >= shareCurrentOpen {
-// 				deletePath("uploads/" + id)
-// 			}
-	
-// 		}
+		// Delete the file only if:
+		//  - the share doesn't exist anymore
+		//  - the creation date was a long time ago (which is defined by the 'extendedExpirationDate' variable)
+		if (readyToDelete == true) && (now.After(extendedExpirationDate) == true) {
+			log.Println("file: ready to delete:", shareIdPath, "created at", fileInfoTime, "expired at", extendedExpirationDate)
+			go deletePath(shareIdPath) 										// Set as Goroutine to avoid database crash due to too many connexion opened
+		}
 
-
-		
-// 		// // Detect if a file has been downloaded a superior number of times that its share can be opened
-// 		// if getFileCurrentDownload(shareId) > getShareOpen(shareId) {
-// 		// 	deletePath(dirUploads + shareIdDir)
-// 		// }
-
-
-		
-//     })
-
-//     task.StartAsync()
-
-//     // Prevent exit
-//     select {}
-// }
-
-
-
-
-// // Task to delete files from filesystem when their shares don't exist anymore (because maxopen value has been reached)
-// func detectOrphansFiles() {
-
-// 	dirUploads := "uploads/"
-
-
-// 	files,  err:= ioutil.ReadDir(dirUploads)
-//     if err != nil {
-//         log.Println(" err:", err)
-//     }
-
-
-// 	db,  err:= sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-// 	defer db.Close()
-
-
-// 	for _, file := range files {
-
-// 		shareIdDir := file.Name()
-
-// 		// Search for a database record corresponding to 'uploads/<id>/' directory
-// 		row := db.QueryRow("SELECT id FROM share WHERE id = :share_id", shareIdDir)
-// 		var rowDataId string
-// 		switch  err:= row.Scan(&rowDataId); err {
-// 			case sql.ErrNoRows:
-// 				log.Println("file:   to delete:", dirUploads + shareIdDir)
-// 				// readyToDelete := true
-// 				// go deletePath(dirUploads + shareIdDir)	// Set as Goroutine to avoid database crash due to too many connexion opened
-// 			case nil:
-// 				log.Println("file: still valid:", dirUploads + shareIdDir)
-// 			default:
-// 				log.Println(" err:", err)
-// 		}
-		
-
-// 		// if readyToDelete == true {
-// 		// 	go deletePath(dirUploads + shareIdDir)		// Set as Goroutine to avoid database crash due to too many connexion opened
-// 		// }
-
-// 	}
-// }
+	}
+}

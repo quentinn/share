@@ -41,7 +41,7 @@ func main() {
 		// go run share web
 		if string(os.Args[1]) == "web" {
 			go periodicCleanExpiredShares()		// Goroutine to clean expired shares
-			// go periodicCleanOrphansFiles()		// Goroutine to clean orphans files
+			go periodicCleanOrphansFiles()		// Goroutine to clean orphans files
 			os.Setenv("DELETE_DB", "false")
 			createDatabase()
 			server.Start()
@@ -450,16 +450,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 
-
 	url:= r.Header.Get("Referer")
 	shareId := url[len(url)-36:]	// Just get the last 36 char of the url because the IDs are 36 char length
 	shareContentMap := getShareContent(shareId)
 	file := shareContentMap["value"]
-
-
-	// // Increment the download counter of the file
-	// updateFileCurrentDownload(shareId)
-
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Disposition", "attachment; filename=" + file)
