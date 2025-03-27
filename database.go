@@ -23,6 +23,10 @@ import (
 // var dbFile string = "sqlite.db"
 var dbFile string = filepath.Join("database", "sqlite.db")
 
+var rowFound    = "db  : records found from table:"
+var rowNotFound = "db  : nothing found from table:"
+var rowDeleted  = "db  : delete record from table:"
+
 
 
 func createDatabase() {
@@ -75,7 +79,7 @@ func createDatabase() {
 			return
 		}
 
-		fmt.Println("Database resetted")
+		log.Println("Database resetted")
 	
 
 	} else {
@@ -97,9 +101,9 @@ func createDatabase() {
 				return
 			}
 
-			fmt.Println("Database created")
+			log.Println("Database created")
 		} else {
-			fmt.Println("Database found")
+			log.Println("Database found")
 		}
 
 	}
@@ -184,6 +188,8 @@ func createSecret(id string, shareId string, text string, expiration string, max
 
 
 
+
+
 // Get the content of a share
 func getShareContent(shareId string) map[string]string {
 	db, err := sql.Open("sqlite3", dbFile)
@@ -198,9 +204,9 @@ func getShareContent(shareId string) map[string]string {
 	var secretText string
 	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'secret'")
+			log.Println(rowNotFound, "secret")
 		case nil:
-			fmt.Println("Row found:", secretText)
+			log.Println(rowFound, "secret")
 		default:
 			panic(err)
 	}
@@ -211,9 +217,9 @@ func getShareContent(shareId string) map[string]string {
 	var filePath string
 	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'file'")
+			log.Println(rowNotFound, "file")
 		case nil:
-			fmt.Println("Row found:", filePath)
+			log.Println(rowFound, "file", filePath)
 		default:
 			panic(err)
 	}
@@ -255,9 +261,9 @@ func getSharePassword(shareId string) string {
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'share'")
+			log.Println(rowNotFound, "share")
 		case nil:
-			fmt.Println("Row found:", rowData)
+			log.Println(rowFound, "share")
 		default:
 			panic(err)
 	}
@@ -281,9 +287,9 @@ func getShareKeyPublic(shareId string) string {
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'share'")
+			log.Println(rowNotFound, "share")
 		case nil:
-			fmt.Println("Row found:", rowData)
+			log.Println(rowFound, "share")
 		default:
 			panic(err)
 	}
@@ -307,9 +313,9 @@ func getShareKeyPrivate(shareId string) string {
 	var rowData string
 	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'share'")
+			log.Println(rowNotFound, "share")
 		case nil:
-			fmt.Println("Row found:", rowData)
+			log.Println(rowFound, "share")
 		default:
 			panic(err)
 	}
@@ -334,9 +340,9 @@ func getShareOpen(shareId string) map[string]string {
 	var rowDataMaxOpen string
 	switch err := row.Scan(&rowDataCurrentOpen, &rowDataMaxOpen); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'share'")
+			log.Println(rowNotFound, "share")
 		case nil:
-			fmt.Println("Rows found:", rowDataCurrentOpen, "and", rowDataMaxOpen)
+			log.Println(rowFound, "share")
 		default:
 			panic(err)
 	}
@@ -365,21 +371,18 @@ func updateShareOpen(shareId string) {
 	var rowDataCurrentOpen string
 	switch err := row.Scan(&rowDataCurrentOpen); err {
 		case sql.ErrNoRows:
-			fmt.Println("No row returned from table 'share'")
+			log.Println(rowNotFound, "share")
 		case nil:
-			fmt.Println("Rows found:", rowDataCurrentOpen)
+			log.Println(rowFound, "share")
 		default:
 			panic(err)
 	}
 
 
 	// Increment the open (meaning it has been opened one time)
-	// currentopen := rowDataCurrentOpen + "1"
 	currentopenInt, _ := strconv.Atoi(rowDataCurrentOpen)
 	currentopen := currentopenInt + 1
 
-	fmt.Println("rowDataCurrentOpen ", rowDataCurrentOpen)
-	fmt.Println("currentopen        ", currentopen)
 
 	_, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
 	if err != nil {
@@ -406,9 +409,9 @@ func deleteShare(shareId string) {
 	var rowShareData string
 	switch err := rowShare.Scan(&rowShareData); err {
 		case sql.ErrNoRows:
-			fmt.Println("Row deleted from table 'share'")
+			log.Println(rowDeleted, "share", shareId)
 		// case nil:
-		// 	fmt.Println("Row found:", rowShareData)
+		// 	log.Println("Row found:", rowShareData)
 		default:
 			panic(err)
 	}
@@ -418,9 +421,9 @@ func deleteShare(shareId string) {
 	var rowSecretData string
 	switch err := rowSecret.Scan(&rowSecretData); err {
 		case sql.ErrNoRows:
-			fmt.Println("Row deleted from table 'secret'")
+			log.Println(rowDeleted, "secret", shareId)
 		// case nil:
-		// 	fmt.Println("Row found:", rowSecretData)
+		// 	log.Println("Row found:", rowSecretData)
 		default:
 			panic(err)
 	}
@@ -430,9 +433,9 @@ func deleteShare(shareId string) {
 	var rowFileData string
 	switch err := rowFile.Scan(&rowFileData); err {
 		case sql.ErrNoRows:
-			fmt.Println("Row deleted from table 'file'")
+			log.Println(rowDeleted, "file", shareId)
 		// case nil:
-		// 	fmt.Println("Row found:", rowFileData)
+		// 	log.Println("Row found:", rowFileData)
 		default:
 			panic(err)
 	}
@@ -469,7 +472,7 @@ func listShareOpen() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("ID:" + id + "; Creted:" + creation + "; Expire:" + expiration)
+		log.Println("ID:" + id + "; Creted:" + creation + "; Expire:" + expiration)
 
 	}
 }
@@ -483,7 +486,7 @@ func periodicClean() {
 
 	task := gocron.NewScheduler(time.UTC)
 	task.Every(1).Minutes().Do(func() {
-		fmt.Println("Periodic cleaning task started at:", time.Now())
+		log.Println("task: periodic clean of expired shares")
 
 		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
@@ -519,28 +522,8 @@ func periodicClean() {
 				go deleteShare(rowDataId)	// Set as Goroutine to avoid database crash due to too many connexion opened
 			}
 
-			// if now.After(expiration) {
-			// 	fmt.Println()
-			// 	fmt.Println("EXPIRED")
-			// 	fmt.Println("id            ", rowDataId)
-			// 	fmt.Println("expiration row", rowDataExpiration)
-			// 	fmt.Println("expiration    ", expiration)
-			// 	fmt.Println("now           ", now)
-
-			// } else if now.Before(expiration)  {
-				
-			// 	fmt.Println()
-			// 	fmt.Println("ALIVE")
-			// 	fmt.Println("id            ", rowDataId)
-			// 	fmt.Println("expiration row", rowDataExpiration)
-			// 	fmt.Println("expiration    ", expiration)
-			// 	fmt.Println("now           ", now)
-
-			// }
 		}
 		
-		// fmt.Println("-------------")
-
     })
 
     task.StartAsync()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
     "encoding/base64"
@@ -38,7 +39,7 @@ func createPath(path string) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		err := os.Mkdir(path, 0700)
 		if err != nil {
-			fmt.Println(err)
+			log.Println("err :", err)
 		}
 	}
 }
@@ -51,7 +52,7 @@ func createPath(path string) {
 func deletePath(path string) {
 	err := os.RemoveAll(path)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err :", err)
 	}
 }
 
@@ -68,7 +69,7 @@ func backupFile(sourceFile string) {
 	// Open the source file 
 	source, err := os.Open(sourceFile)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err :", err)
 	}
 	defer source.Close()
  
@@ -76,7 +77,7 @@ func backupFile(sourceFile string) {
 	// Create the destination file
 	destination, err := os.Create(sourceFile + "." + now)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err :", err)
 	}
 	defer destination.Close()
 
@@ -84,7 +85,7 @@ func backupFile(sourceFile string) {
 	// Copy the contents of source to destination file
   	_, err = io.Copy(destination, source)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err :", err)
 	}
 
 }

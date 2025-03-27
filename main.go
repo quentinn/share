@@ -141,7 +141,7 @@ func (a *App) Start() {
 
 
 	addr := fmt.Sprintf(":%s", a.Port)
-	log.Printf("Starting app on %s", addr)
+	log.Printf("web : starting app on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
@@ -161,7 +161,7 @@ func env(key, adefault string) string {
 
 func logReq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("url: %s", r.Header.Get("Referer"))
+		log.Printf("url : %s", r.Header.Get("Referer"))
 		f(w, r)
 	})
 }
@@ -172,13 +172,13 @@ func logReq(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 func renderTemplate(w http.ResponseWriter, name string, data interface{}) {
 	t, err := template.ParseGlob("templates/*.html")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error %s", err.Error()), 500)
+		http.Error(w, fmt.Sprintf("err : %s", err.Error()), 500)
 		return
 	}
 
 	err = t.ExecuteTemplate(w, name, data)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error %s", err.Error()), 500)
+		http.Error(w, fmt.Sprintf("err : %s", err.Error()), 500)
 		return
 	}
 }
@@ -194,10 +194,8 @@ func viewCreateFile(w http.ResponseWriter, r *http.Request) {
 	
 	renderTemplate(w, "view.create.file.html", struct {
 		TokenAvoidRefresh string
-		// Expiration string
 	}{
 		TokenAvoidRefresh: token,
-		// Expiration: time.Now().String(),
 	})
 }
 
@@ -212,10 +210,8 @@ func viewCreateSecret(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w, "view.create.secret.html", struct {
 		TokenAvoidRefresh string
-		// Expiration string
 	}{
 		TokenAvoidRefresh: token,
-		// Expiration: time.Now().String(),
 	})
 }
 
@@ -255,19 +251,19 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 	// Using GopenPGP
 	privateKey, err := crypto.NewKeyFromArmored(getShareKeyPrivate(idToUnlock))
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err : ", err)
 		return
 	}
 	defer privateKey.ClearPrivateParams()
 	pgp := crypto.PGP()
 	decHandle, err := pgp.Decryption().DecryptionKey(privateKey).New()
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err : ", err)
 		return
 	}
 	decrypted, err := decHandle.Decrypt([]byte(pgpMessageEncrypted), crypto.Armor)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("err : ", err)
 		return
 	}
 
@@ -282,10 +278,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 	shareCurrentOpen := shareOpenMap["currentopen"]
 	shareMaxOpen := shareOpenMap["maxopen"]
 
-
-	fmt.Println("shareCurrentOpen", shareCurrentOpen)
-	fmt.Println("shareMaxOpen", shareMaxOpen)
-
+	
 	// Check if password match
 	if decrypted.String() == getSharePassword(idToUnlock) {
 
@@ -303,7 +296,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 			
 			jsonData, err := json.Marshal(data)
 			if err != nil {
-				fmt.Printf("could not marshal json: %s\n", err)
+				log.Printf("err : could not marshal json: %s\n", err)
 				return
 			}
 		
@@ -327,7 +320,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 		
 
 	} else {
-		fmt.Println("password mismatch")
+		log.Println("err : password mismatch")
 	}
 
 }
@@ -389,21 +382,21 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		// Get handler for filename, size and headers
 		file, handler, err := r.FormFile("myFile")
 		if err != nil {
-			fmt.Println("Error retrieving the file")
-			fmt.Println(err)
+			// log.Println("err : can't retrieve file", file)
+			log.Println("err :", err)
 			return
 		}
 		defer file.Close()
-		// fmt.Printf("Uploaded file: %+v\n", handler.Filename)
-		// fmt.Printf("File size: %+v\n", handler.Size)
-		// fmt.Printf("MIME header: %+v\n", handler.Header)
+		// log.Printf("Uploaded file: %+v\n", handler.Filename)
+		// log.Printf("File size: %+v\n", handler.Size)
+		// log.Printf("MIME header: %+v\n", handler.Header)
 
 		// Create destination directory root
 		dirUploads := "uploads/"
 		if _, err := os.Stat(dirUploads); errors.Is(err, os.ErrNotExist) {
 			err := os.Mkdir(dirUploads, 0700)
 			if err != nil {
-				log.Println(err)
+				log.Println("err :", err)
 			}
 		}
 
@@ -412,7 +405,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
 			err := os.Mkdir(dir, 0700)
 			if err != nil {
-				log.Println(err)
+				log.Println("err :", err)
 			}
 		}
 
