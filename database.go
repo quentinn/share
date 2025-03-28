@@ -23,6 +23,7 @@ import (
 
 // var dbFile string = "sqlite.db"
 var dbFile string = filepath.Join("database", "sqlite.db")
+var dbFileAuth string = filepath.Join("database", ".auth")
 
 var rowFound    = "  db: records found from table:"
 var rowNotFound = "  db: nothing found from table:"
@@ -110,26 +111,11 @@ func createDatabase() {
 		}
 
 	}
+
+
+	// Set database to be read/write only by owner (sqlite doesn't support user/auth)
+	os.Chmod(dbFile, 0600)
 }
-
-
-
-
-// setDatabasePassword() {
-// 	db, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-// 		defer db.Close()
-
-
-
-// 	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
-// 	if err != nil {
-// 		log.Println(" err:", err)
-// 	}
-
-// }
 
 
 
@@ -157,8 +143,7 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 
 
 	db := openDatabase()
-		defer db.Close()
-
+	defer db.Close()
 
 
 	t := time.Now()

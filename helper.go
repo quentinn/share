@@ -97,7 +97,7 @@ func backupFile(sourceFile string) {
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
-	   return false
+		return false
 	}
 	return !info.IsDir()
- }
+}
