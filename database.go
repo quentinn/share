@@ -67,11 +67,12 @@ func createDatabase() {
 		}
 	
 		// Open connexion
-		db,  err:= sql.Open("sqlite3", dbFile)
+		db, err := sql.Open("sqlite3", dbFile)
 		if err != nil {
 			log.Println(" err:", err)
 		}
-		defer db.Close()
+			defer db.Close()
+
 
 		// Create tables
 		_, err = db.Exec(query)
@@ -89,11 +90,12 @@ func createDatabase() {
 		if ! fileExists(dbFile) {
 			
 			// Open connexion
-			db,  err:= sql.Open("sqlite3", dbFile)
+			db, err := sql.Open("sqlite3", dbFile)
 			if err != nil {
 				log.Println(" err:", err)
 			}
-			defer db.Close()
+				defer db.Close()
+
 			
 			// Create tables
 			_, err = db.Exec(query)
@@ -113,13 +115,49 @@ func createDatabase() {
 
 
 
+// setDatabasePassword() {
+// 	db, err := sql.Open("sqlite3", dbFile)
+// 	if err != nil {
+// 		log.Println(" err:", err)
+// 	}
+// 		defer db.Close()
 
-func createShare(id string, expirationGiven string, maxopenGiven string) {
-	db,  err:= sql.Open("sqlite3", dbFile)
+
+
+// 	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
+// 	if err != nil {
+// 		log.Println(" err:", err)
+// 	}
+
+// }
+
+
+
+
+func openDatabase() *sql.DB {
+	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		log.Println(" err:", err)
 	}
-	defer db.Close()
+	// 	defer db.Close()
+
+
+	return db
+}
+
+
+
+
+func createShare(id string, expirationGiven string, maxopenGiven string) {
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
+		defer db.Close()
 
 
 
@@ -141,28 +179,38 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
 
 
-	_, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// _, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+
+	db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
 }
 
 
 
 
 func createFile(id string, shareId string, path string, expiration string, maxopen string) {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
 
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
-	_, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
-	if err != nil {
-		log.Println(" err:", err)
-	}
 
+	// _, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
 
 	createShare(shareId, expiration, maxopen)
 }
@@ -171,16 +219,25 @@ func createFile(id string, shareId string, path string, expiration string, maxop
 
 
 func createSecret(id string, shareId string, text string, expiration string, maxopen string) {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+
+	// _, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
 
 
 	createShare(shareId, expiration, maxopen)
@@ -193,17 +250,25 @@ func createSecret(id string, shareId string, text string, expiration string, max
 
 // Get the content of a share
 func getShareContent(shareId string) map[string]string {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 
 	rowSecret := db.QueryRow("SELECT text FROM secret WHERE share_id = :share_id", shareId)
 	var secretText string
-	switch  err:= rowSecret.Scan(&secretText); err {
+	switch err := rowSecret.Scan(&secretText); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "secret")
 		case nil:
@@ -216,7 +281,7 @@ func getShareContent(shareId string) map[string]string {
 
 	rowFile := db.QueryRow("SELECT path FROM file WHERE share_id = :share_id", shareId)
 	var filePath string
-	switch  err:= rowFile.Scan(&filePath); err {
+	switch err := rowFile.Scan(&filePath); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "file")
 		case nil:
@@ -251,16 +316,24 @@ func getShareContent(shareId string) map[string]string {
 
 // Get the password of a share
 func getSharePassword(shareId string) string {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", shareId)
 	var rowData string
-	switch  err:= row.Scan(&rowData); err {
+	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "share")
 		case nil:
@@ -277,16 +350,24 @@ func getSharePassword(shareId string) string {
 
 // Get the PGP public key of a share
 func getShareKeyPublic(shareId string) string {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	row := db.QueryRow("SELECT pgpkeypublic FROM share WHERE id = :share_id", shareId)
 	var rowData string
-	switch  err:= row.Scan(&rowData); err {
+	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "share")
 		case nil:
@@ -303,16 +384,24 @@ func getShareKeyPublic(shareId string) string {
 
 // Get the PGP private key of a share
 func getShareKeyPrivate(shareId string) string {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	row := db.QueryRow("SELECT pgpkeyprivate FROM share WHERE id = :share_id", shareId)
 	var rowData string
-	switch  err:= row.Scan(&rowData); err {
+	switch err := row.Scan(&rowData); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "share")
 		case nil:
@@ -329,17 +418,25 @@ func getShareKeyPrivate(shareId string) string {
 
 // Get the number of times a share has been opened
 func getShareOpen(shareId string) map[string]string {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	row := db.QueryRow("SELECT currentopen, maxopen FROM share WHERE id = :share_id", shareId)
 	var rowDataCurrentOpen string
 	var rowDataMaxOpen string
-	switch  err:= row.Scan(&rowDataCurrentOpen, &rowDataMaxOpen); err {
+	switch err := row.Scan(&rowDataCurrentOpen, &rowDataMaxOpen); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "share")
 		case nil:
@@ -361,16 +458,24 @@ func getShareOpen(shareId string) map[string]string {
 
 // Update the number of times a share has been opened
 func updateShareOpen(shareId string) {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	row := db.QueryRow("SELECT currentopen FROM share WHERE id = :share_id", shareId)
 	var rowDataCurrentOpen string
-	switch  err:= row.Scan(&rowDataCurrentOpen); err {
+	switch err := row.Scan(&rowDataCurrentOpen); err {
 		case sql.ErrNoRows:
 			log.Println(rowNotFound, "share")
 		case nil:
@@ -385,11 +490,11 @@ func updateShareOpen(shareId string) {
 	currentopen := currentopenInt + 1
 
 
-	_, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
-	if err != nil {
-		log.Println(" err:", err)
-	}
-
+	// _, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
 
 }
 
@@ -399,16 +504,24 @@ func updateShareOpen(shareId string) {
 
 // Delete a share and also its related secrets and files (and delete file from filesystem aswell)
 func deleteShare(shareId string) {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
+
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
 
 	rowShare := db.QueryRow("DELETE FROM share WHERE id = :share_id", shareId)
 	var rowShareData string
-	switch  err:= rowShare.Scan(&rowShareData); err {
+	switch err := rowShare.Scan(&rowShareData); err {
 		case sql.ErrNoRows:
 			log.Println(rowDeleted, "share", shareId)
 		// case nil:
@@ -420,7 +533,7 @@ func deleteShare(shareId string) {
 
 	rowSecret := db.QueryRow("DELETE FROM secret WHERE share_id = :share_id", shareId)
 	var rowSecretData string
-	switch  err:= rowSecret.Scan(&rowSecretData); err {
+	switch err := rowSecret.Scan(&rowSecretData); err {
 		case sql.ErrNoRows:
 			log.Println(rowDeleted, "secret", shareId)
 		// case nil:
@@ -432,7 +545,7 @@ func deleteShare(shareId string) {
 
 	rowFile := db.QueryRow("DELETE FROM file WHERE share_id = :share_id", shareId)
 	var rowFileData string
-	switch  err:= rowFile.Scan(&rowFileData); err {
+	switch err := rowFile.Scan(&rowFileData); err {
 		case sql.ErrNoRows:
 			log.Println(rowDeleted, "file", shareId)
 		// case nil:
@@ -453,14 +566,22 @@ func deleteShare(shareId string) {
 
 // Get list of shares
 func listShareOpen() {
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
 
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
 
-	rows,  err:= db.Query("SELECT id, creation, expiration FROM share")
+
+	rows, err := db.Query("SELECT id, creation, expiration FROM share")
 	if err != nil {
 		log.Println(" err:", err)
 	}
@@ -491,18 +612,26 @@ func periodicCleanExpiredShares() {
 		log.Println("task: periodic clean of expired shares")
 
 
-		db,  err:= sql.Open("sqlite3", dbFile)
-		if err != nil {
-			log.Println(" err:", err)
-		}
+		db := openDatabase()
 		defer db.Close()
-	
 
-		rows,  err:= db.Query("SELECT id, expiration FROM share")
+
+
+		// db, err := sql.Open("sqlite3", dbFile)
+		// if err != nil {
+		// 	log.Println(" err:", err)
+		// }
+		// 	defer db.Close()
+
+
+
+		
+		rows, err := db.Query("SELECT id, expiration FROM share")
 		if err != nil {
 			log.Println(" err:", err)
 		}
 		defer rows.Close()
+
 
 
 		for rows.Next() {
@@ -517,7 +646,7 @@ func periodicCleanExpiredShares() {
 
 			now := time.Now()
 			timeLayout := "2006-01-02T15:04"
-			expiration,  err:= time.Parse(timeLayout, rowDataExpiration)
+			expiration, err := time.Parse(timeLayout, rowDataExpiration)
 			if err != nil {
 				log.Println(" err:", err)
 			}
@@ -529,7 +658,7 @@ func periodicCleanExpiredShares() {
 			}
 
 		}
-		
+	
     })
 
     task.StartAsync()
@@ -568,16 +697,20 @@ func detectOrphansFiles() {
 	dirUploads := "uploads/"
 
 
-	files,  err:= ioutil.ReadDir(dirUploads)
+	files, err := ioutil.ReadDir(dirUploads)
     if err != nil {
         log.Println(" err:", err)
     }
 
 
-	db,  err:= sql.Open("sqlite3", dbFile)
-	if err != nil {
-		log.Println(" err:", err)
-	}
+	// db, err := sql.Open("sqlite3", dbFile)
+	// if err != nil {
+	// 	log.Println(" err:", err)
+	// }
+	// 	defer db.Close()
+
+
+	db := openDatabase()
 	defer db.Close()
 
 
@@ -602,7 +735,7 @@ func detectOrphansFiles() {
 		row := db.QueryRow("SELECT id FROM share WHERE id = :share_id", shareId)
 		var rowDataId string
 		var readyToDelete bool
-		switch  err:= row.Scan(&rowDataId); err {
+		switch err := row.Scan(&rowDataId); err {
 			case sql.ErrNoRows:
 				readyToDelete = true
 			case nil:
