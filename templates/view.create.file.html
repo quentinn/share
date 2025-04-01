@@ -9,10 +9,12 @@
 
 
 
-	<div class="container-progress">
-		<span id="status"></span>
+	<div id="progresscontainer" class="container-progress hidden">
 		<progress id="progressbar" value="0" max="100"></progress>
-		<span id="cancel"><button>cancel</button></span>
+		<div id="status" class="text"></div>
+		<div id="cancel">
+			<button class="button button-small">X</button>
+		</div>
 	</div>
 
 
@@ -32,15 +34,10 @@
 
 <script>
 
-
-
 	var submit = document.getElementById("submit");
-	// submit.onclick = function () { uploadFile(); };
-
+	submit.onclick = function () { uploadFile(); };
 
 	var cancel = document.getElementById("cancel");
-
-
 
 
 	function _(el) {
@@ -48,32 +45,7 @@
 	}
 
 
-	// function uploadFile() {
-	// 	var file = _("myFile").files[0];
-
-	// 	var formdata = new FormData();
-	// 	formdata.append("myFile", file);
-
-	// 	var xhr = new XMLHttpRequest();
-	// 	xhr.upload.addEventListener("progress", progressHandler, false);
-	// 	xhr.addEventListener("load", completeHandler, false);
-	// 	xhr.addEventListener("error", errorHandler, false);
-	// 	xhr.addEventListener("abort", abortHandler, false);
-
-
-	// 	cancel.addEventListener("click", () => {
-	// 		xhr.abort();
-	// 	});
-
-	// 	xhr.open("POST", "/file/shared");
-	// 	xhr.send(formdata);
-	// }
-
-	submit.onclick = async (e) => {
-
-
-		e.preventDefault();
-
+	function uploadFile() {
 		var file = _("myFile").files[0];
 
 		var formdata = new FormData();
@@ -90,19 +62,22 @@
 			xhr.abort();
 		});
 
+
+		// console.log(xhr)
+		window.onbeforeunload = function () {
+			if (xhr.readyState == 0) {
+				return "Cancel upload?";
+			}
+		}
+
 		xhr.open("POST", "/file/shared");
-		await xhr.send(formdata);
+		xhr.send(formdata);
 
-	};
-
+		displayProgress()
+	}
 
 
 	function progressHandler(event) {
-		// _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
-
-		// event.preventDefault();
-
-
 		var percent = (event.loaded / event.total) * 100;
 		_("progressbar").value = Math.round(percent);
 		_("status").innerHTML = Math.round(percent) + "%";
@@ -111,7 +86,7 @@
 
 	function completeHandler(event) {
 		_("status").innerHTML = event.target.responseText;
-		_("progressbar").value = 0; // will clear progress bar after successful upload
+		_("progressbar").value = 0;
 	}
 
 
@@ -123,6 +98,13 @@
 	function abortHandler(event) {
 		_("status").innerHTML = "Aborted";
 	}
+
+
+	function displayProgress() {
+		var progresscontainer = document.getElementById("progresscontainer");
+		progresscontainer.classList.replace("hidden", "visible");
+	}
+
 
 
 </script>
