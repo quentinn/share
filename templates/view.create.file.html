@@ -8,16 +8,12 @@
 	<input required type="file" name="myFile" id="myFile" />
 
 
-
-
-
-
-	<div id="progresscontainer" class="container-progress ">
+	<div id="progresscontainer" class="container-progress hidden">
 		<div id="status" class="text"></div>
 		<progress id="progressbar" value="0" max="100"></progress>
-		<div id="cancel">
+		<!-- <div id="cancel">
 			<button class="button button-small">X</button>
-		</div>
+		</div> -->
 	</div>
 
 
@@ -32,7 +28,7 @@
 	var submit = document.getElementById("submit");
 	submit.onclick = function () { uploadFile(); };
 
-	var cancel = document.getElementById("cancel");
+	// var cancel = document.getElementById("cancel");
 
 
 	function _(el) {
@@ -63,10 +59,10 @@
 			}
 		}
 
-		// Button to cancel upload
-		cancel.addEventListener("click", () => {
-			xhr.abort();
-		});
+		// // Button to cancel upload
+		// cancel.addEventListener("click", () => {
+		// 	xhr.abort();
+		// });
 
 
 
