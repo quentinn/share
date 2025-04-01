@@ -8,9 +8,12 @@
 	<input required type="file" name="myFile" id="myFile" />
 
 
-	<progress id="progressbar" value="0" max="100"></progress>
-	<h3 id="status"></h3>
-	<p id="loaded_n_total"></p>
+
+	<div class="container-progress">
+		<span id="status"></span>
+		<progress id="progressbar" value="0" max="100"></progress>
+		<span id="cancel"><button>cancel</button></span>
+	</div>
 
 
 
@@ -32,7 +35,10 @@
 
 
 	var submit = document.getElementById("submit");
-	submit.onclick = function() { uploadFile(); };
+	// submit.onclick = function () { uploadFile(); };
+
+
+	var cancel = document.getElementById("cancel");
 
 
 
@@ -42,28 +48,64 @@
 	}
 
 
-	function uploadFile() {
+	// function uploadFile() {
+	// 	var file = _("myFile").files[0];
+
+	// 	var formdata = new FormData();
+	// 	formdata.append("myFile", file);
+
+	// 	var xhr = new XMLHttpRequest();
+	// 	xhr.upload.addEventListener("progress", progressHandler, false);
+	// 	xhr.addEventListener("load", completeHandler, false);
+	// 	xhr.addEventListener("error", errorHandler, false);
+	// 	xhr.addEventListener("abort", abortHandler, false);
+
+
+	// 	cancel.addEventListener("click", () => {
+	// 		xhr.abort();
+	// 	});
+
+	// 	xhr.open("POST", "/file/shared");
+	// 	xhr.send(formdata);
+	// }
+
+	submit.onclick = async (e) => {
+
+
+		e.preventDefault();
+
 		var file = _("myFile").files[0];
 
 		var formdata = new FormData();
 		formdata.append("myFile", file);
 
-		var ajax = new XMLHttpRequest();
-		ajax.upload.addEventListener("progress", progressHandler, false);
-		ajax.addEventListener("load", completeHandler, false);
-		ajax.addEventListener("error", errorHandler, false);
-		ajax.addEventListener("abort", abortHandler, false);
-		ajax.open("POST", "/file/shared");
-		ajax.send(formdata);
-	}
+		var xhr = new XMLHttpRequest();
+		xhr.upload.addEventListener("progress", progressHandler, false);
+		xhr.addEventListener("load", completeHandler, false);
+		xhr.addEventListener("error", errorHandler, false);
+		xhr.addEventListener("abort", abortHandler, false);
+
+
+		cancel.addEventListener("click", () => {
+			xhr.abort();
+		});
+
+		xhr.open("POST", "/file/shared");
+		await xhr.send(formdata);
+
+	};
+
 
 
 	function progressHandler(event) {
-		_("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+		// _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+
+		// event.preventDefault();
+
 
 		var percent = (event.loaded / event.total) * 100;
 		_("progressbar").value = Math.round(percent);
-		_("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+		_("status").innerHTML = Math.round(percent) + "%";
 	}
 
 
@@ -74,12 +116,12 @@
 
 
 	function errorHandler(event) {
-		_("status").innerHTML = "Upload Failed";
+		_("status").innerHTML = "Failed";
 	}
 
 
 	function abortHandler(event) {
-		_("status").innerHTML = "Upload Aborted";
+		_("status").innerHTML = "Aborted";
 	}
 
 
