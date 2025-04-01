@@ -5,12 +5,20 @@
 
 	<input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}" />
 
-	<input required type="file" name="myFile" id="myFile" />
+
+	<label for="myFile" class="container-file" id="dropcontainer">
+		<span class="drop-title">Drop a file</span>
+		<input required type="file" name="myFile" id="myFile" />
+	</label>
 
 
-	<div id="progresscontainer" class="container-progress hidden">
-		<div id="status" class="text"></div>
-		<progress id="progressbar" value="0" max="100"></progress>
+	
+	<div id="progresscontainer" class="container-progress ">
+		<!-- <label for="file" id="status" class="text">test</label> -->
+
+		<div id="progressbar" class="progress text"></div>
+
+		<!-- <progress id="progressbar" value="20" max="100" data-label="status"></progress> -->
 		<!-- <div id="cancel">
 			<button class="button button-small">X</button>
 		</div> -->
@@ -24,6 +32,10 @@
 
 
 <script>
+
+
+
+
 
 	var submit = document.getElementById("submit");
 	submit.onclick = function () { uploadFile(); };
@@ -66,36 +78,41 @@
 
 
 
-		displayProgress()
 	}
 
 
 	function progressHandler(event) {
 		var percent = (event.loaded / event.total) * 100;
-		_("progressbar").value = Math.round(percent);
-		_("status").innerHTML = Math.round(percent) + "%";
+		_("progressbar").innerHTML = Math.round(percent) + "%";
+
+		displayProgress(percent)
+
 	}
 
 
 	function completeHandler(event) {
 		_("status").innerHTML = event.target.responseText;
-		_("progressbar").value = 0;
+		_("progressbar").innerHTML = 0;
 	}
 
 
 	function errorHandler(event) {
-		_("status").innerHTML = "Failed";
+		_("progressbar").innerHTML = "Failed";
 	}
 
 
 	function abortHandler(event) {
-		_("status").innerHTML = "Aborted";
+		_("progressbar").innerHTML = "Aborted";
 	}
 
 
-	function displayProgress() {
+	function displayProgress(width) {
 		var progresscontainer = document.getElementById("progresscontainer");
 		progresscontainer.classList.replace("hidden", "visible");
+
+
+		var progressbar = document.getElementById("progressbar");
+		progressbar.style.width = width + "%";
 	}
 
 
