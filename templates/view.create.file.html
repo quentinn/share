@@ -46,6 +46,7 @@
 
 
 	function uploadFile() {
+
 		var file = _("myFile").files[0];
 
 		var formdata = new FormData();
@@ -56,22 +57,23 @@
 		xhr.addEventListener("load", completeHandler, false);
 		xhr.addEventListener("error", errorHandler, false);
 		xhr.addEventListener("abort", abortHandler, false);
+		xhr.open("POST", "/file/shared", true);
+		xhr.send(formdata);
 
 
-		cancel.addEventListener("click", () => {
-			xhr.abort();
-		});
-
-
-		// console.log(xhr)
+		// Prevent closing tab while uploading
 		window.onbeforeunload = function () {
 			if (xhr.readyState == 0) {
 				return "Cancel upload?";
 			}
 		}
 
-		xhr.open("POST", "/file/shared");
-		xhr.send(formdata);
+		// Button to cancel upload
+		cancel.addEventListener("click", () => {
+			xhr.abort();
+		});
+
+
 
 		displayProgress()
 	}
