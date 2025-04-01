@@ -1,7 +1,8 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #1691f5; /*this default color will be overwritten from custom/theme.css*/
+    --color: #1691f5;
+    /*this default color will be overwritten from custom/theme.css*/
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
     --lighter-color: color-mix(in srgb, #fff, var(--color) 5%);
@@ -408,4 +409,45 @@ textarea {
     font-weight: bold;
     font-size: 16px;
     text-align: center;
+}
+
+/* 
+
+
+progress:not([value]) {
+    color: transparent;
+} */
+
+progress {
+    -webkit-appearance: none;
+    appearance: none;
+
+    /* width: 800px;
+    height: 10px;
+
+    margin: none;
+    padding: none;
+
+    border: none;
+
+
+    background-color: transparent;
+    color: var(--color) !important; */
+
+}
+
+
+progress[value]::-webkit-progress-bar {
+
+    width: 800px;
+    height: 10px;
+
+    margin: none;
+    padding: none;
+
+    border: none;
+
+
+    background-color: transparent;
+    color: var(--color) !important;
 }

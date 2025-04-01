@@ -1,12 +1,89 @@
 {{ template "layout.header.html" . }}
 <h1 class="title">Share a file</h1>
 
-<form action="/file/shared" method="post" enctype="multipart/form-data">
-    <input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}"/>
+<form action="/file/shared" method="post" enctype="multipart/form-data" id="form">
 
-	<input required type="file" name="myFile"/>
+	<input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}" />
+
+	<input required type="file" name="myFile" id="myFile" />
+
+
+	<progress id="progressbar" value="0" max="100"></progress>
+	<h3 id="status"></h3>
+	<p id="loaded_n_total"></p>
+
+
+
 
 
 	{{ template "layout.form.share.html" . }}
 </form>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+	var submit = document.getElementById("submit");
+	submit.onclick = function() { uploadFile(); };
+
+
+
+
+	function _(el) {
+		return document.getElementById(el);
+	}
+
+
+	function uploadFile() {
+		var file = _("myFile").files[0];
+
+		var formdata = new FormData();
+		formdata.append("myFile", file);
+
+		var ajax = new XMLHttpRequest();
+		ajax.upload.addEventListener("progress", progressHandler, false);
+		ajax.addEventListener("load", completeHandler, false);
+		ajax.addEventListener("error", errorHandler, false);
+		ajax.addEventListener("abort", abortHandler, false);
+		ajax.open("POST", "/file/shared");
+		ajax.send(formdata);
+	}
+
+
+	function progressHandler(event) {
+		_("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+
+		var percent = (event.loaded / event.total) * 100;
+		_("progressbar").value = Math.round(percent);
+		_("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+	}
+
+
+	function completeHandler(event) {
+		_("status").innerHTML = event.target.responseText;
+		_("progressbar").value = 0; // will clear progress bar after successful upload
+	}
+
+
+	function errorHandler(event) {
+		_("status").innerHTML = "Upload Failed";
+	}
+
+
+	function abortHandler(event) {
+		_("status").innerHTML = "Upload Aborted";
+	}
+
+
+</script>
+
+
 {{ template "layout.footer.html" . }}
