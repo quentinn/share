@@ -427,10 +427,8 @@ func deleteShare(shareId string) {
 
 // Get list of shares
 func listShareOpen() {
-
 	db := openDatabase()
 	defer db.Close()
-
 
 
 	rows, err := db.Query("SELECT id, creation, expiration FROM share")
