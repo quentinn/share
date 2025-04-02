@@ -1,12 +1,136 @@
 {{ template "layout.header.html" . }}
 <h1 class="title">Share a file</h1>
 
-<form action="/file/shared" method="post" enctype="multipart/form-data">
-    <input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}"/>
+<form action="/file/shared" method="post" enctype="multipart/form-data" id="form">
 
-	<input required type="file" name="myFile"/>
+	<input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}" />
+
+
+	<label id="dropzone" for="myFile" class="container-file">
+		<div>
+			<label id="uploadLabel" for="myFile" class="text">Drop here</label>
+			<input required type="file" name="myFile" id="myFile" class="text" />
+		</div>
+	</label>
+
+	<div id="progresscontainer" class="container-progress visible ">
+		<div id="progressbar" class="progress text"></div>
+	</div>
 
 
 	{{ template "layout.form.share.html" . }}
 </form>
+
+
+
+<script>
+	// This trick permit to center the name of the file in the drop area
+	// Edit the label with the file name
+	var myFile = document.getElementById('myFile');
+	myFile.onchange = function (event) {
+		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
+	}
+
+
+	// Allow drag & drop
+	var dropzone = document.getElementById('dropzone');
+	dropzone.addEventListener('dragover', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('dragenter', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('dragleave', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('ondrop', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('ondrag', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+
+
+
+
+	var submit = document.getElementById('submit');
+	submit.onclick = function () {
+		uploadFile();
+	};
+
+
+	function uploadFile() {
+
+		var file = element("myFile").files[0];
+
+		var formdata = new FormData();
+		formdata.append("myFile", file);
+
+		var xhr = new XMLHttpRequest();
+		xhr.upload.addEventListener("progress", progressHandler, false);
+		xhr.addEventListener("load", completeHandler, false);
+		xhr.addEventListener("error", errorHandler, false);
+		xhr.addEventListener("abort", abortHandler, false);
+		xhr.open("POST", "/file/shared", true);
+		xhr.send(formdata);
+
+
+		// // Prevent closing tab while uploading
+		// window.onbeforeunload = function () {
+		// 	if (xhr.readyState == 0) {
+		// 		return "Cancel upload?";
+		// 	}
+		// }
+
+
+	}
+
+
+	function progressHandler(event) {
+		var percent = (event.loaded / event.total) * 100;
+		element("progressbar").innerHTML = Math.round(percent) + "%";
+
+		displayProgress(percent)
+
+	}
+
+
+	function completeHandler(event) {
+		element("status").innerHTML = event.target.responseText;
+		element("progressbar").innerHTML = 0;
+	}
+
+
+	function errorHandler(event) {
+		element("progressbar").innerHTML = "Failed";
+	}
+
+
+	function abortHandler(event) {
+		element("progressbar").innerHTML = "Aborted";
+	}
+
+
+	function displayProgress(width) {
+		var progresscontainer = document.getElementById("progresscontainer");
+		progresscontainer.classList.replace("hidden", "visible");
+
+		var progressbar = document.getElementById("progressbar");
+		progressbar.style.width = width + "%";
+	}
+
+
+
+</script>
+
+
 {{ template "layout.footer.html" . }}

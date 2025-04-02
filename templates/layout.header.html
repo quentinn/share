@@ -6,6 +6,8 @@
 
   <link rel="stylesheet" href="../static/main.css">
   <link rel="stylesheet" href="../static/custom/theme.css">
+
+  <script type="text/javascript" src="../static/main.js"></script>
 </head>
 
 <body>
@@ -39,7 +41,7 @@
 
     function checkUrl(url) {
       var http = new XMLHttpRequest();
-      http.open('HEAD', url, false);
+      http.open('HEAD', url, true);
       http.send();
       return http.status == 200;
     }

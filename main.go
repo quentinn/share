@@ -13,6 +13,10 @@ import (
 	"net/http"
 	"encoding/json"
 
+	"strconv"
+	// "time"
+	// "math/rand"
+
 	"github.com/google/uuid"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
@@ -140,7 +144,7 @@ func (a *App) Start() {
 	http.Handle("/share/uploads/{id}/{file}", logReq(downloadFile))				// Download a shared file
 	
 
-
+	
 	addr := fmt.Sprintf(":%s", a.Port)
 	log.Printf(" web: starting app on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
@@ -240,7 +244,7 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 	r.ParseForm()
 
 
-	 url:= r.Header.Get("Referer")
+	url:= r.Header.Get("Referer")
 	idToUnlock := url[len(url)-36:] // Just get the last 36 char of the url because the IDs are 36 char length
 
 
@@ -308,7 +312,8 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 			shareOpenMap := getShareOpen(idToUnlock)
 			shareCurrentOpen := shareOpenMap["currentopen"]
 			shareMaxOpen := shareOpenMap["maxopen"]
-			if shareCurrentOpen >= shareMaxOpen {
+			// if shareCurrentOpen >= shareMaxOpen {
+			if shareCurrentOpen > shareMaxOpen {
 				go deleteShare(idToUnlock)
 			}
 
@@ -374,8 +379,8 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 		id := uuid.NewString()
 		shared_id := uuid.NewString()
-		uri := r.Header.Get("Referer")											// Entire path 'http://domain:port/node1/node2/etc.../'
-		 url:= path.Dir(uri)													// Only the 'http://domain:port' part
+		uri := r.Header.Get("Referer")										// Entire path 'http://domain:port/node1/node2/etc.../'
+		url:= path.Dir(uri)													// Only the 'http://domain:port' part
 		link := strings.Join([]string{"/share/", shared_id}, "")
 
 
@@ -391,6 +396,9 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		// log.Printf("Uploaded file: %+v\n", handler.Filename)
 		// log.Printf("File size: %+v\n", handler.Size)
 		// log.Printf("MIME header: %+v\n", handler.Header)
+
+
+
 
 		// Create destination directory root
 		dirUploads := "uploads/"
@@ -427,6 +435,19 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
+
+		stat, err := dst.Stat()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		size, _ := strconv.Atoi(strconv.FormatInt(stat.Size(), 10))
+		fmt.Println(size)
+
+
+
+
+
 		// Create database entries
 		createFile(id, shared_id, filePath, r.PostFormValue("expiration"), r.PostFormValue("maxopen"))
 
@@ -447,7 +468,6 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 
-
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 	url:= r.Header.Get("Referer")
@@ -460,3 +480,8 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 
 	http.ServeFile(w, r, file)
 }
+
+
+
+
+

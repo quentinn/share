@@ -135,13 +135,6 @@ func openDatabase() *sql.DB {
 
 
 func createShare(id string, expirationGiven string, maxopenGiven string) {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
 
@@ -164,11 +157,6 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 	keyPublicChain, _ := keyPublic.GetArmoredPublicKey()
 
 
-	// _, err = db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-
 	db.Exec("INSERT INTO share(id, password, pgpkeypublic, pgpkeyprivate, maxopen, currentopen, expiration, creation) values(:id, :password, :pgpkeypublic, :pgpkeyprivate, :maxopen, :currentopen, :expiration, :creation)", id, password, keyPublicChain, keyPrivateChain, maxopen, currentopen, expiration, creation)
 }
 
@@ -176,26 +164,12 @@ func createShare(id string, expirationGiven string, maxopenGiven string) {
 
 
 func createFile(id string, shareId string, path string, expiration string, maxopen string) {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
 
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
-
-	// _, err = db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 	db.Exec("INSERT INTO file(id, path, share_id) values(:id, :path, :share_id)", id, path, shareId)
+
 
 	createShare(shareId, expiration, maxopen)
 }
@@ -204,24 +178,10 @@ func createFile(id string, shareId string, path string, expiration string, maxop
 
 
 func createSecret(id string, shareId string, text string, expiration string, maxopen string) {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
 
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
-	// _, err = db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 	db.Exec("INSERT INTO secret(id, text, share_id) values(:id, :text, :share_id)", id, text, shareId)
 
 
@@ -235,20 +195,8 @@ func createSecret(id string, shareId string, text string, expiration string, max
 
 // Get the content of a share
 func getShareContent(shareId string) map[string]string {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-
 
 
 	rowSecret := db.QueryRow("SELECT text FROM secret WHERE share_id = :share_id", shareId)
@@ -301,19 +249,8 @@ func getShareContent(shareId string) map[string]string {
 
 // Get the password of a share
 func getSharePassword(shareId string) string {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	row := db.QueryRow("SELECT password FROM share WHERE id = :share_id", shareId)
@@ -335,19 +272,8 @@ func getSharePassword(shareId string) string {
 
 // Get the PGP public key of a share
 func getShareKeyPublic(shareId string) string {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	row := db.QueryRow("SELECT pgpkeypublic FROM share WHERE id = :share_id", shareId)
@@ -369,19 +295,8 @@ func getShareKeyPublic(shareId string) string {
 
 // Get the PGP private key of a share
 func getShareKeyPrivate(shareId string) string {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	row := db.QueryRow("SELECT pgpkeyprivate FROM share WHERE id = :share_id", shareId)
@@ -403,19 +318,8 @@ func getShareKeyPrivate(shareId string) string {
 
 // Get the number of times a share has been opened
 func getShareOpen(shareId string) map[string]string {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	row := db.QueryRow("SELECT currentopen, maxopen FROM share WHERE id = :share_id", shareId)
@@ -430,12 +334,11 @@ func getShareOpen(shareId string) map[string]string {
 			log.Println(" err:", err)
 	}
 
-	
+
 	return map[string]string{
 		"currentopen": rowDataCurrentOpen,
 		"maxopen": rowDataMaxOpen,
 	}
-
 }
 
 
@@ -443,19 +346,8 @@ func getShareOpen(shareId string) map[string]string {
 
 // Update the number of times a share has been opened
 func updateShareOpen(shareId string) {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	row := db.QueryRow("SELECT currentopen FROM share WHERE id = :share_id", shareId)
@@ -475,12 +367,7 @@ func updateShareOpen(shareId string) {
 	currentopen := currentopenInt + 1
 
 
-	// _, err = db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 	db.Exec("UPDATE share SET currentopen = :currentopen WHERE id = :share_id", currentopen, shareId)
-
 }
 
 
@@ -489,19 +376,8 @@ func updateShareOpen(shareId string) {
 
 // Delete a share and also its related secrets and files (and delete file from filesystem aswell)
 func deleteShare(shareId string) {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	rowShare := db.QueryRow("DELETE FROM share WHERE id = :share_id", shareId)
@@ -541,8 +417,8 @@ func deleteShare(shareId string) {
 
 
 
-	// // Delete the directory containing files of the share
-	// deletePath("uploads/" + shareId)
+	// Delete the directory containing files of the share
+	deletePath("uploads/" + shareId)
 	
 }
 
@@ -551,19 +427,8 @@ func deleteShare(shareId string) {
 
 // Get list of shares
 func listShareOpen() {
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
-
-
 	db := openDatabase()
 	defer db.Close()
-
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
 
 
 	rows, err := db.Query("SELECT id, creation, expiration FROM share")
@@ -600,23 +465,12 @@ func periodicCleanExpiredShares() {
 		db := openDatabase()
 		defer db.Close()
 
-
-
-		// db, err := sql.Open("sqlite3", dbFile)
-		// if err != nil {
-		// 	log.Println(" err:", err)
-		// }
-		// 	defer db.Close()
-
-
-
-		
+	
 		rows, err := db.Query("SELECT id, expiration FROM share")
 		if err != nil {
 			log.Println(" err:", err)
 		}
 		defer rows.Close()
-
 
 
 		for rows.Next() {
@@ -687,12 +541,6 @@ func detectOrphansFiles() {
         log.Println(" err:", err)
     }
 
-
-	// db, err := sql.Open("sqlite3", dbFile)
-	// if err != nil {
-	// 	log.Println(" err:", err)
-	// }
-	// 	defer db.Close()
 
 
 	db := openDatabase()
