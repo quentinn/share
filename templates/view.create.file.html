@@ -6,20 +6,16 @@
 	<input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}" />
 
 
-	<label for="myFile" class="container-file">
+	<label id="dropzone" for="myFile" class="container-file">
 		<div>
 			<label id="uploadLabel" for="myFile" class="text">Drop here</label>
 			<input required type="file" name="myFile" id="myFile" class="text" />
 		</div>
 	</label>
 
-
-
-
-	<div id="progresscontainer" class="container-progress ">
+	<div id="progresscontainer" class="container-progress visible ">
 		<div id="progressbar" class="progress text"></div>
 	</div>
-
 
 
 	{{ template "layout.form.share.html" . }}
@@ -28,26 +24,43 @@
 
 
 <script>
+	// This trick permit to center the name of the file in the drop area
+	// Edit the label with the file name
+	var myFile = document.getElementById('myFile');
+	myFile.onchange = function (event) {
+		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
+	}
+
+
+	// Allow drag & drop
+	var dropzone = document.getElementById('dropzone');
+	dropzone.addEventListener('dragover', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('dragenter', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('dragleave', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+	
+	dropzone.addEventListener('ondrop', (event) => {
+		event.preventDefault();
+		console.log(event);
+	});
+
+
+
 
 	var submit = document.getElementById('submit');
 	submit.onclick = function () {
 		uploadFile();
 	};
-
-
-	// This trick permit to center the name of the file in the drop area
-	// Edit the label with the file name
-	var myFile = document.getElementById('myFile');
-	myFile.onchange = function (event) {
-		event.preventDefault();
-
-		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
-	}
-	const getFileName = (event) => {
-		const files = event.target.files;
-		const fileName = files[0].name;
-	}
-
 
 
 	function uploadFile() {
@@ -105,7 +118,6 @@
 	function displayProgress(width) {
 		var progresscontainer = document.getElementById("progresscontainer");
 		progresscontainer.classList.replace("hidden", "visible");
-
 
 		var progressbar = document.getElementById("progressbar");
 		progressbar.style.width = width + "%";

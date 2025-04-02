@@ -413,12 +413,6 @@ textarea {
 }
 
 
-.progress {
-    height: 100%;
-    background: var(--lighter2-color);
-}
-
-
 .container-progress {
     display: block;
     text-align: left;
@@ -430,21 +424,20 @@ textarea {
     right: 25%;
     margin-left: auto;
     margin-right: auto;
-
-    margin-top: calc(var(--main-input-height) * -1);
+    margin-top: calc(var(--main-input-height) * -1.015);
 
     border: var(--debug)
 }
 
 
-.container-progress>* {
+.container-progress>.progress {
     display: inline-block;
-    vertical-align: sub;
-}
+    vertical-align: top;
 
+    height: 100%;
+    background: var(--lighter2-color);
 
-.container-progress>progress {
-    max-width: 80%;
+    border-radius: var(--radius);
 }
 
 
@@ -486,17 +479,13 @@ textarea {
 .container-file:hover,
 .container-file.drag-active {
     background-color: var(--lighter2-color);
-
 }
 
 
 input[type=file] {
-
     border-radius: var(--radius);
-
     cursor: pointer;
-
-    visibility: hidden;
+    display: none;
 
     border: var(--debug);
 }
@@ -505,14 +494,11 @@ input[type=file] {
 input[type=file]::file-selector-button {
     width: 0px;
     height: 0px;
-
     margin: 0px;
     padding: 0px;
 
-    background-color: none;
+    background-color: transparent;
     cursor: pointer;
 
     border: var(--debug);
-
-
 }
