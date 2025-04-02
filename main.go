@@ -312,7 +312,8 @@ func unlockShare(w http.ResponseWriter, r *http.Request)  {
 			shareOpenMap := getShareOpen(idToUnlock)
 			shareCurrentOpen := shareOpenMap["currentopen"]
 			shareMaxOpen := shareOpenMap["maxopen"]
-			if shareCurrentOpen >= shareMaxOpen {
+			// if shareCurrentOpen >= shareMaxOpen {
+			if shareCurrentOpen > shareMaxOpen {
 				go deleteShare(idToUnlock)
 			}
 

@@ -417,8 +417,8 @@ func deleteShare(shareId string) {
 
 
 
-	// // Delete the directory containing files of the share
-	// deletePath("uploads/" + shareId)
+	// Delete the directory containing files of the share
+	deletePath("uploads/" + shareId)
 	
 }
 
