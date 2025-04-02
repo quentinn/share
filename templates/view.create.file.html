@@ -6,22 +6,18 @@
 	<input required type="hidden" name="TokenAvoidRefresh" value="{{ .TokenAvoidRefresh }}" />
 
 
-	<label for="myFile" class="container-file" id="dropcontainer">
-		<span class="drop-title">Drop a file</span>
-		<input required type="file" name="myFile" id="myFile" />
+	<label for="myFile" class="container-file">
+		<div>
+			<label id="uploadLabel" for="myFile" class="text">Drop here</label>
+			<input required type="file" name="myFile" id="myFile" class="text" />
+		</div>
 	</label>
 
 
-	
+
+
 	<div id="progresscontainer" class="container-progress ">
-		<!-- <label for="file" id="status" class="text">test</label> -->
-
 		<div id="progressbar" class="progress text"></div>
-
-		<!-- <progress id="progressbar" value="20" max="100" data-label="status"></progress> -->
-		<!-- <div id="cancel">
-			<button class="button button-small">X</button>
-		</div> -->
 	</div>
 
 
@@ -33,24 +29,33 @@
 
 <script>
 
+	var submit = document.getElementById('submit');
+	submit.onclick = function () {
+		uploadFile();
+	};
 
 
-
-
-	var submit = document.getElementById("submit");
-	submit.onclick = function () { uploadFile(); };
-
-	// var cancel = document.getElementById("cancel");
-
-
-	function _(el) {
-		return document.getElementById(el);
+	// This trick permit to center the name of the file in the drop area
+	// Edit the label with the file name
+	var myFile = document.getElementById('myFile');
+	var uploadLabel = document.getElementById('uploadLabel');
+	window.onload = function () {
+		myFile.addEventListener('change', getFileName);
 	}
+	myFile.onchange = function (event) {
+		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
+	}
+	const getFileName = (event) => {
+		event.preventDefault();
+		const files = event.target.files;
+		const fileName = files[0].name;
+	}
+
 
 
 	function uploadFile() {
 
-		var file = _("myFile").files[0];
+		var file = element("myFile").files[0];
 
 		var formdata = new FormData();
 		formdata.append("myFile", file);
@@ -64,18 +69,12 @@
 		xhr.send(formdata);
 
 
-		// Prevent closing tab while uploading
-		window.onbeforeunload = function () {
-			if (xhr.readyState == 0) {
-				return "Cancel upload?";
-			}
-		}
-
-		// // Button to cancel upload
-		// cancel.addEventListener("click", () => {
-		// 	xhr.abort();
-		// });
-
+		// // Prevent closing tab while uploading
+		// window.onbeforeunload = function () {
+		// 	if (xhr.readyState == 0) {
+		// 		return "Cancel upload?";
+		// 	}
+		// }
 
 
 	}
@@ -83,7 +82,7 @@
 
 	function progressHandler(event) {
 		var percent = (event.loaded / event.total) * 100;
-		_("progressbar").innerHTML = Math.round(percent) + "%";
+		element("progressbar").innerHTML = Math.round(percent) + "%";
 
 		displayProgress(percent)
 
@@ -91,18 +90,18 @@
 
 
 	function completeHandler(event) {
-		_("status").innerHTML = event.target.responseText;
-		_("progressbar").innerHTML = 0;
+		element("status").innerHTML = event.target.responseText;
+		element("progressbar").innerHTML = 0;
 	}
 
 
 	function errorHandler(event) {
-		_("progressbar").innerHTML = "Failed";
+		element("progressbar").innerHTML = "Failed";
 	}
 
 
 	function abortHandler(event) {
-		_("progressbar").innerHTML = "Aborted";
+		element("progressbar").innerHTML = "Aborted";
 	}
 
 
