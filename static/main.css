@@ -365,37 +365,15 @@ input[type=password] {
 }
 
 
-/* input[type=file] {
-    width: var(--main-input-width);
-    height: var(--main-input-height);
-    text-align: center !important;
-    padding: 12px 20px;
-
-    border-color: var(--color) !important;
-    border: var(--border) dashed;
-    border-radius: var(--radius);
-    max-width: 100%;
-
-    font-weight: bold;
-    font-size: 18px;
-}
-
-
-input[type=file]::file-selector-button {
-    visibility: hidden;
-}
-
-
-input[type=file]:hover {
-    cursor: pointer;
-} */
-
 
 textarea {
     width: var(--main-input-width);
     height: var(--main-input-height);
     max-width: 100%;
-    /* padding: 12px 20px; */
+    padding: 12px 20px;
+    box-sizing: border-box;
+
+    margin: none;
 
     background-color: transparent;
     border-color: var(--color) !important;
@@ -488,6 +466,7 @@ textarea {
     cursor: pointer;
 }
 
+
 .container-file>div {
     width: var(--main-input-width);
     height: var(--main-input-height);
@@ -502,15 +481,6 @@ textarea {
     align-items: center;
 
 }
-
-#myFile {
-    text-align: center;
-    position: absolute;
-    margin: 0 auto;
-
-}
-
-
 
 
 .container-file:hover,

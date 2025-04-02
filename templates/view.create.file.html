@@ -38,15 +38,12 @@
 	// This trick permit to center the name of the file in the drop area
 	// Edit the label with the file name
 	var myFile = document.getElementById('myFile');
-	var uploadLabel = document.getElementById('uploadLabel');
-	window.onload = function () {
-		myFile.addEventListener('change', getFileName);
-	}
 	myFile.onchange = function (event) {
+		event.preventDefault();
+
 		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
 	}
 	const getFileName = (event) => {
-		event.preventDefault();
 		const files = event.target.files;
 		const fileName = files[0].name;
 	}
