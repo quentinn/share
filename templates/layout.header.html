@@ -29,23 +29,6 @@
       }
     }
 
-
-    function setLogo(fileLogo) {
-      let logoImg = document.createElement('img');
-      logoImg.setAttribute('src', fileLogo);
-
-      let logo = document.getElementById('logo');
-      logo.appendChild(logoImg)
-    }
-
-
-    function checkUrl(url) {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', url, true);
-      http.send();
-      return http.status == 200;
-    }
-
   </script>
 
 

@@ -1,5 +1,23 @@
+// Check if an URL exists
+function checkUrl(url) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('HEAD', url, true);
+	xhr.send();
+
+	return xhr.status == 200;
+}
+
+
+
+// Shortcut to get element
+function element(element) {
+	return document.getElementById(element);
+}
+
+
+
 // Display an error notification
-function display_error(message) {
+function displayError(message) {
 	let error = document.createElement('div');
 
 	// Set the ID to always replace the same element with the error
@@ -19,6 +37,11 @@ function display_error(message) {
 
 
 
-function element(element) {
-	return document.getElementById(element);
+// Set logo from given file
+function setLogo(fileLogo) {
+	let logoImg = document.createElement('img');
+	logoImg.setAttribute('src', fileLogo);
+
+	let logo = document.getElementById('logo');
+	logo.appendChild(logoImg)
 }
