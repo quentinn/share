@@ -62,9 +62,10 @@ docker compose up -d
 ## Customization
 > Customizations are handled within ```/static/custom``` directory. \
 > A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
+> CSS overwrites must be placed in ```/static/custom/theme.css```
 
 ### Logo
-- Drop an image under ```/static/custom/logo.png```
+- Drop an image at ```/static/custom/logo.png```
 - Overwrite logo size
 ```static/custom/theme.css
 #logo>img {
