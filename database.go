@@ -7,7 +7,6 @@ import (
 	"time"
 	"strconv"
 	"path/filepath"
-	"io/ioutil"
 
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
