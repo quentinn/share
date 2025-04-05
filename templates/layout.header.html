@@ -21,11 +21,11 @@
         document.body.classList.toggle('dark', e.target.checked)
       })
 
-      // Logo
-      if (checkUrl('/static/custom/logo.png')) {
-        setLogo('../static/custom/logo.png');
-      } else {
+      // Logo      
+      if (! checkUrl('/static/custom/logo.png')) {
         setLogo('../static/default-logo.png');
+      } else {
+        setLogo('../static/custom/logo.png');
       }
     }
 

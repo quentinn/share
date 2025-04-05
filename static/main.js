@@ -1,10 +1,9 @@
 // Check if an URL exists
 function checkUrl(url) {
-	var xhr = new XMLHttpRequest();
-	xhr.open('HEAD', url, true);
-	xhr.send();
-
-	return xhr.status == 200;
+	var http = new XMLHttpRequest();
+	http.open('HEAD', url, false);
+	http.send();
+	return http.status == 200;
 }
 
 
