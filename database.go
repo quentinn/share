@@ -509,83 +509,83 @@ func periodicCleanExpiredShares() {
 
 
 
-// Task to delete files front filesystem when their shares don't exist anymore (because maxopen value has been reached)
-func periodicCleanOrphansFiles() {
+// // Task to delete files front filesystem when their shares don't exist anymore (because maxopen value has been reached)
+// func periodicCleanOrphansFiles() {
 
-	task := gocron.NewScheduler(time.UTC)
-	task.Every(1).Minutes().Do(func() {
-		log.Println("task: periodic clean of orphans files")
+// 	task := gocron.NewScheduler(time.UTC)
+// 	task.Every(1).Minutes().Do(func() {
+// 		log.Println("task: periodic clean of orphans files")
 
-		// Detect files from another function to be able to watch future uploads
-		detectOrphansFiles()
+// 		// Detect files from another function to be able to watch future uploads
+// 		detectOrphansFiles()
 		
-    })
+//     })
 
-    task.StartAsync()
+//     task.StartAsync()
 
-    // Prevent exit
-    select {}
-}
-
-
-
-
-// Task to delete files from filesystem when their shares don't exist anymore (because maxopen value has been reached)
-func detectOrphansFiles() {
-
-	dirUploads := "uploads/"
-
-
-	files, err := ioutil.ReadDir(dirUploads)
-    if err != nil {
-        log.Println(" err:", err)
-    }
+//     // Prevent exit
+//     select {}
+// }
 
 
 
-	db := openDatabase()
-	defer db.Close()
+
+// // Task to delete files from filesystem when their shares don't exist anymore (because maxopen value has been reached)
+// func detectOrphansFiles() {
+
+// 	dirUploads := "uploads/"
 
 
-	for _, file := range files {
-
-		shareId := file.Name()											// Get the id from the directory name at 'upload/<id>' 
-		shareIdPath := dirUploads + shareId
-
-
-		// Get file creation date
-		fileInfo, err := os.Stat(shareIdPath) 
-		if err != nil {
-			log.Println(" err:", err)
-		}
-		fileInfoTime := fileInfo.ModTime()								// The directory should never change, so modification date = creation date
-		extendedExpirationDate := fileInfoTime.Add(24 * time.Hour)		// Create a "fake" extended expiration date for the file (this will permit to check if we consider the file can be deleted or not)
-
-		now := time.Now()
+// 	files, err := ioutil.ReadDir(dirUploads)
+//     if err != nil {
+//         log.Println(" err:", err)
+//     }
 
 
-		// Search for a database record corresponding to 'uploads/<id>/' directory
-		row := db.QueryRow("SELECT id FROM share WHERE id = :share_id", shareId)
-		var rowDataId string
-		var readyToDelete bool
-		switch err := row.Scan(&rowDataId); err {
-			case sql.ErrNoRows:
-				readyToDelete = true
-			case nil:
-				readyToDelete = false
-			default:
-				log.Println(" err:", err)
-		}
+
+// 	db := openDatabase()
+// 	defer db.Close()
+
+
+// 	for _, file := range files {
+
+// 		shareId := file.Name()											// Get the id from the directory name at 'upload/<id>' 
+// 		shareIdPath := dirUploads + shareId
+
+
+// 		// Get file creation date
+// 		fileInfo, err := os.Stat(shareIdPath) 
+// 		if err != nil {
+// 			log.Println(" err:", err)
+// 		}
+// 		fileInfoTime := fileInfo.ModTime()								// The directory should never change, so modification date = creation date
+// 		extendedExpirationDate := fileInfoTime.Add(24 * time.Hour)		// Create a "fake" extended expiration date for the file (this will permit to check if we consider the file can be deleted or not)
+
+// 		now := time.Now()
+
+
+// 		// Search for a database record corresponding to 'uploads/<id>/' directory
+// 		row := db.QueryRow("SELECT id FROM share WHERE id = :share_id", shareId)
+// 		var rowDataId string
+// 		var readyToDelete bool
+// 		switch err := row.Scan(&rowDataId); err {
+// 			case sql.ErrNoRows:
+// 				readyToDelete = true
+// 			case nil:
+// 				readyToDelete = false
+// 			default:
+// 				log.Println(" err:", err)
+// 		}
 
 		
 
-		// Delete the file only if:
-		//  - the share doesn't exist anymore
-		//  - the creation date was a long time ago (which is defined by the 'extendedExpirationDate' variable)
-		if (readyToDelete == true) && (now.After(extendedExpirationDate) == true) {
-			log.Println("file: ready to delete:", shareIdPath, "created at", fileInfoTime, "expired at", extendedExpirationDate)
-			go deletePath(shareIdPath) 										// Set as Goroutine to avoid database crash due to too many connexion opened
-		}
+// 		// Delete the file only if:
+// 		//  - the share doesn't exist anymore
+// 		//  - the creation date was a long time ago (which is defined by the 'extendedExpirationDate' variable)
+// 		if (readyToDelete == true) && (now.After(extendedExpirationDate) == true) {
+// 			log.Println("file: ready to delete:", shareIdPath, "created at", fileInfoTime, "expired at", extendedExpirationDate)
+// 			go deletePath(shareIdPath) 										// Set as Goroutine to avoid database crash due to too many connexion opened
+// 		}
 
-	}
-}
+// 	}
+// }
