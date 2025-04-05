@@ -21,29 +21,12 @@
         document.body.classList.toggle('dark', e.target.checked)
       })
 
-      // Logo
-      if (checkUrl('/static/custom/logo.png')) {
-        setLogo('../static/custom/logo.png');
-      } else {
+      // Logo      
+      if (! checkUrl('/static/custom/logo.png')) {
         setLogo('../static/default-logo.png');
+      } else {
+        setLogo('../static/custom/logo.png');
       }
-    }
-
-
-    function setLogo(fileLogo) {
-      let logoImg = document.createElement('img');
-      logoImg.setAttribute('src', fileLogo);
-
-      let logo = document.getElementById('logo');
-      logo.appendChild(logoImg)
-    }
-
-
-    function checkUrl(url) {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', url, true);
-      http.send();
-      return http.status == 200;
     }
 
   </script>
