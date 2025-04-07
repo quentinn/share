@@ -1,20 +1,18 @@
+<div align="center">
 
-<div style="width: 100%;">
-	<div style="font-size: 1rem; font-weight: 600; margin-bottom: -50px; text-align: right;">
-		<a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
-		<br>
-		<a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
-	</div>
-	<img src="https://raw.githubusercontent.com/ggtrd/share/refs/heads/dev/static/default-logo.png" alt="Share logo" style="display: inline; height: 90px; margin-right: 10px; margin-bottom: -30px;">
-	<span style="font-size: 3rem; font-weight: 600; margin-bottom: -30px">
-		Share
-	</span>
-	<div style="font-size: 1rem; font-weight: 600; margin-top: 40px;">
-		Share is a web service that permit to securely share files and secrets to anyone.
-	</div>
+<a href="https://github.com/ggtrd/share" target="_blank" title="Share" style="display: inline;">
+	<img height="90px" alt="Share logo" src="https://raw.githubusercontent.com/ggtrd/share/refs/heads/dev/static/default-logo.png">
+</a>
+
+# Share
+
+Share is a web service that permit to securely share files and secrets to anyone.
+
+[Github](https://github.com/ggtrd/share)
+| 
+[Docker Hub](https://hub.docker.com/r/ggtrd/share)
+
 </div>
-
-<br>
 
 
 ## Features
