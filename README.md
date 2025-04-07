@@ -1,4 +1,6 @@
 # Share
+![alt text](https://raw.githubusercontent.com/ggtrd/share/refs/heads/dev/static/default-logo.png)
+
 <a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
 <a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
 
