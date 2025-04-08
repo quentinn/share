@@ -86,6 +86,12 @@
 		var percent = (event.loaded / event.total) * 100;
 		element("progressbar").innerHTML = Math.round(percent) + "%";
 
+
+		window.onbeforeunload = confirmExit;
+		function confirmExit() {
+			return "Upload in progress. Confirm leave?";
+		}
+
 		displayProgress(percent)
 	}
 
