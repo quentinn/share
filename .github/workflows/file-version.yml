@@ -19,11 +19,10 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
 
-      - name: Write to file
-        uses: frdrwrt/write-to-file@latest
+      - uses: devops-actions/json-to-file@v1.0.0
         with:
-          filepath: /.VERSION
-          content: ${{ steps.meta.outputs.tags }}
+          json: ${{ steps.meta.outputs.tags }}
+          filename: '.VERSION'
 
 
 
