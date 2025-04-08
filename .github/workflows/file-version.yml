@@ -1,8 +1,9 @@
 name: Write Version to File
+
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   write-version:
