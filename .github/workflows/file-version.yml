@@ -1,21 +1,29 @@
-name: Write Version to File
+name: Overwrite some file
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ dev ]
+  workflow_dispatch:
 
 jobs:
-  write-version:
+  build:
     runs-on: ubuntu-latest
-    name: Write Version to File
     steps:
-    - uses: actions/checkout@master
-    - name: Update version
-      uses: brettdorrans/write-version-to-file@master
-      with:
-        filename: '.VERSION'
-        placeholder: '${VERSION}'
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-
-        
+      - name: Overwrite file
+        uses: "slegare/write-file-action@1.0.2"
+        with:
+          path: .VERSION
+          write-mode: overwrite
+          contents: |
+            console.log('some contents')
+            
+      - name: Commit & Push
+        uses: Andro999b/push@v1.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          force: true
+          message: 'Overwritten by Github Actions - ${date}'
