@@ -95,6 +95,11 @@ body {
 }
 
 
+.dark * .button-copy {
+    outline-color: var(--lighter2-color);
+}
+
+
 #logo>img {
     max-width: 130px;
 
