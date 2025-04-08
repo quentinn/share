@@ -20,7 +20,7 @@ jobs:
             type=semver,pattern={{version}}
 
       - name: Write to file
-        uses: actions/write-to-file@v1.0
+        uses: actions/write-to-file@latest
         with:
           filepath: /.VERSION
           content: ${{ steps.meta.outputs.tags }}
