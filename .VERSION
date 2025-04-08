@@ -1,1 +1,1 @@
-${VERSION}
+console.log('some contents')
