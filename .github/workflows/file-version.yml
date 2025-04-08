@@ -6,24 +6,16 @@ on:
       - dev
 
 jobs:
-  write_version:
+  write-version:
     runs-on: ubuntu-latest
+    name: Write Version to File
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v4
-
-      - name: Extract Metadata
-        uses: docker/metadata-action@v5
-        id: meta
-        with:
-          tags: |
-            type=semver,pattern={{version}}
-
-      - uses: devops-actions/json-to-file@v1.0.0
-        with:
-          json: ${{ steps.meta.outputs.tags }}
-          filename: '.VERSION'
-
+    - uses: actions/checkout@master
+    - name: Update version
+      uses: brettdorrans/write-version-to-file@master
+      with:
+        filename: '.VERSION'
+        placeholder: '${VERSION}'
 
 
         
