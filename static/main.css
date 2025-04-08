@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #1691f5;
+    --color: #36BCFF;
     /*this default color will be overwritten from custom/theme.css*/
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
