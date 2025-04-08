@@ -1,8 +1,19 @@
+<div align="center">
+
+<a href="https://github.com/ggtrd/share" target="_blank" title="Share" style="display: inline;">
+	<img height="90px" alt="Share logo" src="https://raw.githubusercontent.com/ggtrd/share/refs/heads/dev/static/default-logo.png">
+</a>
+
 # Share
-<a href="https://github.com/ggtrd/share" target="_blank">GitHub</a>
-<a href="https://hub.docker.com/r/ggtrd/share" target="_blank">Docker Hub</a>
 
 Share is a web service that permit to securely share files and secrets to anyone.
+
+[Github](https://github.com/ggtrd/share)
+| 
+[Docker Hub](https://hub.docker.com/r/ggtrd/share)
+
+</div>
+
 
 ## Features
 - Share secrets
@@ -61,8 +72,8 @@ docker compose up -d
 
 ## Customization
 > Customizations are handled within ```/static/custom``` directory. \
-> A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml).
-> CSS overwrites must be placed in ```/static/custom/theme.css```
+> A default mount point is configured in [docker-compose.yml](https://raw.githubusercontent.com/ggtrd/share/refs/heads/main/docker-compose.yml). \
+> CSS overwrites must be placed in ```/static/custom/theme.css``` file.
 
 ### Logo
 - Drop an image at ```/static/custom/logo.png```

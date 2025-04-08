@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #1691f5;
+    --color: #36BCFF;
     /*this default color will be overwritten from custom/theme.css*/
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
@@ -95,8 +95,13 @@ body {
 }
 
 
+.dark * .button-copy {
+    outline-color: var(--lighter2-color);
+}
+
+
 #logo>img {
-    max-width: 130px;
+    max-width: 60px;
 
     padding-left: 36px;
     padding-right: 18px;
@@ -264,6 +269,39 @@ h1 {
 }
 
 
+.text-box>.button-copy {
+    float: right;
+    margin-top: -11px;
+    margin-right: -26px;
+}
+
+
+.button-copy {
+    width: 40px;
+    height: 40px;
+
+
+    text-align: center;
+    vertical-align: sub;
+
+    color: var(--darker-color);
+    background-color: transparent;
+    border: none;
+
+
+    outline: 3px solid var(--darker-color);
+    outline-offset: -16px;
+    border-radius: calc(var(--radius) + 20%);
+}
+
+
+.button-copy:hover {
+    /* background-color: var(--lighter-color); */
+    outline-color: var(--color);
+    cursor: pointer;
+}
+
+
 .button-small {
     text-align: center !important;
 
@@ -401,8 +439,6 @@ textarea {
     padding: 12px 20px;
     width: 30%;
 
-    border-color: var(--error-color) !important;
-    background-color: var(--error-color) !important;
     border: var(--border) solid;
     border-radius: var(--radius);
 
@@ -410,6 +446,18 @@ textarea {
     font-weight: bold;
     font-size: 16px;
     text-align: center;
+}
+
+
+.notification-error {
+    border-color: var(--error-color) !important;
+    background-color: var(--error-color) !important;
+}
+
+
+.notification-info {
+    border-color: var(--color) !important;
+    background-color: var(--color) !important;
 }
 
 
