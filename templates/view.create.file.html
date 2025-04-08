@@ -30,25 +30,20 @@
 	var uploadLabel = document.getElementById('uploadLabel');
 	myFile.onchange = function (event) {
 		uploadLabel.innerHTML = event.target.files[0].name;
-		console.log(event)
 	}
 
 
 	// Allow drag & drop
 	var dropContainer = document.getElementById("dropzone");
 	dropContainer.addEventListener("dragover", (event) => {
-		// Avoid the file to be opened on a new tab instead of beeing dropped to the input
-		event.preventDefault()
+		event.preventDefault() // Avoid the file to be opened on a new tab instead of beeing dropped to the input
 	}, false);
 	dropContainer.addEventListener("drop", (event) => {
-		// Avoid the file to be opened on a new tab instead of beeing dropped to the input
-		event.preventDefault()
-		// Get the file from event to apply it on the input
-		myFile.files = event.dataTransfer.files;
-		// Edit the text of the label
-		uploadLabel.innerHTML = event.dataTransfer.files[0].name
-	});
+		event.preventDefault() // Avoid the file to be opened on a new tab instead of beeing dropped to the input
 
+		myFile.files = event.dataTransfer.files; // Get the file from event to apply it on the input
+		uploadLabel.innerHTML = event.dataTransfer.files[0].name // Edit the text of the label
+	});
 
 
 
@@ -56,41 +51,32 @@
 	submit.onclick = function () {
 		uploadFile();
 	};
-
 	function uploadFile() {
-
 		var file = element("myFile").files[0];
+		if (file) {
+			var formdata = new FormData();
+			formdata.append("myFile", file);
 
-		var formdata = new FormData();
-		formdata.append("myFile", file);
-
-		var xhr = new XMLHttpRequest();
-		xhr.upload.addEventListener("progress", progressHandler, false);
-		xhr.addEventListener("load", completeHandler, false);
-		xhr.addEventListener("error", errorHandler, false);
-		xhr.addEventListener("abort", abortHandler, false);
-		xhr.open("POST", "/file/shared", true);
-		xhr.send(formdata);
-
-
-		// // Prevent closing tab while uploading
-		// window.onbeforeunload = function () {
-		// 	if (xhr.readyState == 0) {
-		// 		return "Cancel upload?";
-		// 	}
-		// }
+			var xhr = new XMLHttpRequest();
+			xhr.upload.addEventListener("progress", progressHandler, false);
+			xhr.addEventListener("load", completeHandler, false);
+			xhr.addEventListener("error", errorHandler, false);
+			xhr.addEventListener("abort", abortHandler, false);
+			xhr.open("POST", "/file/shared", true);
+			xhr.send(formdata);
+		}
 	}
 
 
 	function progressHandler(event) {
-		var percent = (event.loaded / event.total) * 100;
-		element("progressbar").innerHTML = Math.round(percent) + "%";
-
-
+		// Add a security to prevent closing tab when uploading file
 		window.onbeforeunload = confirmExit;
 		function confirmExit() {
 			return "Upload in progress. Confirm leave?";
 		}
+
+		var percent = (event.loaded / event.total) * 100;
+		element("progressbar").innerHTML = Math.round(percent) + "%";
 
 		displayProgress(percent)
 	}
@@ -113,15 +99,9 @@
 
 
 	function displayProgress(width) {
-		// var progresscontainer = document.getElementById("progresscontainer");
-		// progresscontainer.classList.replace("hidden", "visible");
-
 		var progressbar = document.getElementById("progressbar");
 		progressbar.style.width = width + "%";
 	}
-
-
-
 </script>
 
 
