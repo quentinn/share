@@ -15,21 +15,43 @@ function element(element) {
 
 
 
-// Display an error notification
+// Display an notification notification
 function displayError(message) {
-	let error = document.createElement('div');
+	let notification = document.createElement('div');
 
-	// Set the ID to always replace the same element with the error
-	error.setAttribute("id", "error");
+	// Set the ID to always replace the same element with the notification
+	notification.setAttribute("id", "error");
 
-	error.innerHTML = message;
-	error.className = 'notification';
+	notification.innerHTML = message;
+	notification.className = 'notification notification-error';
 
-	document.body.appendChild(error);
+	document.body.appendChild(notification);
 
 	// Automatically delete notification after few seconds
 	setTimeout(function () {
-		document.body.removeChild(error);
+		document.body.removeChild(notification);
+	}, 3000);
+
+}
+
+
+
+
+// Display an notification notification
+function displayInfo(message) {
+	let notification = document.createElement('div');
+
+	// Set the ID to always replace the same element with the notification
+	notification.setAttribute("id", "info");
+
+	notification.innerHTML = message;
+	notification.className = 'notification notification-info';
+
+	document.body.appendChild(notification);
+
+	// Automatically delete notification after few seconds
+	setTimeout(function () {
+		document.body.removeChild(notification);
 	}, 3000);
 
 }
