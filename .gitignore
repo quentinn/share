@@ -1,6 +1,5 @@
 go.sum
 LICENSE.md
-VERSION
 *.db
 share
 uploads
