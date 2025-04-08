@@ -13,7 +13,7 @@
 		</div>
 	</label>
 
-	<div id="progresscontainer" class="container-progress visible ">
+	<div id="progresscontainer" class="container-progress">
 		<div id="progressbar" class="progress text"></div>
 	</div>
 
@@ -27,36 +27,26 @@
 	// This trick permit to center the name of the file in the drop area
 	// Edit the label with the file name
 	var myFile = document.getElementById('myFile');
+	var uploadLabel = document.getElementById('uploadLabel');
 	myFile.onchange = function (event) {
-		document.getElementById('uploadLabel').innerHTML = event.target.files[0].name;
+		uploadLabel.innerHTML = event.target.files[0].name;
+		console.log(event)
 	}
 
 
 	// Allow drag & drop
-	var dropzone = document.getElementById('dropzone');
-	dropzone.addEventListener('dragover', (event) => {
-		event.preventDefault();
-		console.log(event);
-	});
-	
-	dropzone.addEventListener('dragenter', (event) => {
-		event.preventDefault();
-		console.log(event);
-	});
-	
-	dropzone.addEventListener('dragleave', (event) => {
-		event.preventDefault();
-		console.log(event);
-	});
-	
-	dropzone.addEventListener('ondrop', (event) => {
-		event.preventDefault();
-		console.log(event);
-	});
-	
-	dropzone.addEventListener('ondrag', (event) => {
-		event.preventDefault();
-		console.log(event);
+	var dropContainer = document.getElementById("dropzone");
+	dropContainer.addEventListener("dragover", (event) => {
+		// Avoid the file to be opened on a new tab instead of beeing dropped to the input
+		event.preventDefault()
+	}, false);
+	dropContainer.addEventListener("drop", (event) => {
+		// Avoid the file to be opened on a new tab instead of beeing dropped to the input
+		event.preventDefault()
+		// Get the file from event to apply it on the input
+		myFile.files = event.dataTransfer.files;
+		// Edit the text of the label
+		uploadLabel.innerHTML = event.dataTransfer.files[0].name
 	});
 
 
@@ -66,7 +56,6 @@
 	submit.onclick = function () {
 		uploadFile();
 	};
-
 
 	function uploadFile() {
 
@@ -90,8 +79,6 @@
 		// 		return "Cancel upload?";
 		// 	}
 		// }
-
-
 	}
 
 
@@ -100,7 +87,6 @@
 		element("progressbar").innerHTML = Math.round(percent) + "%";
 
 		displayProgress(percent)
-
 	}
 
 
@@ -121,8 +107,8 @@
 
 
 	function displayProgress(width) {
-		var progresscontainer = document.getElementById("progresscontainer");
-		progresscontainer.classList.replace("hidden", "visible");
+		// var progresscontainer = document.getElementById("progresscontainer");
+		// progresscontainer.classList.replace("hidden", "visible");
 
 		var progressbar = document.getElementById("progressbar");
 		progressbar.style.width = width + "%";
