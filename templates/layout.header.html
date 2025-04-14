@@ -16,16 +16,45 @@
 <body>
 
   <script>
+
+    sessionStorage.setItem('darkmode', true);
+
     window.onload = function () {
+      sessionStorage.setItem('darkmode', true);
 
       // Dark mode
-      const toggle = document.getElementById('toggle');
-      toggle.addEventListener('change', (e) => {
-        document.body.classList.toggle('dark', e.target.checked)
+      const toggle = document.getElementById('darkmode');
+      toggle.addEventListener('change', (event) => {
+        document.body.classList.toggle('dark', event.target.checked);
+
+
+
+        if (sessionStorage.getItem('darkmode').valueOf(1) == true) {
+          sessionStorage.setItem('darkmode', true);
+
+          console.log('test1: ' + sessionStorage)
+          console.log('test2: ' + sessionStorage.getItem('darkmode'))
+
+        } else {
+          sessionStorage.setItem('darkmode', false);
+          console.log('test3: ' + sessionStorage.getItem('darkmode').valueOf(1))
+
+        }
+
       })
 
+      // if (sessionStorage.getItem('darkmode') == true) {
+      //   // sessionStorage.getItem("darkmode");
+      //   // $("body").addClass("dark");
+      //   // sessionStorage.setItem("darkMode", true);
+
+      //   document.body.classList.toggle('dark', e.target.checked)
+
+      // }
+
+
       // Logo      
-      if (! checkUrl('/static/custom/logo.png')) {
+      if (!checkUrl('/static/custom/logo.png')) {
         setLogo('../static/default-logo.png');
       } else {
         setLogo('../static/custom/logo.png');
@@ -55,9 +84,12 @@
 
 
     <div class="nav-item right">
-      <input type="checkbox" id="toggle" name="toggle" />
-      <label for="toggle"></label>
+      <div class="nav-link toggle">
+        <input id="darkmode" type="checkbox" />
+        <label for="darkmode"></label>
+      </div>
     </div>
+
 
   </div>
 
