@@ -17,46 +17,33 @@
 
   <script>
 
-
     function getDarkmodeStatus() {
-      var boolean = (sessionStorage.getItem('darkmode').valueOf(1) === 'true');
+      var boolean = (localStorage.getItem('darkmode') === 'true');
       return boolean;
     }
 
 
-    // function toggleDarkmode() {
-    //   document.body.classList.toggle('dark', getDarkmodeStatus());
-    //   console.log('test1: ' + event.target.checked)
-    //   console.log('test2: ' + getDarkmodeStatus())
-    // };
+    function setDarkmode() {
+      document.body.classList.toggle('dark', getDarkmodeStatus());
+    }
 
 
-
-    console.log('begin: ' + getDarkmodeStatus());
-
-    document.body.classList.toggle('dark', getDarkmodeStatus());
-
+    // Set the darkmode when entering navigation
+    setDarkmode();
 
 
     window.onload = function () {
 
-      // sessionStorage.setItem('darkmode', 'false');
-
-
+      // Darkmode
       const darkmode = document.getElementById('darkmode');
-      darkmode.checked = getDarkmodeStatus();
-
-
+      darkmode.checked = getDarkmodeStatus();                       // Check the checkbox according to what's stored in the session storage
       darkmode.addEventListener('change', (event) => {
-        sessionStorage.setItem('darkmode', event.target.checked);
-        document.body.classList.toggle('dark', getDarkmodeStatus());
+        localStorage.setItem('darkmode', event.target.checked);
+        setDarkmode();
 
         console.log('event: ' + event.target.checked);
         console.log('sessi: ' + getDarkmodeStatus());
       })
-
-
-
 
 
       // Logo      
