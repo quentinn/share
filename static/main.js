@@ -60,8 +60,10 @@ function displayInfo(message) {
 
 // Set logo from given file
 function setLogo(fileLogo) {
-	let logoImg = document.createElement('img');
-	logoImg.setAttribute('src', fileLogo);
+	let logoImg = document.createElement('object');
+	logoImg.setAttribute('type', 'image/svg+xml');
+	logoImg.setAttribute('data', fileLogo);
+	logoImg.setAttribute('id', 'logo-img');
 
 	let logo = document.getElementById('logo');
 	logo.appendChild(logoImg)

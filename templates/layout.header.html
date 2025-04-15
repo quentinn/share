@@ -40,19 +40,43 @@
       darkmode.addEventListener('change', (event) => {
         localStorage.setItem('darkmode', event.target.checked);
         setDarkmode();
-
-        console.log('event: ' + event.target.checked);
-        console.log('sessi: ' + getDarkmodeStatus());
       })
 
 
       // Logo      
       if (!checkUrl('/static/custom/logo.png')) {
-        setLogo('../static/default-logo.png');
+        setLogo('../static/default-logo.svg');
       } else {
         setLogo('../static/custom/logo.png');
       }
-    }
+
+
+
+
+      // // var logo = document.getElementById('logo');
+      // // var img = logo.children[0].contentDocument; // get the <img> inside the logo div
+      // var img = document.getElementById('logo-img').contentDocument;
+      // var svg = img.getElementById('logo-svg');
+
+      // console.log(svg);
+
+
+      // Get the Object by ID
+      var a = document.getElementById("logo-img");
+
+      // Get the SVG Document inside the Object tag
+      var svgDoc = a.contentDocument;
+
+      // Get one of the SVG items by ID
+      var svgItem = svgDoc.getElementById("logo-svg");
+      console.log(svgItem);
+
+      // Set the color to something else
+      svgItem.setAttribute("fill", "lime");
+
+    };
+
+
 
   </script>
 
@@ -79,7 +103,7 @@
     <div class="nav-item right">
       <div class="nav-link toggle">
         <input id="darkmode" type="checkbox" />
-        <label for="darkmode"></label>
+        <label for="darkmode" class="toggle-darkmode"></label>
       </div>
     </div>
 
