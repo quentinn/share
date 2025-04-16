@@ -43,38 +43,32 @@
       })
 
 
-      // Logo      
+      // Logo
+      var logo = document.getElementById('logo');
       if (!checkUrl('/static/custom/logo.png')) {
-        setLogo('../static/default-logo.svg');
+        // Create an object to be able to read the SVG from its file
+        let object = document.createElement('object');
+        object.setAttribute('type', 'image/svg+xml');
+        object.setAttribute('data', '../static/default-logo.svg');
+
+        // Add the object under the logo placeholder
+        logo.appendChild(object);
+
+        // Get the SVG in the DOM to be able to change its color
+        let svg = logo.children[0]; // get the <img> inside the logo div
+        svg.addEventListener('load', function () {
+          let svgItem = svg.contentDocument.getElementById('svg');
+          svgItem.style.fill = 'red';
+        }, false);
+
       } else {
-        setLogo('../static/custom/logo.png');
+        let img = document.createElement('img');
+        img.setAttribute('src', '../static/custom/logo.png');
+        logo.appendChild(img)
       }
 
-
-
-
-      // // var logo = document.getElementById('logo');
-      // // var img = logo.children[0].contentDocument; // get the <img> inside the logo div
-      // var img = document.getElementById('logo-img').contentDocument;
-      // var svg = img.getElementById('logo-svg');
-
-      // console.log(svg);
-
-
-      // Get the Object by ID
-      var a = document.getElementById("logo-img");
-
-      // Get the SVG Document inside the Object tag
-      var svgDoc = a.contentDocument;
-
-      // Get one of the SVG items by ID
-      var svgItem = svgDoc.getElementById("logo-svg");
-      console.log(svgItem);
-
-      // Set the color to something else
-      svgItem.setAttribute("fill", "lime");
-
     };
+
 
 
 
@@ -84,6 +78,7 @@
   <div class="container-nav">
     <a href="/" class="nav-item">
       <div id="logo">
+        <!-- <img src="../static/default-logo.svg" id="logo-img"> -->
       </div>
     </a>
 
