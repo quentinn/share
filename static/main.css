@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700,700italic);
 
 :root {
-    --color: #36BCFF;
+    --color: #368aff;
     /*this default color will be overwritten from custom/theme.css*/
     --darker-color: color-mix(in srgb, #000, var(--color) 40%);
     --darker2-color: color-mix(in srgb, #000, var(--color) 80%);
@@ -95,7 +95,7 @@ body {
 
 
 .dark * .container-file .text {
-    color: var(--darker2-color) !important;
+    color: var(--lighter2-color) !important;
 }
 
 
@@ -123,7 +123,7 @@ body {
 
 
 #logo>* {
-    max-width: 60px;
+    max-width: 70px;
 
     padding-left: 36px;
     padding-right: 18px;
@@ -638,5 +638,5 @@ input[type=file]::file-selector-button {
 
 
 .toggle-darkmode {
-    margin-top: 6px;
+    margin-top: 16px;
 }

@@ -57,8 +57,14 @@
         // Get the SVG in the DOM to be able to change its color
         let svg = logo.children[0]; // get the <img> inside the logo div
         svg.addEventListener('load', function () {
-          let svgItem = svg.contentDocument.getElementById('svg');
-          svgItem.style.fill = 'red';
+          let item = svg.contentDocument.getElementById('svg');
+
+          // Trick to get the color from an item that is already used in the DOM to be able to apply it to the SVG
+          let elementThatHasColor = document.getElementsByClassName('nav-link')[0];
+          let color = window.getComputedStyle(elementThatHasColor).getPropertyValue('color');
+
+          item.style.fill = color;
+
         }, false);
 
       } else {
